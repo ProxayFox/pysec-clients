@@ -55,10 +55,12 @@ class BaseQuery(BaseModel):
                 case list() if all(isinstance(v, str) for v in value):
                     values = ", ".join(f"'{v}'" for v in value)
                     filter_list.append(f"{field} in ({values})")
+                case None:
+                    pass
                 case _:
                     raise TypeError(
                         str(
-                            f"Unsupported filter value type for field: {field}."
+                            f"Unsupported filter value type for field: {field}, value: {value}"
                             "\nRaise an issue if you need support for this type."
                         )
                     )
@@ -78,10 +80,12 @@ class BaseResults:
         params: dict[str, str],
         *,
         path: str | None = None,  # overrides endpoint._PATH for sub-resources
+        single: bool = False,  # True when endpoint returns a bare object, not a collection
     ) -> None:
         self._endpoint = endpoint
         self._params = params
         self._path = path or endpoint._PATH
+        self._single = single
         self._container: ArrowRecordContainer | None = None
 
     def _ensure_fetched(self) -> ArrowRecordContainer:
@@ -91,8 +95,32 @@ class BaseResults:
                 unknown_field_policy="drop",
                 coercion_policy="coerce",
             )
+
+        if self._single:
+            response = self._endpoint._request(
+                "GET",
+                self._path,
+                params=self._params,
+            )
+            response.raise_for_status()
+            self._container.extend([response.json()])
+        elif self._params.get("$top") or self._params.get("$skip"):
+            # If $top or $skip is specified, we should not paginate
+            response = self._endpoint._request(
+                "GET",
+                self._path,
+                params=self._params
+            )
+            response.raise_for_status()
+            body: dict = response.json()
+            self._container.extend(body.get("value", []))
+        else:
             self._endpoint._paginate_into(
-                self._path, self._params, self._container)
+                self._path,
+                self._params,
+                self._container
+            )
+
         return self._container
 
     def to_json(self) -> list[dict]:
@@ -103,7 +131,7 @@ class BaseResults:
             import pyarrow  # noqa: F401
         except ImportError:
             raise ImportError(
-                "Install with: uv add microsoft-mde-client[arrow]"
+                "Install with: uv add mde-client[arrow]"
             ) from None
         return self._ensure_fetched().to_table()
 
@@ -112,7 +140,7 @@ class BaseResults:
             import polars  # noqa: F401
         except ImportError:
             raise ImportError(
-                "Install with: uv add microsoft-mde-client[polars]"
+                "Install with: uv add mde-client[polars]"
             ) from None
         return self._ensure_fetched().to_polars_frame()
 

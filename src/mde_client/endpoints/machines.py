@@ -91,7 +91,7 @@ class MachinesEndpoint(BaseEndpoint):
         if id is None:
             raise ValueError("id must be provided")
         path = f"{self._PATH}/{id}"
-        return MachineResults(self, {}, path=path)
+        return MachineResults(self, {}, path=path, single=True)
 
     def logonusers(self, id: str):
         """Get machine logon users for a machine
@@ -104,49 +104,47 @@ class MachinesEndpoint(BaseEndpoint):
         """Get machine related alerts
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-related-alerts
         """
-        # path = f"{self._PATH}/{id}/alerts"
-
-        pass
+        path = f"{self._PATH}/{id}/alerts"
+        raise NotImplementedError("alerts endpoint not implemented yet")
 
     def software(self, id: str):
         """Get installed software
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-installed-software
         """
-        # path = f"{self._PATH}/{id}/software"
-
-        pass
+        path = f"{self._PATH}/{id}/software"
+        raise NotImplementedError("software endpoint not implemented yet")
 
     def vulnerabilities(self, id: str):
         """Get discovered vulnerabilities for a machine.
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-discovered-vulnerabilities
         """
-        # path = f"{self._PATH}/{id}/vulnerabilities"
-
-        pass
+        path = f"{self._PATH}/{id}/vulnerabilities"
+        raise NotImplementedError(
+            "vulnerabilities endpoint not implemented yet")
 
     def recommendations(self, id: str):
         """Get security recommendations for a machine.
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-security-recommendations
         """
-        # path = f"{self._PATH}/{id}/recommendations"
-
-        pass
+        path = f"{self._PATH}/{id}/recommendations"
+        raise NotImplementedError(
+            "recommendations endpoint not implemented yet")
 
     def tags(self, id: str):
         """Find devices by tag API
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/find-machines-by-tag
         """
-        # path = f"{self._PATH}/{id}/tags"
-
-        pass
+        path = f"{self._PATH}/{id}/tags"
+        raise NotImplementedError("tags endpoint not implemented yet")
 
     def getmissingkbs(self, id: str):
         """Get missing KBs by device ID
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-missing-kbs-machine
         """
-        # path = f"{self._PATH}/{id}/getmissingkbs"
-
-        pass
+        path = f"{self._PATH}/{id}/getmissingkbs"
+        raise NotImplementedError(
+            "getmissingkbs endpoint not implemented yet"
+        )
 
 
 class MachineNotFoundError(Exception):
