@@ -1,52 +1,84 @@
 # pysec-clients
 
-Monorepo of Python API clients for security vendors — Defender, CrowdStrike, Tenable, and more to come.
+Monorepo of Python API clients for security vendors.
 
-Each vendor ships as its own installable package under `src/`.
+Each vendor package lives under `src/` as its own installable workspace member, with shared tooling and quality checks at the repository root.
 
 ## Packages
 
-| Package | Vendor | Install |
-| ------- | ------ | ------- |
-| [mde-client](src/mde_client/) | Microsoft Defender for Endpoint | `uv add mde-client` |
+| Package | Vendor | Notes |
+| ------- | ------ | ----- |
+| [mde-client](src/mde_client/) | Microsoft Defender for Endpoint | OAuth client credentials auth, lazy endpoint results, PyArrow/Polars output helpers |
 
 ## Requirements
 
-- Python ≥ 3.14
-- [uv](https://docs.astral.sh/uv/) for dependency management
+- Python >= 3.14
+- [uv](https://docs.astral.sh/uv/) for environment and dependency management
+- [`just`](https://just.systems/) for common development tasks
 
-## Quick start
+## Quick Start
 
 ```bash
-# clone and bootstrap
-git clone <repo-url> && cd pysec-clients
+git clone <repo-url>
+cd pysec-clients
 uv sync --all-packages --all-groups
-
-# run the full quality gate (lint → format → typecheck → test)
 just quality
 ```
 
-## Development
+Use `uv` for dependency operations throughout the workspace. Do not use `pip` or `poetry` here.
 
-All tasks are run through [`just`](https://just.systems/):
+## Project Layout
 
-```bash
-just lint          # ruff check
-just lint-fix      # ruff check --fix
-just format        # ruff format
-just typecheck     # ty + pyright
-just test          # pytest
-just quality       # all of the above, in order
-just docs-serve    # local MkDocs preview
+```text
+pysec-clients/
+ pyproject.toml      # uv workspace configuration and shared dependency groups
+ justfile            # lint, format, typecheck, test, docs tasks
+ src/
+  mde_client/       # Microsoft Defender for Endpoint package
+ test/               # repository-level tests
 ```
 
-> **Note:** Always use `uv` for dependency operations — never `pip` or `poetry`.
+Vendor packages follow the same high-level pattern:
 
-## Adding a new vendor client
+- `client.py` exposes the top-level client and lifecycle management.
+- `auth.py` encapsulates vendor authentication.
+- `endpoints/` contains endpoint clients and query/result types.
+- `schemas/` holds table schemas or response-shaping helpers when needed.
+
+For package-specific API usage, authentication requirements, and examples, start with the vendor README. The current implementation is documented in [src/mde_client/README.md](src/mde_client/README.md).
+
+## Development Workflow
+
+All common tasks are exposed through `just`:
+
+```bash
+just lint          # uv run ruff check .
+just lint-fix      # uv run ruff check --fix .
+just format        # uv run ruff format .
+just format-check  # uv run ruff format --check .
+just test          # uv run pytest -q
+just test-all      # uv run pytest --runslow -q
+just typecheck     # uv run ty check --project . && uvx pyright --threads
+just quality       # lint, format-check/format, typecheck, test
+```
+
+Documentation tasks also exist in `justfile`:
+
+```bash
+just docs-build    # uv run --group docs mkdocs build --strict
+just docs-serve    # uv run --group docs mkdocs serve
+just docs-validate # uv run --group docs mkdocs build --strict
+```
+
+Those docs commands currently require a checked-in `mkdocs.yml`. They are part of the intended workflow, but they are not runnable from this repository state until that configuration file is added.
+
+## Adding A New Vendor Client
 
 1. Create `src/<vendor_client>/` with its own `pyproject.toml`.
-2. Follow the same architecture as `mde_client` — see the [mde-client README](src/mde_client/README.md).
+2. Follow the same package shape as `src/mde_client/`.
 3. Register the workspace member in the root `pyproject.toml` under `[tool.uv.sources]`.
+4. Add or extend tests under `test/` for the new package surface.
+5. Document package-specific setup and examples in that package's README.
 
 ## License
 
