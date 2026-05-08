@@ -106,20 +106,12 @@ class BaseResults:
             self._container.extend([response.json()])
         elif self._params.get("$top") or self._params.get("$skip"):
             # If $top or $skip is specified, we should not paginate
-            response = self._endpoint._request(
-                "GET",
-                self._path,
-                params=self._params
-            )
+            response = self._endpoint._request("GET", self._path, params=self._params)
             response.raise_for_status()
             body: dict = response.json()
             self._container.extend(body.get("value", []))
         else:
-            self._endpoint._paginate_into(
-                self._path,
-                self._params,
-                self._container
-            )
+            self._endpoint._paginate_into(self._path, self._params, self._container)
 
         return self._container
 
@@ -130,18 +122,14 @@ class BaseResults:
         try:
             import pyarrow  # noqa: F401
         except ImportError:
-            raise ImportError(
-                "Install with: uv add mde-client[arrow]"
-            ) from None
+            raise ImportError("Install with: uv add mde-client[arrow]") from None
         return self._ensure_fetched().to_table()
 
     def to_polars(self):
         try:
             import polars  # noqa: F401
         except ImportError:
-            raise ImportError(
-                "Install with: uv add mde-client[polars]"
-            ) from None
+            raise ImportError("Install with: uv add mde-client[polars]") from None
         return self._ensure_fetched().to_polars_frame()
 
     def refresh(self) -> "BaseResults":

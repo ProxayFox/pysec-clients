@@ -5,7 +5,7 @@ class MSALAuth:
     """Handles OAuth token acquisition and caching via MSAL.
 
     Accepts an optional token_cache so callers can inject a
-    SerializableTokenCache for persistence — or get in-memory by default.
+    SerializableTokenCache for persistence, or get in-memory by default.
     """
 
     _SCOPES = ["https://api.securitycenter.microsoft.com/.default"]

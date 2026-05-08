@@ -61,10 +61,9 @@ class LogonUserResults(BaseResults):
 
 class MachinesEndpoint(BaseEndpoint):
     """Client for the /api/machines endpoint.
+    This is not intended to be used directly. Instead, used through MDEClient.machines.
 
-    This is not intended to be used directly. Instead, use MDEClient.machines.
-
-    Returns a lazy ``MachineResults`` handle — no HTTP request is issued
+    Returns a lazy ``MachineResults`` handle, no HTTP request is issued
         until a terminal method is called::
 
             results = client.machines.get_all(query)
@@ -72,7 +71,7 @@ class MachinesEndpoint(BaseEndpoint):
             table   = results.to_arrow()     # pa.Table  (requires [arrow])
             df      = results.to_polars()    # DataFrame (requires [polars])
 
-        Call ``results.refresh()`` to discard cached data and re-fetch.
+        **Call ``results.refresh()`` to discard cached data and re-fetch.**
     """
 
     _PATH = "/api/machines"
@@ -104,47 +103,43 @@ class MachinesEndpoint(BaseEndpoint):
         """Get machine related alerts
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-related-alerts
         """
-        path = f"{self._PATH}/{id}/alerts"
+        # path = f"{self._PATH}/{id}/alerts"
         raise NotImplementedError("alerts endpoint not implemented yet")
 
     def software(self, id: str):
         """Get installed software
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-installed-software
         """
-        path = f"{self._PATH}/{id}/software"
+        # path = f"{self._PATH}/{id}/software"
         raise NotImplementedError("software endpoint not implemented yet")
 
     def vulnerabilities(self, id: str):
         """Get discovered vulnerabilities for a machine.
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-discovered-vulnerabilities
         """
-        path = f"{self._PATH}/{id}/vulnerabilities"
-        raise NotImplementedError(
-            "vulnerabilities endpoint not implemented yet")
+        # path = f"{self._PATH}/{id}/vulnerabilities"
+        raise NotImplementedError("vulnerabilities endpoint not implemented yet")
 
     def recommendations(self, id: str):
         """Get security recommendations for a machine.
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-security-recommendations
         """
-        path = f"{self._PATH}/{id}/recommendations"
-        raise NotImplementedError(
-            "recommendations endpoint not implemented yet")
+        # path = f"{self._PATH}/{id}/recommendations"
+        raise NotImplementedError("recommendations endpoint not implemented yet")
 
     def tags(self, id: str):
         """Find devices by tag API
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/find-machines-by-tag
         """
-        path = f"{self._PATH}/{id}/tags"
+        # path = f"{self._PATH}/{id}/tags"
         raise NotImplementedError("tags endpoint not implemented yet")
 
     def getmissingkbs(self, id: str):
         """Get missing KBs by device ID
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-missing-kbs-machine
         """
-        path = f"{self._PATH}/{id}/getmissingkbs"
-        raise NotImplementedError(
-            "getmissingkbs endpoint not implemented yet"
-        )
+        # path = f"{self._PATH}/{id}/getmissingkbs"
+        raise NotImplementedError("getmissingkbs endpoint not implemented yet")
 
 
 class MachineNotFoundError(Exception):

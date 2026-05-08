@@ -27,7 +27,7 @@ class MDEClient:
             client_id="...",
             client_secret="...",
         )
-        table = client.machines.list(MachinesQuery(health_status="Active"))
+        table = client.machines.get_all(MachinesQuery(health_status="Active"))
     """
 
     _DEFAULT_BASE_URL = "https://api.securitycenter.microsoft.com"
