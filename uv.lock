@@ -1377,9 +1377,15 @@ dependencies = [
     { name = "aiohttp" },
     { name = "http-to-arrow" },
     { name = "msal" },
-    { name = "polars" },
-    { name = "pyarrow" },
     { name = "requests" },
+]
+
+[package.optional-dependencies]
+arrow = [
+    { name = "pyarrow" },
+]
+polars = [
+    { name = "polars" },
 ]
 
 [package.metadata]
@@ -1387,10 +1393,11 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.13.5" },
     { name = "http-to-arrow", git = "https://github.com/ProxayFox/proxay-pylibs.git?subdirectory=src%2Fhttp_to_arrow" },
     { name = "msal", specifier = ">=1.36.0" },
-    { name = "polars", specifier = ">=1.40.1" },
-    { name = "pyarrow", specifier = ">=24.0.0" },
+    { name = "polars", marker = "extra == 'polars'", specifier = ">=1.40.1" },
+    { name = "pyarrow", marker = "extra == 'arrow'", specifier = ">=24.0.0" },
     { name = "requests", specifier = ">=2.33.1" },
 ]
+provides-extras = ["arrow", "polars"]
 
 [[package]]
 name = "mdurl"
@@ -2204,7 +2211,7 @@ name = "pysec-clients"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
-    { name = "mde-client" },
+    { name = "mde-client", extra = ["arrow", "polars"] },
 ]
 
 [package.dev-dependencies]
@@ -2234,7 +2241,7 @@ docs = [
 ]
 
 [package.metadata]
-requires-dist = [{ name = "mde-client", editable = "src/mde_client" }]
+requires-dist = [{ name = "mde-client", extras = ["arrow", "polars"], editable = "src/mde_client" }]
 
 [package.metadata.requires-dev]
 dev = [

@@ -3,8 +3,12 @@ from __future__ import annotations
 import httpx
 import asyncio
 from datetime import datetime
+from typing import TYPE_CHECKING
 from ..auth import MSALAuth
 from pydantic import BaseModel, Field
+
+if TYPE_CHECKING:
+    from http_to_arrow import ArrowRecordContainer
 
 
 class BaseQuery(BaseModel):
@@ -125,3 +129,48 @@ class BaseEndpoint:
             )
 
         return asyncio.run(self._apaginate(path, params))
+
+    async def _apaginate_into(
+        self,
+        path: str,
+        params: dict[str, str],
+        container: ArrowRecordContainer,
+    ) -> None:
+        """Walk OData @odata.nextLink pagination, streaming each page into *container*.
+
+        Unlike ``_apaginate`` this never builds a full ``list[dict]`` — each
+        page's ``value`` array is fed directly into the container via
+        ``container.extend()``.
+        """
+        next_url: str | None = None
+
+        while True:
+            if next_url:
+                response = await self._arequest("GET", next_url)
+            else:
+                response = await self._arequest("GET", path, params=params)
+
+            response.raise_for_status()
+            body: dict = response.json()
+            container.extend(body.get("value", []))
+
+            next_url = body.get("@odata.nextLink")
+            if not next_url:
+                break
+
+    def _paginate_into(
+        self,
+        path: str,
+        params: dict[str, str],
+        container: ArrowRecordContainer,
+    ) -> None:
+        """Sync wrapper for ``_apaginate_into``."""
+
+        # If the caller specified $top or $skip, we should not paginate
+        if params.get("$top") or params.get("$skip"):
+            raise ValueError(
+                "Cannot use _paginate when $top or $skip is specified in params."
+                "Use _request instead, or remove $top/$skip to enable pagination."
+            )
+
+        asyncio.run(self._apaginate_into(path, params, container))

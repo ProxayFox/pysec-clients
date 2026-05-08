@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import logging
-import pyarrow as pa
 
 from datetime import datetime
-from typing import Literal
+from typing import Literal, Any, TYPE_CHECKING
 
 from .base import BaseQuery, BaseEndpoint
+
+if TYPE_CHECKING:
+    import pyarrow as pa
 
 log = logging.getLogger(__name__)
 
@@ -51,27 +53,138 @@ class MachinesQuery(BaseQuery):
     rbacGroupId: str | None = None
 
 
-class MachineResult:
-    """Lazy result handle, holds the query intent, fires on terminal call"""
+class MachineResults:
+    """Lazy collection handle — holds the query intent, fires on terminal call.
+
+    Constructed by ``MachinesEndpoint.get_all()``; no HTTP request is issued
+    until a terminal method (``to_json``, ``to_arrow``, ``to_polars``) is
+    called.  The internal cache is an ``ArrowRecordContainer`` that receives
+    pages streamed directly from the paginator — a full ``list[dict]`` is
+    never built in memory.
+
+    Terminal methods:
+        - ``to_json()``   — ``list[dict[str, Any]]`` (always available)
+        - ``to_arrow()``  — ``pa.Table``  (requires the ``arrow`` extra)
+        - ``to_polars()`` — ``pl.DataFrame`` (requires the ``polars`` extra)
+
+    Call ``refresh()`` to discard cached data and re-fetch on the next
+    terminal call.  ``refresh()`` returns ``self`` so the caller must
+    choose a format explicitly::
+
+        results.refresh().to_arrow()
+    """
+
+    def __init__(
+        self,
+        endpoint: MachinesEndpoint,
+        params: dict[str, str],
+    ) -> None:
+        self._endpoint = endpoint
+        self._params = params
+        self._container: Any = None  # ArrowRecordContainer once fetched
+
+    # ------------------------------------------------------------------
+    # Internal
+    # ------------------------------------------------------------------
+
+    def _ensure_fetched(self) -> None:
+        """Populate the container on first access; subsequent calls are a no-op."""
+        if self._container is not None:
+            return
+
+        # TODO: define MACHINES_SCHEMA (pa.Schema) for the /api/machines
+        # response so ArrowRecordContainer can enforce column types and
+        # handle coercion.  Until then, raise so callers get a clear signal.
+        raise NotImplementedError(
+            "MACHINES_SCHEMA is not yet defined. A PyArrow schema describing "
+            "the /api/machines response fields is required before "
+            "ArrowRecordContainer can be initialised."
+        )
+
+    # ------------------------------------------------------------------
+    # Terminal methods
+    # ------------------------------------------------------------------
+
+    def to_json(self) -> list[dict[str, Any]]:
+        """Materialise results as plain Python dicts (no extra deps needed)."""
+        self._ensure_fetched()
+        return self._container.to_table().to_pylist()
+
+    def to_arrow(self) -> pa.Table:
+        """Materialise results as a PyArrow ``Table``.
+
+        Requires the ``arrow`` extra::
+
+            uv add mde-client[arrow]
+        """
+        try:
+            import pyarrow as _pa  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                "Arrow support requires the 'arrow' extra. "
+                "Install with: uv add mde-client[arrow]"
+            ) from None
+
+        self._ensure_fetched()
+        return self._container.to_table()
+
+    def to_polars(self):  # -> pl.DataFrame
+        """Materialise results as a Polars ``DataFrame``.
+
+        Requires the ``polars`` extra::
+
+            uv add mde-client[polars]
+        """
+        try:
+            import polars as _pl  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                "Polars support requires the 'polars' extra. "
+                "Install with: uv add mde-client[polars]"
+            ) from None
+
+        self._ensure_fetched()
+        return self._container.to_polars_frame()
+
+    # ------------------------------------------------------------------
+    # Cache management
+    # ------------------------------------------------------------------
+
+    def refresh(self) -> MachineResults:
+        """Discard cached data so the next terminal call re-fetches.
+
+        Returns ``self`` so the caller chooses the output format explicitly::
+
+            results.refresh().to_arrow()
+        """
+        self._container = None
+        return self
 
 
 class MachinesEndpoint(BaseEndpoint):
     """Client for the /api/machines endpoint.
 
     This is not intended to be used directly. Instead, use MDEClient.machines.
+
+    Returns a lazy ``MachineResults`` handle — no HTTP request is issued
+        until a terminal method is called::
+
+            results = client.machines.get_all(query)
+            records = results.to_json()      # list[dict]
+            table   = results.to_arrow()     # pa.Table  (requires [arrow])
+            df      = results.to_polars()    # DataFrame (requires [polars])
+
+        Call ``results.refresh()`` to discard cached data and re-fetch.
     """
 
     _PATH = "/api/machines"
 
-    def get_all(self, query: MachinesQuery | None = None) -> pa.Table:
+    def get_all(self, query: MachinesQuery | None = None) -> MachineResults:
         """Get all machines, with optional filtering.
         Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-machines
         """
-        q = query.to_odata_filters if query else {}
-        path = self._PATH
-
-        records = self._paginate(path, q)
-        return pa.Table.from_pylist(records)
+        params = query.to_odata_filters if query else {}
+        return MachineResults(self, params)
 
     def get(self, id: str | None = None):
         """Get machine by ID
