@@ -1,0 +1,51 @@
+{
+	"name": "pysec-clients DevContainer",
+	"build": {
+		"dockerfile": "dockerfile"
+	},
+	"remoteUser": "vscode",
+	"features": {
+		"ghcr.io/devcontainers/features/node:2.0.0": {}
+	},
+	"mounts": [
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
+	],
+	"customizations": {
+		"vscode": {
+			"settings": {
+				"python.languageServer": "Pylance",
+				"ty.importStrategy": "fromEnvironment",
+				"ty.diagnosticMode": "openFilesOnly",
+				"ty.disableLanguageServices": true
+			},
+			"extensions": [
+				// Python extensions
+				"ms-python.python",
+				"ms-python.debugpy",
+				"ms-python.vscode-python-envs",
+				"ms-python.isort",
+				"ms-python.black-formatter",
+				"ms-python.vscode-pylance",
+				"astral-sh.ty",
+				"njpwerner.autodocstring",
+				"wholroyd.jinja",
+				"batisteo.vscode-django",
+				"KevinRose.vsc-python-indent",
+				// Remote development extensions
+				"ms-vscode-remote.vscode-remote-extensionpack",
+				"GitHub.codespaces",
+				// Markdown extensions
+				"yzhang.markdown-all-in-one", // Markdown All in One
+				"DavidAnson.vscode-markdownlint", // Markdown Linter
+				// Git/GitHub Extensions
+				"GitHub.vscode-pull-request-github", // GitHub PR Extension
+				"GitHub.vscode-github-actions", // GitHub Actions
+				// Misc
+				"tamasfe.even-better-toml", // TOML support
+				"Gruntfuggly.todo-tree",
+				"EditorConfig.EditorConfig", // EditorConfig support
+				"skellock.just" // Justfile support
+			]
+		}
+	}
+}

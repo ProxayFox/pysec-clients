@@ -1,0 +1,7 @@
+FROM mcr.microsoft.com/devcontainers/python:3.14-trixie
+
+# Install uv without relying on GHCR image pulls
+RUN python -m pip install --no-cache-dir --upgrade pip uv
+
+# Install just (command runner)
+RUN curl -sSf https://just.systems/install.sh | bash -s -- --to /usr/local/bin
