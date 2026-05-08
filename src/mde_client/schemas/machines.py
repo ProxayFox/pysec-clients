@@ -1,0 +1,71 @@
+import pyarrow as pa
+
+MACHINE_IP_ADDRESS_TYPE: pa.StructType = pa.struct(
+    [
+        pa.field("ipAddress", pa.string()),
+        pa.field("macAddress", pa.string()),
+        pa.field("type", pa.string()),
+        pa.field("operationalStatus", pa.string()),
+    ]
+)
+
+VM_METADATA_TYPE: pa.StructType = pa.struct(
+    [
+        pa.field("vmId", pa.string()),
+        pa.field("cloudProvider", pa.string(), nullable=False),
+        pa.field("resourceId", pa.string()),
+        pa.field("subscriptionId", pa.string()),
+    ]
+)
+
+MACHINES_SCHEMA: pa.Schema = pa.schema(
+    [
+        pa.field("id", pa.string(), nullable=False),
+        pa.field("mergedIntoMachineId", pa.string()),
+        pa.field("isPotentialDuplication", pa.bool_(), nullable=False),
+        pa.field("isExcluded", pa.bool_(), nullable=False),
+        pa.field("exclusionReason", pa.string()),
+        pa.field("computerDnsName", pa.string()),
+        pa.field("firstSeen", pa.timestamp("ms")),
+        pa.field("lastSeen", pa.timestamp("ms")),
+        pa.field("osPlatform", pa.string()),
+        pa.field("osProcessor", pa.string()),
+        pa.field("version", pa.string()),
+        pa.field("lastIpAddress", pa.string()),
+        pa.field("lastExternalIpAddress", pa.string()),
+        pa.field("agentVersion", pa.string()),
+        pa.field("osBuild", pa.int64()),
+        pa.field("healthStatus", pa.string(), nullable=False),
+        pa.field("deviceValue", pa.string(), nullable=False),
+        pa.field("rbacGroupId", pa.int32(), nullable=False),
+        pa.field("rbacGroupName", pa.string()),
+        pa.field("ipAddresses", pa.list_(MACHINE_IP_ADDRESS_TYPE)),
+        pa.field("riskScore", pa.string()),
+        pa.field("exposureLevel", pa.string(), nullable=False),
+        pa.field("isAadJoined", pa.bool_()),
+        pa.field("aadDeviceId", pa.string()),
+        pa.field("machineTags", pa.list_(pa.string())),
+        pa.field("vmMetadata", VM_METADATA_TYPE),
+        pa.field("onboardingStatus", pa.string(), nullable=False),
+        pa.field("osArchitecture", pa.string()),
+        pa.field("managedBy", pa.string(), nullable=False),
+        pa.field("managedByStatus", pa.string(), nullable=False),
+    ]
+)
+
+LOGON_USERS_BY_MACHINE_SCHEMA: pa.Schema = pa.schema(
+    [
+        pa.field("id", pa.string(), nullable=False),
+        pa.field("accountName", pa.string()),
+        pa.field("accountDomain", pa.string()),
+        pa.field("accountSid", pa.string()),
+        pa.field("firstSeen", pa.timestamp("ms")),
+        pa.field("lastSeen", pa.timestamp("ms")),
+        pa.field("mostPrevalentMachineId", pa.string()),
+        pa.field("leastPrevalentMachineId", pa.string()),
+        pa.field("logonTypes", pa.string()),
+        pa.field("logOnMachinesCount", pa.int64()),
+        pa.field("isDomainAdmin", pa.bool_()),
+        pa.field("isOnlyNetworkUser", pa.bool_()),
+    ]
+)

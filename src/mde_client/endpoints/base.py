@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import httpx
 import asyncio
+import pyarrow as pa
 from datetime import datetime
-from typing import TYPE_CHECKING
-from ..auth import MSALAuth
 from pydantic import BaseModel, Field
+from http_to_arrow import ArrowRecordContainer
 
-if TYPE_CHECKING:
-    from http_to_arrow import ArrowRecordContainer
+from ..auth import MSALAuth
 
 
 class BaseQuery(BaseModel):
@@ -70,12 +69,66 @@ class BaseQuery(BaseModel):
         return params
 
 
+class BaseResults:
+    SCHEMA: pa.Schema
+
+    def __init__(
+        self,
+        endpoint: BaseEndpoint,
+        params: dict[str, str],
+        *,
+        path: str | None = None,  # overrides endpoint._PATH for sub-resources
+    ) -> None:
+        self._endpoint = endpoint
+        self._params = params
+        self._path = path or endpoint._PATH
+        self._container: ArrowRecordContainer | None = None
+
+    def _ensure_fetched(self) -> ArrowRecordContainer:
+        if self._container is None:
+            self._container = ArrowRecordContainer(
+                schema=self.SCHEMA,
+                unknown_field_policy="drop",
+                coercion_policy="coerce",
+            )
+            self._endpoint._paginate_into(
+                self._path, self._params, self._container)
+        return self._container
+
+    def to_json(self) -> list[dict]:
+        return self._ensure_fetched().to_table().to_pylist()
+
+    def to_arrow(self) -> pa.Table:
+        try:
+            import pyarrow  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                "Install with: uv add microsoft-mde-client[arrow]"
+            ) from None
+        return self._ensure_fetched().to_table()
+
+    def to_polars(self):
+        try:
+            import polars  # noqa: F401
+        except ImportError:
+            raise ImportError(
+                "Install with: uv add microsoft-mde-client[polars]"
+            ) from None
+        return self._ensure_fetched().to_polars_frame()
+
+    def refresh(self) -> "BaseResults":
+        self._container = None
+        return self
+
+
 class BaseEndpoint:
     """Base class for API endpoints.
 
     Not intended to be used directly. Endpoint clients should inherit from this
     and implement their own methods.
     """
+
+    _PATH: str = ""
 
     def __init__(self, http: httpx.Client, auth: MSALAuth) -> None:
         self._http = http
