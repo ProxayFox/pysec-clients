@@ -990,6 +990,15 @@ wheels = [
 ]
 
 [[package]]
+name = "http-to-arrow"
+version = "0.1.0"
+source = { git = "https://github.com/ProxayFox/proxay-pylibs.git?subdirectory=src%2Fhttp_to_arrow#fc7b4ceed2202f9071fa58061a25a94f589a63a7" }
+dependencies = [
+    { name = "polars" },
+    { name = "pyarrow" },
+]
+
+[[package]]
 name = "httpcore"
 version = "1.0.9"
 source = { registry = "https://pypi.org/simple" }
@@ -1366,6 +1375,7 @@ version = "0.1.0"
 source = { editable = "src/mde_client" }
 dependencies = [
     { name = "aiohttp" },
+    { name = "http-to-arrow" },
     { name = "msal" },
     { name = "polars" },
     { name = "pyarrow" },
@@ -1375,6 +1385,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.13.5" },
+    { name = "http-to-arrow", git = "https://github.com/ProxayFox/proxay-pylibs.git?subdirectory=src%2Fhttp_to_arrow" },
     { name = "msal", specifier = ">=1.36.0" },
     { name = "polars", specifier = ">=1.40.1" },
     { name = "pyarrow", specifier = ">=24.0.0" },

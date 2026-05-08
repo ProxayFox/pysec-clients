@@ -3,7 +3,7 @@ requires = ["setuptools>=69", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "microsoft-mde-client"
+name = "mde-client"
 version = "0.1.0"
 description = "Monorepo for security vendor API clients, e.g. Defender, CrowdStrike, Tenable, and more to come."
 requires-python = ">=3.14"
@@ -13,6 +13,7 @@ authors = [
 ]
 dependencies = [
     "aiohttp>=3.13.5",
+    "http-to-arrow",
     "msal>=1.36.0",
     "polars>=1.40.1",
     "pyarrow>=24.0.0",
@@ -20,4 +21,7 @@ dependencies = [
 ]
 
 [tool.setuptools]
-package-dir = { "microsoft_mde_client" = "." }
+package-dir = { "mde_client" = "." }
+
+[tool.uv.sources]
+http-to-arrow = { git = "https://github.com/ProxayFox/proxay-pylibs.git", subdirectory = "src/http_to_arrow" }
