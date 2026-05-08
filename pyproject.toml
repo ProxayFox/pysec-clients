@@ -8,6 +8,7 @@ authors = [
     { name = "Proxay", email = "28168887+ProxayFox@users.noreply.github.com" },
 ]
 requires-python = ">=3.14"
+dependencies = ["mde-client"]
 
 [dependency-groups]
 dev = [
@@ -39,7 +40,7 @@ docs = [
 members = ["src/*"]
 
 [tool.uv.sources]
-microsoft-mde-client = { workspace = true }
+mde-client = { workspace = true }
 
 [tool.ty.environment]
 python = "./.venv"
@@ -48,5 +49,5 @@ root = ["./src", "."]
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
-include = ["src", "main.py", "test"]
+include = ["src", "test"]
 extraPaths = ["src"]

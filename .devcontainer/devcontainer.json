@@ -10,9 +10,7 @@
 	"mounts": [
 		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,consistency=cached"
 	],
-
-	"postStartCommand": "uv sync --all-groups",
-
+	"postStartCommand": "uv sync --all-packages --all-groups",
 	"customizations": {
 		"vscode": {
 			"settings": {
