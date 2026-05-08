@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "microsoft-mde-client"
+version = "0.1.0"
+description = "Monorepo for security vendor API clients, e.g. Defender, CrowdStrike, Tenable, and more to come."
+requires-python = ">=3.14"
+license = "AGPL-3.0"
+authors = [
+    { name = "Proxay", email = "28168887+ProxayFox@users.noreply.github.com" },
+]
+dependencies = [
+    "aiohttp>=3.13.5",
+    "msal>=1.36.0",
+    "polars>=1.40.1",
+    "pyarrow>=24.0.0",
+    "requests>=2.33.1",
+]
+
+[tool.setuptools]
+package-dir = { "microsoft_mde_client" = "." }
