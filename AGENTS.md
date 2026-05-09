@@ -2,51 +2,68 @@
 
 ## Project
 
-Monorepo of Python API clients for security vendors (Defender, CrowdStrike, Tenable, …).
-Each vendor lives as its own package under `src/`.
+Monorepo of Python API clients for security vendors. Each client package lives under `src/` as a uv workspace member.
 
-## Workspace layout
+Start with:
 
-```text
-pyproject.toml          # root: uv workspace config, dev/docs dependency groups
-justfile                # task runner — preferred entrypoint for all commands
-src/
-  mde_client/           # Microsoft Defender for Endpoint client
-    client.py           # MDEClient — top-level client, lazy endpoint properties
-    auth.py             # MSALAuth — OAuth token acquisition via MSAL
-    endpoints/          # one module per API area (e.g. machines.py)
-    pyproject.toml      # package-level deps
-test/                   # pytest test root (mirrors src/ structure)
-```
+- [README.md](README.md) for repository workflow and task runner commands.
+- [src/mde_client/README.md](src/mde_client/README.md) for the current package surface and API usage.
 
-## Tooling
+## Current repo shape
+
+- `pyproject.toml`: uv workspace, dependency groups, pytest and typechecker config.
+- `justfile`: preferred entrypoint for lint, format, typecheck, test, docs, and schema-generation tasks.
+- `src/mde_client/`: current Microsoft Defender for Endpoint client package.
+- `tests/`: pytest suite.
+- `scripts/mde_contract.py`: regenerates schema modules from Defender metadata.
+
+## Working rules
+
+- Use `uv` for all dependency operations. Do not use `pip` or `poetry`.
+- Prefer `just` commands over raw tool invocations.
+- Run `just quality` before finishing a change. This skips integration tests via `--skip-integration`.
+- Use `just quality-full` only when Azure-backed integration coverage is required and credentials are available.
+- When changing generated schema surfaces, prefer `just schema-build` or `just schema-refresh` over broad manual edits.
+
+## Common commands
 
 | Task | Command |
 | ---- | ------- |
 | Bootstrap env | `uv sync --all-packages --all-groups` |
 | Lint | `just lint` |
-| Auto-fix lint | `just lint-fix` |
 | Format | `just format` |
-| Type-check | `just typecheck` (runs `ty` + `pyright`) |
-| Test | `just test` |
-| Full quality gate | `just quality` (lint → format → typecheck → test) |
-| Docs build | `just docs-build` |
+| Type-check | `just typecheck` |
+| Focused tests | `just test tests/...` |
+| Default quality gate | `just quality` |
+| Full gate with integration | `just quality-full` |
+| Regenerate schemas from local metadata | `just schema-build` |
+| Refresh metadata and regenerate schemas | `just schema-refresh` |
 
-Always use `uv` for dependency operations — never `pip` or `poetry`.
-Run `just quality` before considering a change complete.
+## MDE client architecture
 
-## Architecture — adding a new vendor client
+The current package follows `Client -> Auth -> Endpoint -> Results -> Schema`.
 
-1. Create `src/<vendor_client>/` with its own `pyproject.toml`.
-2. Follow the same pattern as `mde_client`: Client → Auth → Endpoints → Models.
-3. Register the new workspace member in the root `pyproject.toml` under `[tool.uv.sources]`.
+- `client.py`: `MDEClient`, context-manager lifecycle, lazy endpoint properties.
+- `auth.py`: `MSALAuth`, token acquisition, cache injection.
+- `endpoints/base.py`: shared endpoint/query/results behavior.
+- `endpoints/machines.py`: endpoint methods and `BaseResults` subclasses.
+- `schemas/`: Arrow schemas used by result materialization.
 
-## Conventions
+Important implementation detail: endpoint methods currently return lazy `BaseResults` wrappers such as `MachineResults`, not eager tables or single Pydantic models. Terminal methods like `.to_json()`, `.to_arrow()`, `.to_polars()`, and `.refresh()` control fetch/materialization.
 
-- Python ≥ 3.14 — use modern syntax (`X | Y` unions, etc.).
-- Full type annotations on every public API; validated by `pyright` and `ty`.
-- Pydantic v2 for request/response models (`model_validate`, `model_dump`, `model_config`).
-- PyArrow `pa.Table` for collection returns; Pydantic model for single-item returns.
-- Dependency injection of `httpx.Client` and `msal.TokenCache` for testability.
-- Module-level logger: `log = logging.getLogger(__name__)`.
-- `extra="ignore"` on response models so upstream API additions don't break the client.
+## Conventions that matter
+
+- Python >= 3.14 with modern typing syntax.
+- Preserve full type annotations; both `ty` and `pyright` must pass.
+- Pydantic v2 only.
+- Keep constructor injection for `httpx.Client` and `msal.TokenCache` to preserve testability.
+- Use module-level loggers as `log = logging.getLogger(__name__)`.
+- For API-shaped models, prefer tolerant parsing with `extra="ignore"`, `populate_by_name=True`, and `Field(alias=...)` where the upstream payload uses different names.
+- Defender filter/query models intentionally preserve API field names such as `healthStatus`; do not normalize those to snake_case unless the package surface already does so.
+
+## Scoped instructions
+
+Use the narrower instruction files when they apply instead of repeating them here:
+
+- `.github/instructions/python-workflow.instructions.md`
+- `.github/instructions/mde-client.instructions.md`
