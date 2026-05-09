@@ -3,6 +3,10 @@
 	"build": {
 		"dockerfile": "dockerfile"
 	},
+	"runArgs": [
+		"--env-file",
+		".env"
+	],
 	"remoteUser": "vscode",
 	"features": {
 		"ghcr.io/devcontainers/features/node:2.0.0": {}
