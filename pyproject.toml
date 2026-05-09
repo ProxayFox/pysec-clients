@@ -44,10 +44,10 @@ mde-client = { workspace = true }
 
 [tool.ty.environment]
 python = "./.venv"
-root = ["./src", "./test"]
+root = ["./src", "./tests"]
 
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
-include = ["src", "test"]
+include = ["src", "tests"]
 extraPaths = ["src"]
