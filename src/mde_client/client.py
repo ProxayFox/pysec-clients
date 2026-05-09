@@ -2,6 +2,7 @@ import msal
 import httpx
 
 from .auth import MSALAuth
+from .endpoints.base import BaseEndpoint
 from .endpoints.machines import MachinesEndpoint
 
 
@@ -56,6 +57,10 @@ class MDEClient:
     # ------------------------------------------------------------------
     # Endpoints
     # ------------------------------------------------------------------
+
+    @property
+    def misc(self) -> BaseEndpoint:
+        return BaseEndpoint(self._http, self._auth)
 
     @property
     def machines(self) -> MachinesEndpoint:
