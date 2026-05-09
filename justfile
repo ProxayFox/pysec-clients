@@ -9,27 +9,27 @@ help:
     @just --list
 
 # --- Development ---
-lint:
-    uv run ruff check .
+lint path=".":
+    uv run ruff check {{path}}
 
-lint-fix:
-    uv run ruff check --fix .
+lint-fix path=".":
+    uv run ruff check --fix {{path}}
 
-format:
-    uv run ruff format .
+format path=".":
+    uv run ruff format {{path}}
 
-format-check:
-    uv run ruff format --check .
+format-check path=".":
+    uv run ruff format --check {{path}}
 
 #  --- Testing ---
-test:
-    uv run pytest -q    
+test path="tests/":
+    uv run pytest -q {{path}}
 
-test-all:
-    uv run pytest --runslow -q
+test-all path="tests/":
+    uv run pytest --runslow -q {{path}}
 
-typecheck:
-    uv run ty check --project .
+typecheck path=".":
+    uv run ty check --project {{path}}
     uvx pyright --threads
 
 # --- Quality CI/CD Gate ---
@@ -38,6 +38,14 @@ quality:
     if ! just format-check; then just format; fi
     just typecheck
     just test
+
+# Similar to Quality, but only targets schema validation
+quality-schema path="src/mde_client/schemas" tests="tests/mde_client/test_schema_validator.py":
+    if ! just lint {{path}}; then just lint-fix {{path}}; fi
+    if ! just format-check {{path}}; then just format {{path}}; fi
+    just typecheck {{path}}
+    just test {{tests}}
+
 
 # --- Documentation ---
 docs-build:
@@ -48,3 +56,21 @@ docs-serve:
 
 docs-validate:
     uv run --group docs mkdocs build --strict
+
+# --- Schema management ---
+
+# Regenerate schemas from existing XML (no credentials required)
+schema-build:
+    uv run scripts/mde_contract.py --no-fetch
+
+# Preview what schema-build would write, without touching any files
+schema-build-dry:
+    uv run scripts/mde_contract.py --no-fetch --dry-run
+
+# Re-fetch $metadata from the live API then regenerate (requires Azure credentials)
+schema-refresh:
+    uv run scripts/mde_contract.py --refresh-metadata
+
+# Preview what schema-refresh would write, without touching any files
+schema-refresh-dry:
+    uv run scripts/mde_contract.py --refresh-metadata --dry-run
