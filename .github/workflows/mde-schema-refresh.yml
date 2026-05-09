@@ -1,0 +1,69 @@
+name: Refresh MDE Schema Contracts
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"   # Every Monday at 03:00 UTC
+  workflow_dispatch:        # Allow manual trigger from the Actions tab
+    inputs:
+      force_refresh:
+        description: "Force re-fetch of $metadata even if not stale"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  refresh-schemas:
+    name: Regenerate Arrow schemas from MDE $metadata
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install dependencies
+        run: uv sync --all-groups
+
+      - name: Regenerate schemas
+        env:
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: uv run scripts/mde_contract.py --refresh-metadata
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Open pull request
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/mde-schema-refresh
+          delete-branch: true
+          commit-message: "chore(schemas): refresh MDE Arrow schema contracts"
+          title: "chore(schemas): refresh MDE Arrow schema contracts"
+          body: |
+            Automated weekly refresh of the Arrow schema contracts generated from the MDE API `$metadata` endpoint.
+
+            **Triggered by:** ${{ github.event_name == 'schedule' && 'weekly schedule' || 'manual dispatch' }}
+            **Workflow run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            ---
+            Review the diff to confirm the changes reflect expected upstream API updates before merging.
+          labels: |
+            automated
+            schemas
