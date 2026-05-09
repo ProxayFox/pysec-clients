@@ -22,8 +22,8 @@ format-check path=".":
     uv run ruff format --check {{path}}
 
 #  --- Testing ---
-test path="tests/":
-    uv run pytest -q {{path}}
+test path="tests/" +args="":
+    uv run pytest -q {{path}} {{args}}
 
 test-all path="tests/":
     uv run pytest --runslow -q {{path}}
@@ -37,15 +37,21 @@ quality:
     if ! just lint; then just lint-fix; fi
     if ! just format-check; then just format; fi
     just typecheck
-    just test
+    just test --skip-integration
 
 # Similar to Quality, but only targets schema validation
 quality-schema path="src/mde_client/schemas" tests="tests/mde_client/test_schema_validator.py":
     if ! just lint {{path}}; then just lint-fix {{path}}; fi
     if ! just format-check {{path}}; then just format {{path}}; fi
     just typecheck {{path}}
-    just test {{tests}}
+    just test {{tests}} --skip-integration
 
+# Like Quality, but also includes integration tests that require Azure credentials. Use with caution in CI/CD pipelines.
+quality-full:
+    if ! just lint; then just lint-fix; fi
+    if ! just format-check; then just format; fi
+    just typecheck
+    just test
 
 # --- Documentation ---
 docs-build:

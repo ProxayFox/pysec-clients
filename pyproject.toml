@@ -44,6 +44,9 @@ mde-client = { workspace = true }
 
 [tool.pytest.ini_options]
 pythonpath = ["scripts"]
+markers = [
+    "integration: live API integration tests (require Azure credentials)",
+]
 
 [tool.ty.environment]
 python = "./.venv"
