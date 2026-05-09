@@ -36,6 +36,7 @@ import pyarrow as pa
 import pytest
 
 import mde_client.schemas as schemas_pkg
+from mde_contract import EDM_PA_TYPES
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
@@ -46,21 +47,10 @@ FIXTURE_XML = Path("tests/mde_client/fixtures/mde_metadata.xml")
 _MDE_NS = "http://docs.oasis-open.org/odata/ns/edm"
 _MDE_API_PREFIX = "microsoft.windowsDefenderATP.api."
 
+# Unpack just the pa.DataType half of each tuple — the str half is only needed
+# by the code generator, not by tests that compare actual Arrow types.
 _EDM_TO_PA: dict[str, pa.DataType] = {
-    "Edm.String": pa.string(),
-    "Edm.Int16": pa.int16(),
-    "Edm.Int32": pa.int32(),
-    "Edm.Int64": pa.int64(),
-    "Edm.Boolean": pa.bool_(),
-    "Edm.Double": pa.float64(),
-    "Edm.Single": pa.float32(),
-    "Edm.Byte": pa.uint8(),
-    "Edm.SByte": pa.int8(),
-    "Edm.Guid": pa.string(),
-    "Edm.DateTimeOffset": pa.timestamp("ms"),
-    "Edm.Duration": pa.duration("ms"),
-    "Edm.TimeOfDay": pa.time64("us"),
-    "Edm.Binary": pa.large_binary(),
+    edm: pa_type for edm, (pa_type, _) in EDM_PA_TYPES.items()
 }
 
 # ── Name derivation helpers ───────────────────────────────────────────────────
