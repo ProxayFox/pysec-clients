@@ -2,11 +2,19 @@ from __future__ import annotations
 
 import logging
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Literal
 
 from .base import BaseQuery, BaseEndpoint, BaseResults
-from ..schemas import MACHINE_SCHEMA, USER_SCHEMA
+from ..schemas import (
+    MACHINE_SCHEMA,
+    USER_SCHEMA,
+    ALERT_SCHEMA,
+    SOFTWARE_SCHEMA,
+    VULNERABILITY_SCHEMA,
+    RECOMMENDATION_SCHEMA,
+    PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
+)
 
 log = logging.getLogger(__name__)
 
@@ -59,6 +67,26 @@ class LogonUserResults(BaseResults):
     SCHEMA = USER_SCHEMA
 
 
+class AlertResults(BaseResults):
+    SCHEMA = ALERT_SCHEMA
+
+
+class SoftwareResults(BaseResults):
+    SCHEMA = SOFTWARE_SCHEMA
+
+
+class VulnerabilityResults(BaseResults):
+    SCHEMA = VULNERABILITY_SCHEMA
+
+
+class RecommendationResults(BaseResults):
+    SCHEMA = RECOMMENDATION_SCHEMA
+
+
+class PublicProductFixResults(BaseResults):
+    SCHEMA = PUBLIC_PRODUCT_FIX_DTO_SCHEMA
+
+
 class MachinesEndpoint(BaseEndpoint):
     """Client for the /api/machines endpoint.
     This is not intended to be used directly. Instead, used through MDEClient.machines.
@@ -78,68 +106,103 @@ class MachinesEndpoint(BaseEndpoint):
 
     def get_all(self, query: MachinesQuery | None = None) -> MachineResults:
         """Get all machines, with optional filtering.
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-machines
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machines
         """
         params = query.to_odata_filters if query else {}
         return MachineResults(self, params)
 
-    def get(self, id: str | None = None):
+    def get(self, id: str | None = None) -> MachineResults:
         """Get machine by ID
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-by-id
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-by-id
         """
         if id is None:
             raise ValueError("id must be provided")
         path = f"{self._PATH}/{id}"
         return MachineResults(self, {}, path=path, single=True)
 
-    def logonusers(self, id: str):
+    def logonusers(self, id: str) -> LogonUserResults:
         """Get machine logon users for a machine
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-log-on-users
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-log-on-users
         """
         path = f"{self._PATH}/{id}/logonusers"
         return LogonUserResults(self, {}, path=path)
 
-    def alerts(self, id: str):
+    def alerts(self, id: str) -> AlertResults:
         """Get machine related alerts
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-related-alerts
-        """
-        # path = f"{self._PATH}/{id}/alerts"
-        raise NotImplementedError("alerts endpoint not implemented yet")
 
-    def software(self, id: str):
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-related-alerts
+        """
+        path = f"{self._PATH}/{id}/alerts"
+        return AlertResults(self, {}, path=path)
+
+    def software(self, id: str) -> SoftwareResults:
         """Get installed software
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-installed-software
-        """
-        # path = f"{self._PATH}/{id}/software"
-        raise NotImplementedError("software endpoint not implemented yet")
 
-    def vulnerabilities(self, id: str):
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-installed-software
+        """
+        path = f"{self._PATH}/{id}/software"
+        return SoftwareResults(self, {}, path=path)
+
+    def vulnerabilities(self, id: str) -> VulnerabilityResults:
         """Get discovered vulnerabilities for a machine.
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-discovered-vulnerabilities
-        """
-        # path = f"{self._PATH}/{id}/vulnerabilities"
-        raise NotImplementedError("vulnerabilities endpoint not implemented yet")
 
-    def recommendations(self, id: str):
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-discovered-vulnerabilities
+        """
+        path = f"{self._PATH}/{id}/vulnerabilities"
+        return VulnerabilityResults(self, {}, path=path)
+
+    def recommendations(self, id: str) -> RecommendationResults:
         """Get security recommendations for a machine.
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-security-recommendations
-        """
-        # path = f"{self._PATH}/{id}/recommendations"
-        raise NotImplementedError("recommendations endpoint not implemented yet")
 
-    def tags(self, id: str):
-        """Find devices by tag API
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/find-machines-by-tag
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-security-recommendations
         """
-        # path = f"{self._PATH}/{id}/tags"
-        raise NotImplementedError("tags endpoint not implemented yet")
+        path = f"{self._PATH}/{id}/recommendations"
+        return RecommendationResults(self, {}, path=path)
 
-    def getmissingkbs(self, id: str):
+    def getmissingkbs(self, id: str) -> PublicProductFixResults:
         """Get missing KBs by device ID
-        Docs: https://learn.microsoft.com/en-us/defender-endpoint/api/get-missing-kbs-machine
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-missing-kbs-machine
         """
-        # path = f"{self._PATH}/{id}/getmissingkbs"
-        raise NotImplementedError("getmissingkbs endpoint not implemented yet")
+        path = f"{self._PATH}/{id}/getmissingkbs"
+        return PublicProductFixResults(self, {}, path=path)
+
+    def findbyip(self, ip: str, timestamp: datetime) -> MachineResults:
+        """Find devices by internal IP
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/find-machines-by-ip
+
+        Args:
+            ip(str): The internal IP address to search for.
+            timestamp(datetime): UTC ISO 8601 timestamp to search for.
+        """
+        timestamp_utc = (
+            timestamp.astimezone(timezone.utc)
+            if timestamp.tzinfo is not None
+            else timestamp.replace(tzinfo=timezone.utc)
+        )
+        timestamp_iso = timestamp_utc.isoformat().replace("+00:00", "Z")
+        path = f"{self._PATH}/findbyip(ip='{ip}',timestamp={timestamp_iso})"
+        return MachineResults(self, {}, path=path)
+
+    def tag(self, tag: str, useStartsWithFilter: bool = False) -> MachineResults:
+        """Find devices by tag API
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/find-machines-by-tag
+
+        Args:
+            tag(str): The tag to search for. Can be a full tag or a prefix if useStartsWithFilter is true.
+            useStartsWithFilter(bool): Whether to use startswith filter or exact match. Default is false (exact match).
+        """
+        path = f"{self._PATH}/findbytag"
+        params = {
+            "tag": tag,
+            "useStartsWithFilter": str(useStartsWithFilter).lower(),
+        }
+        return MachineResults(self, params, path=path)
 
 
 class MachineNotFoundError(Exception):
