@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Literal
 
 from .base import BaseQuery, BaseEndpoint, BaseResults
-from ..schemas.machines import MACHINES_SCHEMA, LOGON_USERS_BY_MACHINE_SCHEMA
+from ..schemas import MACHINE_SCHEMA, USER_SCHEMA
 
 log = logging.getLogger(__name__)
 
@@ -52,11 +52,11 @@ class MachinesQuery(BaseQuery):
 
 
 class MachineResults(BaseResults):
-    SCHEMA = MACHINES_SCHEMA
+    SCHEMA = MACHINE_SCHEMA
 
 
 class LogonUserResults(BaseResults):
-    SCHEMA = LOGON_USERS_BY_MACHINE_SCHEMA
+    SCHEMA = USER_SCHEMA
 
 
 class MachinesEndpoint(BaseEndpoint):
