@@ -80,7 +80,9 @@ def _xml_name_for_const(
     if not matches:
         return None
     if len(matches) > 1:
-        raise AssertionError(f"Ambiguous XML type resolution for {const_name}: {matches}")
+        raise AssertionError(
+            f"Ambiguous XML type resolution for {const_name}: {matches}"
+        )
     return matches[0]
 
 
@@ -198,9 +200,7 @@ def _complex_name_for_type_const(const_name: str, meta: _ParsedMetadata) -> str:
     )
 
     if complex_name is None:
-        pytest.skip(
-            f"ComplexType target for {const_name!r} not found in XML fixture"
-        )
+        pytest.skip(f"ComplexType target for {const_name!r} not found in XML fixture")
 
     return complex_name
 
