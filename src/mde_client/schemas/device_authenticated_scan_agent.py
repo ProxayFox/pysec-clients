@@ -6,11 +6,15 @@ DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA: pa.Schema = pa.schema(
     [
         pa.field("id", pa.string(), nullable=False),
         pa.field("machineId", pa.string()),
-        pa.field("lastSeen", pa.timestamp("ms"), nullable=False),
+        pa.field("lastSeen", pa.timestamp("us", tz="UTC"), nullable=False),
         pa.field("computerDnsName", pa.string()),
         pa.field("assignedApplicationId", pa.string()),
         pa.field("scannerSoftwareVersion", pa.string()),
-        pa.field("lastCommandExecutionTimestamp", pa.timestamp("ms"), nullable=False),
+        pa.field(
+            "lastCommandExecutionTimestamp",
+            pa.timestamp("us", tz="UTC"),
+            nullable=False,
+        ),
         pa.field("mdeClientVersion", pa.string()),
     ]
 )

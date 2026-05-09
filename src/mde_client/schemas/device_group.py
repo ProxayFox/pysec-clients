@@ -49,7 +49,7 @@ DEVICE_GROUP_SCHEMA: pa.Schema = pa.schema(
         pa.field("automationLevel", pa.string(), nullable=False),
         pa.field("description", pa.string()),
         pa.field("deviceCount", pa.int32(), nullable=False),
-        pa.field("lastUpdateTime", pa.timestamp("ms")),
+        pa.field("lastUpdateTime", pa.timestamp("us", tz="UTC")),
         pa.field("aadUsersGroups", pa.list_(AAD_USERS_GROUP_TYPE)),
         pa.field("deviceGroupRules", DEVICE_GROUP_RULES_TYPE),
     ]

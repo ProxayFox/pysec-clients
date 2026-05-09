@@ -4,7 +4,7 @@ import pyarrow as pa
 
 CONFIGURATION_SCORE_SCHEMA: pa.Schema = pa.schema(
     [
-        pa.field("time", pa.timestamp("ms"), nullable=False),
+        pa.field("time", pa.timestamp("us", tz="UTC"), nullable=False),
         pa.field("score", pa.float64(), nullable=False),
         pa.field("rbacGroupName", pa.string()),
         pa.field("rbacGroupId", pa.int64()),

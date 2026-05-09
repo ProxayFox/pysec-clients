@@ -5,8 +5,8 @@ import pyarrow as pa
 INVESTIGATION_SCHEMA: pa.Schema = pa.schema(
     [
         pa.field("id", pa.string(), nullable=False),
-        pa.field("startTime", pa.timestamp("ms")),
-        pa.field("endTime", pa.timestamp("ms")),
+        pa.field("startTime", pa.timestamp("us", tz="UTC")),
+        pa.field("endTime", pa.timestamp("us", tz="UTC")),
         pa.field("state", pa.string(), nullable=False),
         pa.field("cancelledBy", pa.string()),
         pa.field("statusDetails", pa.string()),

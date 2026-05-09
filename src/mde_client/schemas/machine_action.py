@@ -27,8 +27,8 @@ CUSTOM_PLAYBOOK_COMMAND_RESULT_TYPE: pa.StructType = pa.struct(
     [
         pa.field("index", pa.int32(), nullable=False),
         pa.field("command", CUSTOM_PLAYBOOK_COMMAND_TYPE),
-        pa.field("startTime", pa.timestamp("ms")),
-        pa.field("endTime", pa.timestamp("ms")),
+        pa.field("startTime", pa.timestamp("us", tz="UTC")),
+        pa.field("endTime", pa.timestamp("us", tz="UTC")),
         pa.field("commandStatus", pa.string(), nullable=False),
         pa.field("errors", pa.list_(pa.string())),
     ]
@@ -36,8 +36,8 @@ CUSTOM_PLAYBOOK_COMMAND_RESULT_TYPE: pa.StructType = pa.struct(
 
 TROUBLESHOOT_INFO_TYPE: pa.StructType = pa.struct(
     [
-        pa.field("expirationUtc", pa.timestamp("ms"), nullable=False),
-        pa.field("startTsModeUtc", pa.timestamp("ms"), nullable=False),
+        pa.field("expirationUtc", pa.timestamp("us", tz="UTC"), nullable=False),
+        pa.field("startTsModeUtc", pa.timestamp("us", tz="UTC"), nullable=False),
         pa.field("paramsJsonFormatVersion", pa.int32(), nullable=False),
         pa.field("state", pa.int32(), nullable=False),
     ]
@@ -54,11 +54,11 @@ MACHINE_ACTION_SCHEMA: pa.Schema = pa.schema(
         pa.field("machineId", pa.string()),
         pa.field("computerDnsName", pa.string()),
         pa.field("relatedFileInfo", RELATED_FILE_INFO_TYPE),
-        pa.field("creationDateTimeUtc", pa.timestamp("ms"), nullable=False),
-        pa.field("lastUpdateDateTimeUtc", pa.timestamp("ms"), nullable=False),
+        pa.field("creationDateTimeUtc", pa.timestamp("us", tz="UTC"), nullable=False),
+        pa.field("lastUpdateDateTimeUtc", pa.timestamp("us", tz="UTC"), nullable=False),
         pa.field("cancellationRequestor", pa.string()),
         pa.field("cancellationComment", pa.string()),
-        pa.field("cancellationDateTimeUtc", pa.timestamp("ms")),
+        pa.field("cancellationDateTimeUtc", pa.timestamp("us", tz="UTC")),
         pa.field("errorHResult", pa.int32(), nullable=False),
         pa.field("scope", pa.string()),
         pa.field("commands", pa.list_(CUSTOM_PLAYBOOK_COMMAND_RESULT_TYPE)),

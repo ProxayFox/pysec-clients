@@ -26,9 +26,11 @@ INDICATOR_SCHEMA: pa.Schema = pa.schema(
         pa.field("title", pa.string()),
         pa.field("description", pa.string()),
         pa.field("recommendedActions", pa.string()),
-        pa.field("creationTimeDateTimeUtc", pa.timestamp("ms"), nullable=False),
-        pa.field("expirationTime", pa.timestamp("ms")),
-        pa.field("lastUpdateTime", pa.timestamp("ms"), nullable=False),
+        pa.field(
+            "creationTimeDateTimeUtc", pa.timestamp("us", tz="UTC"), nullable=False
+        ),
+        pa.field("expirationTime", pa.timestamp("us", tz="UTC")),
+        pa.field("lastUpdateTime", pa.timestamp("us", tz="UTC"), nullable=False),
         pa.field("lastUpdatedBy", pa.string()),
         pa.field("rbacGroupNames", pa.list_(pa.string())),
         pa.field("rbacGroupIds", pa.list_(pa.int32()), nullable=False),

@@ -29,7 +29,7 @@ BASELINE_EXCEPTION_SCHEMA: pa.Schema = pa.schema(
         pa.field("id", pa.string(), nullable=False),
         pa.field("approvedBy", pa.string()),
         pa.field("justification", pa.string()),
-        pa.field("dueDate", pa.timestamp("ms"), nullable=False),
+        pa.field("dueDate", pa.timestamp("us", tz="UTC"), nullable=False),
         pa.field("description", pa.string()),
         pa.field("status", pa.string()),
         pa.field("isActive", pa.bool_(), nullable=False),
@@ -40,10 +40,10 @@ BASELINE_EXCEPTION_SCHEMA: pa.Schema = pa.schema(
         pa.field("complianceLevel", pa.string()),
         pa.field("configurations", pa.list_(BASELINE_CONFIGURATION_DTO_TYPE)),
         pa.field("devices", pa.list_(BASELINE_EXCEPTION_DEVICE_DTO_TYPE)),
-        pa.field("lastModifiedOn", pa.timestamp("ms")),
+        pa.field("lastModifiedOn", pa.timestamp("us", tz="UTC")),
         pa.field("lastModifiedBy", USER_DTO_TYPE),
         pa.field("title", pa.string()),
-        pa.field("createdOn", pa.timestamp("ms")),
+        pa.field("createdOn", pa.timestamp("us", tz="UTC")),
         pa.field("requester", USER_DTO_TYPE),
     ]
 )

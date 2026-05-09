@@ -14,10 +14,14 @@ AGENT_CONTRACT_TYPE: pa.StructType = pa.struct(
         pa.field("id", pa.string()),
         pa.field("machineId", pa.string()),
         pa.field("machineName", pa.string()),
-        pa.field("lastSeen", pa.timestamp("ms"), nullable=False),
+        pa.field("lastSeen", pa.timestamp("us", tz="UTC"), nullable=False),
         pa.field("assignedApplicationId", pa.string()),
         pa.field("scannerSoftwareVersion", pa.string()),
-        pa.field("lastCommandExecutionTimestamp", pa.timestamp("ms"), nullable=False),
+        pa.field(
+            "lastCommandExecutionTimestamp",
+            pa.timestamp("us", tz="UTC"),
+            nullable=False,
+        ),
         pa.field("mdeClientVersion", pa.string()),
     ]
 )
@@ -26,7 +30,7 @@ SCAN_STATE_TYPE: pa.StructType = pa.struct(
     [
         pa.field("status", pa.string()),
         pa.field("failureReason", pa.string()),
-        pa.field("executionDateTime", pa.timestamp("ms")),
+        pa.field("executionDateTime", pa.timestamp("us", tz="UTC")),
     ]
 )
 
