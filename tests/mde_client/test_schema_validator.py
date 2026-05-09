@@ -36,7 +36,7 @@ import pyarrow as pa
 import pytest
 
 import mde_client.schemas as schemas_pkg
-from mde_contract import EDM_PA_TYPES
+from mde_contract import EDM_PA_TYPES, to_const
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
@@ -66,12 +66,22 @@ def _const_to_type_name(const: str, suffix: str) -> str:
     return "".join(part.capitalize() for part in base.split("_"))
 
 
-def _schema_const_to_entity(const: str) -> str:
-    return _const_to_type_name(const, "_SCHEMA")
-
-
-def _type_const_to_complex(const: str) -> str:
-    return _const_to_type_name(const, "_TYPE")
+def _xml_name_for_const(
+    const_name: str, suffix: str, candidate_names: list[str]
+) -> str | None:
+    """Resolve a generated constant name back to the original XML type name."""
+    matches = list(
+        dict.fromkeys(
+            name
+            for name in candidate_names
+            if f"{to_const(name)}{suffix}" == const_name
+        )
+    )
+    if not matches:
+        return None
+    if len(matches) > 1:
+        raise AssertionError(f"Ambiguous XML type resolution for {const_name}: {matches}")
+    return matches[0]
 
 
 # ── Module-level parametrize lists ───────────────────────────────────────────
@@ -161,6 +171,40 @@ def _load_const(name: str) -> Any:
     return getattr(schemas_pkg, name)
 
 
+def _schema_props_for_const(
+    const_name: str, meta: _ParsedMetadata
+) -> tuple[str, list[ET.Element]]:
+    """Resolve a _SCHEMA constant to its XML type name and flattened properties."""
+    type_name = _xml_name_for_const(
+        const_name,
+        "_SCHEMA",
+        [*meta.entity_types, *meta.complex_types],
+    )
+
+    if type_name is None:
+        pytest.skip(
+            f"Schema target for {const_name!r} not found as EntityType or ComplexType in XML fixture"
+        )
+
+    return type_name, meta.props_for(type_name)
+
+
+def _complex_name_for_type_const(const_name: str, meta: _ParsedMetadata) -> str:
+    """Resolve a _TYPE constant to its XML ComplexType name."""
+    complex_name = _xml_name_for_const(
+        const_name,
+        "_TYPE",
+        list(meta.complex_types),
+    )
+
+    if complex_name is None:
+        pytest.skip(
+            f"ComplexType target for {const_name!r} not found in XML fixture"
+        )
+
+    return complex_name
+
+
 def _expected_pa_type(
     odata_t: str,
     meta: _ParsedMetadata,
@@ -234,20 +278,16 @@ class TestSchemaModuleIntegrity:
 
 
 class TestSchemaFieldCoverage:
-    """Every XML Property on an EntityType must appear in the Arrow schema."""
+    """Every XML Property on a schema-backed type must appear in the Arrow schema."""
 
     @pytest.mark.parametrize("const_name", _SCHEMA_NAMES)
     def test_all_xml_properties_present(
         self, const_name: str, mde_xml: _ParsedMetadata
     ) -> None:
-        entity_name = _schema_const_to_entity(const_name)
-
-        if entity_name not in mde_xml.entity_types:
-            pytest.skip(f"EntityType {entity_name!r} not found in XML fixture")
+        _, xml_props = _schema_props_for_const(const_name, mde_xml)
 
         schema: pa.Schema = _load_const(const_name)
         arrow_field_names = {schema.field(i).name for i in range(len(schema))}
-        xml_props = mde_xml.props_for(entity_name)
         xml_field_names = {p.get("Name", "") for p in xml_props}
 
         missing = xml_field_names - arrow_field_names
@@ -266,15 +306,12 @@ class TestFieldNullability:
     def test_schema_nullability_matches_xml(
         self, const_name: str, mde_xml: _ParsedMetadata
     ) -> None:
-        entity_name = _schema_const_to_entity(const_name)
-
-        if entity_name not in mde_xml.entity_types:
-            pytest.skip(f"EntityType {entity_name!r} not found in XML fixture")
+        _, xml_props = _schema_props_for_const(const_name, mde_xml)
 
         schema: pa.Schema = _load_const(const_name)
         xml_non_nullable = {
             p.get("Name", "")
-            for p in mde_xml.props_for(entity_name)
+            for p in xml_props
             if p.get("Nullable", "true").lower() == "false"
         }
 
@@ -295,10 +332,7 @@ class TestFieldNullability:
     def test_struct_nullability_matches_xml(
         self, const_name: str, mde_xml: _ParsedMetadata
     ) -> None:
-        complex_name = _type_const_to_complex(const_name)
-
-        if complex_name not in mde_xml.complex_types:
-            pytest.skip(f"ComplexType {complex_name!r} not found in XML fixture")
+        complex_name = _complex_name_for_type_const(const_name, mde_xml)
 
         struct_type: pa.StructType = _load_const(const_name)
         xml_non_nullable = {
@@ -331,15 +365,12 @@ class TestFieldTypes:
     def test_primitive_field_types(
         self, const_name: str, mde_xml: _ParsedMetadata
     ) -> None:
-        entity_name = _schema_const_to_entity(const_name)
-
-        if entity_name not in mde_xml.entity_types:
-            pytest.skip(f"EntityType {entity_name!r} not found in XML fixture")
+        _, xml_props = _schema_props_for_const(const_name, mde_xml)
 
         schema: pa.Schema = _load_const(const_name)
         mismatches: list[str] = []
 
-        for prop in mde_xml.props_for(entity_name):
+        for prop in xml_props:
             field_name = prop.get("Name", "")
             odata_t = prop.get("Type", "Edm.String")
             expected = _expected_pa_type(odata_t, mde_xml)
@@ -365,15 +396,12 @@ class TestFieldTypes:
     def test_collection_fields_are_lists(
         self, const_name: str, mde_xml: _ParsedMetadata
     ) -> None:
-        entity_name = _schema_const_to_entity(const_name)
-
-        if entity_name not in mde_xml.entity_types:
-            pytest.skip(f"EntityType {entity_name!r} not found in XML fixture")
+        _, xml_props = _schema_props_for_const(const_name, mde_xml)
 
         schema: pa.Schema = _load_const(const_name)
         mismatches: list[str] = []
 
-        for prop in mde_xml.props_for(entity_name):
+        for prop in xml_props:
             if not prop.get("Type", "").startswith("Collection("):
                 continue
             field_name = prop.get("Name", "")
@@ -394,15 +422,12 @@ class TestFieldTypes:
     def test_non_abstract_complex_type_fields_are_structs(
         self, const_name: str, mde_xml: _ParsedMetadata
     ) -> None:
-        entity_name = _schema_const_to_entity(const_name)
-
-        if entity_name not in mde_xml.entity_types:
-            pytest.skip(f"EntityType {entity_name!r} not found in XML fixture")
+        _, xml_props = _schema_props_for_const(const_name, mde_xml)
 
         schema: pa.Schema = _load_const(const_name)
         mismatches: list[str] = []
 
-        for prop in mde_xml.props_for(entity_name):
+        for prop in xml_props:
             odata_t = prop.get("Type", "")
             # Unwrap Collection to check inner type
             inner = (
@@ -449,10 +474,7 @@ class TestStructTypeConstants:
     def test_all_xml_properties_present_in_struct(
         self, const_name: str, mde_xml: _ParsedMetadata
     ) -> None:
-        complex_name = _type_const_to_complex(const_name)
-
-        if complex_name not in mde_xml.complex_types:
-            pytest.skip(f"ComplexType {complex_name!r} not found in XML fixture")
+        complex_name = _complex_name_for_type_const(const_name, mde_xml)
 
         struct_type: pa.StructType = _load_const(const_name)
         struct_field_names = {
