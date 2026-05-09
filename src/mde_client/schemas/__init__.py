@@ -6,6 +6,7 @@ import importlib
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .action_availability_status import ACTION_AVAILABILITY_STATUS_SCHEMA
     from .alert import (
         ALERT_SCHEMA,
         ALERT_RELATED_USER_TYPE,
@@ -14,6 +15,14 @@ if TYPE_CHECKING:
         ALERT_EVIDENCE_TYPE,
         DOMAIN_TYPE,
     )
+    from .asset_baseline_assessment import ASSET_BASELINE_ASSESSMENT_SCHEMA
+    from .asset_browser_extension import ASSET_BROWSER_EXTENSION_SCHEMA
+    from .asset_certificate_assessment import ASSET_CERTIFICATE_ASSESSMENT_SCHEMA
+    from .asset_configuration import ASSET_CONFIGURATION_SCHEMA
+    from .asset_hardware_firmware import ASSET_HARDWARE_FIRMWARE_SCHEMA
+    from .asset_non_cpe_software import ASSET_NON_CPE_SOFTWARE_SCHEMA
+    from .asset_software import ASSET_SOFTWARE_SCHEMA
+    from .asset_vulnerability import ASSET_VULNERABILITY_SCHEMA
     from .baseline_configuration import BASELINE_CONFIGURATION_SCHEMA
     from .baseline_exception import (
         BASELINE_EXCEPTION_SCHEMA,
@@ -32,6 +41,7 @@ if TYPE_CHECKING:
         WORKSPACE_PROPERTIES_TYPE,
         DATA_EXPORT_SETTINGS_LOG_DEFINITION_TYPE,
     )
+    from .delta_asset_vulnerability import DELTA_ASSET_VULNERABILITY_SCHEMA
     from .device_authenticated_scan_agent import DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA
     from .device_authenticated_scan_definition import (
         DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
@@ -47,9 +57,14 @@ if TYPE_CHECKING:
         DEVICE_GROUP_LIST_PROPERTY_CONDITION_TYPE,
         DEVICE_GROUP_RULES_TYPE,
     )
+    from .dlp_machine import DLP_MACHINE_SCHEMA
     from .domain import DOMAIN_SCHEMA
+    from .export_files_response import EXPORT_FILES_RESPONSE_SCHEMA
     from .file import FILE_SCHEMA
     from .firmware import FIRMWARE_SCHEMA
+    from .in_org_domain_stats import IN_ORG_DOMAIN_STATS_SCHEMA
+    from .in_org_file_stats import IN_ORG_FILE_STATS_SCHEMA
+    from .in_org_ip_stats import IN_ORG_IP_STATS_SCHEMA
     from .incident import (
         INCIDENT_SCHEMA,
         VM_METADATA_TYPE,
@@ -64,6 +79,10 @@ if TYPE_CHECKING:
     from .investigation import INVESTIGATION_SCHEMA
     from .ip import IP_SCHEMA
     from .library_files import LIBRARY_FILES_SCHEMA
+    from .list_1_of_import_indicator_result import (
+        LIST_1_OF_IMPORT_INDICATOR_RESULT_SCHEMA,
+    )
+    from .list_1_of_indicator import LIST_1_OF_INDICATOR_SCHEMA
     from .machine import (
         MACHINE_SCHEMA,
         MACHINE_IP_ADDRESS_TYPE,
@@ -76,7 +95,11 @@ if TYPE_CHECKING:
         CUSTOM_PLAYBOOK_COMMAND_RESULT_TYPE,
         TROUBLESHOOT_INFO_TYPE,
     )
+    from .public_asset_dto import PUBLIC_ASSET_DTO_SCHEMA
+    from .public_asset_vulnerability_dto import PUBLIC_ASSET_VULNERABILITY_DTO_SCHEMA
+    from .public_distribution_dto import PUBLIC_DISTRIBUTION_DTO_SCHEMA
     from .public_product_dto import PUBLIC_PRODUCT_DTO_SCHEMA
+    from .public_product_fix_dto import PUBLIC_PRODUCT_FIX_DTO_SCHEMA
     from .public_vulnerability_dto import PUBLIC_VULNERABILITY_DTO_SCHEMA
     from .recommendation import RECOMMENDATION_SCHEMA
     from .remediation_task import REMEDIATION_TASK_SCHEMA
@@ -88,12 +111,21 @@ if TYPE_CHECKING:
     from .vulnerability import VULNERABILITY_SCHEMA
 
 _NAME_TO_MODULE: dict[str, str] = {
+    "ACTION_AVAILABILITY_STATUS_SCHEMA": "action_availability_status",
     "ALERT_SCHEMA": "alert",
     "ALERT_RELATED_USER_TYPE": "alert",
     "LOGGED_ON_USER_TYPE": "alert",
     "ALERT_COMMENT_TYPE": "alert",
     "ALERT_EVIDENCE_TYPE": "alert",
     "DOMAIN_TYPE": "alert",
+    "ASSET_BASELINE_ASSESSMENT_SCHEMA": "asset_baseline_assessment",
+    "ASSET_BROWSER_EXTENSION_SCHEMA": "asset_browser_extension",
+    "ASSET_CERTIFICATE_ASSESSMENT_SCHEMA": "asset_certificate_assessment",
+    "ASSET_CONFIGURATION_SCHEMA": "asset_configuration",
+    "ASSET_HARDWARE_FIRMWARE_SCHEMA": "asset_hardware_firmware",
+    "ASSET_NON_CPE_SOFTWARE_SCHEMA": "asset_non_cpe_software",
+    "ASSET_SOFTWARE_SCHEMA": "asset_software",
+    "ASSET_VULNERABILITY_SCHEMA": "asset_vulnerability",
     "BASELINE_CONFIGURATION_SCHEMA": "baseline_configuration",
     "BASELINE_EXCEPTION_SCHEMA": "baseline_exception",
     "BASELINE_CONFIGURATION_DTO_TYPE": "baseline_exception",
@@ -108,6 +140,7 @@ _NAME_TO_MODULE: dict[str, str] = {
     "STORAGE_ACCOUNT_PROPERTIES_TYPE": "data_export_settings",
     "WORKSPACE_PROPERTIES_TYPE": "data_export_settings",
     "DATA_EXPORT_SETTINGS_LOG_DEFINITION_TYPE": "data_export_settings",
+    "DELTA_ASSET_VULNERABILITY_SCHEMA": "delta_asset_vulnerability",
     "DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA": "device_authenticated_scan_agent",
     "DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA": "device_authenticated_scan_definition",
     "AGENT_CONTRACT_TYPE": "device_authenticated_scan_definition",
@@ -119,9 +152,14 @@ _NAME_TO_MODULE: dict[str, str] = {
     "DEVICE_GROUP_PROPERTY_CONDITION_TYPE": "device_group",
     "DEVICE_GROUP_LIST_PROPERTY_CONDITION_TYPE": "device_group",
     "DEVICE_GROUP_RULES_TYPE": "device_group",
+    "DLP_MACHINE_SCHEMA": "dlp_machine",
     "DOMAIN_SCHEMA": "domain",
+    "EXPORT_FILES_RESPONSE_SCHEMA": "export_files_response",
     "FILE_SCHEMA": "file",
     "FIRMWARE_SCHEMA": "firmware",
+    "IN_ORG_DOMAIN_STATS_SCHEMA": "in_org_domain_stats",
+    "IN_ORG_FILE_STATS_SCHEMA": "in_org_file_stats",
+    "IN_ORG_IP_STATS_SCHEMA": "in_org_ip_stats",
     "INCIDENT_SCHEMA": "incident",
     "VM_METADATA_TYPE": "incident",
     "MTP_DEVICE_TYPE": "incident",
@@ -132,6 +170,8 @@ _NAME_TO_MODULE: dict[str, str] = {
     "INVESTIGATION_SCHEMA": "investigation",
     "IP_SCHEMA": "ip",
     "LIBRARY_FILES_SCHEMA": "library_files",
+    "LIST_1_OF_IMPORT_INDICATOR_RESULT_SCHEMA": "list_1_of_import_indicator_result",
+    "LIST_1_OF_INDICATOR_SCHEMA": "list_1_of_indicator",
     "MACHINE_SCHEMA": "machine",
     "MACHINE_IP_ADDRESS_TYPE": "machine",
     "MACHINE_ACTION_SCHEMA": "machine_action",
@@ -140,7 +180,11 @@ _NAME_TO_MODULE: dict[str, str] = {
     "CUSTOM_PLAYBOOK_COMMAND_TYPE": "machine_action",
     "CUSTOM_PLAYBOOK_COMMAND_RESULT_TYPE": "machine_action",
     "TROUBLESHOOT_INFO_TYPE": "machine_action",
+    "PUBLIC_ASSET_DTO_SCHEMA": "public_asset_dto",
+    "PUBLIC_ASSET_VULNERABILITY_DTO_SCHEMA": "public_asset_vulnerability_dto",
+    "PUBLIC_DISTRIBUTION_DTO_SCHEMA": "public_distribution_dto",
     "PUBLIC_PRODUCT_DTO_SCHEMA": "public_product_dto",
+    "PUBLIC_PRODUCT_FIX_DTO_SCHEMA": "public_product_fix_dto",
     "PUBLIC_VULNERABILITY_DTO_SCHEMA": "public_vulnerability_dto",
     "RECOMMENDATION_SCHEMA": "recommendation",
     "REMEDIATION_TASK_SCHEMA": "remediation_task",
@@ -168,12 +212,21 @@ def __getattr__(name: str) -> object:
 
 __all__ = [
     "AAD_USERS_GROUP_TYPE",
+    "ACTION_AVAILABILITY_STATUS_SCHEMA",
     "ADVANCED_ACTIVE_CONFIGURATION_TYPE",
     "AGENT_CONTRACT_TYPE",
     "ALERT_COMMENT_TYPE",
     "ALERT_EVIDENCE_TYPE",
     "ALERT_RELATED_USER_TYPE",
     "ALERT_SCHEMA",
+    "ASSET_BASELINE_ASSESSMENT_SCHEMA",
+    "ASSET_BROWSER_EXTENSION_SCHEMA",
+    "ASSET_CERTIFICATE_ASSESSMENT_SCHEMA",
+    "ASSET_CONFIGURATION_SCHEMA",
+    "ASSET_HARDWARE_FIRMWARE_SCHEMA",
+    "ASSET_NON_CPE_SOFTWARE_SCHEMA",
+    "ASSET_SOFTWARE_SCHEMA",
+    "ASSET_VULNERABILITY_SCHEMA",
     "BASELINE_CONFIGURATION_DTO_TYPE",
     "BASELINE_CONFIGURATION_SCHEMA",
     "BASELINE_EXCEPTION_DEVICE_DTO_TYPE",
@@ -188,6 +241,7 @@ __all__ = [
     "CUSTOM_PLAYBOOK_PARAMETER_TYPE",
     "DATA_EXPORT_SETTINGS_LOG_DEFINITION_TYPE",
     "DATA_EXPORT_SETTINGS_SCHEMA",
+    "DELTA_ASSET_VULNERABILITY_SCHEMA",
     "DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA",
     "DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA",
     "DEVICE_AV_INFO_SCHEMA",
@@ -195,16 +249,23 @@ __all__ = [
     "DEVICE_GROUP_PROPERTY_CONDITION_TYPE",
     "DEVICE_GROUP_RULES_TYPE",
     "DEVICE_GROUP_SCHEMA",
+    "DLP_MACHINE_SCHEMA",
     "DOMAIN_SCHEMA",
     "DOMAIN_TYPE",
     "EVENT_HUB_PROPERTIES_TYPE",
+    "EXPORT_FILES_RESPONSE_SCHEMA",
     "FILE_SCHEMA",
     "FIRMWARE_SCHEMA",
     "INCIDENT_SCHEMA",
     "INDICATOR_SCHEMA",
     "INVESTIGATION_SCHEMA",
+    "IN_ORG_DOMAIN_STATS_SCHEMA",
+    "IN_ORG_FILE_STATS_SCHEMA",
+    "IN_ORG_IP_STATS_SCHEMA",
     "IP_SCHEMA",
     "LIBRARY_FILES_SCHEMA",
+    "LIST_1_OF_IMPORT_INDICATOR_RESULT_SCHEMA",
+    "LIST_1_OF_INDICATOR_SCHEMA",
     "LOGGED_ON_USER_TYPE",
     "MACHINE_ACTION_SCHEMA",
     "MACHINE_IP_ADDRESS_TYPE",
@@ -212,8 +273,12 @@ __all__ = [
     "MTP_ALERT_EVIDENCE_TYPE",
     "MTP_ALERT_TYPE",
     "MTP_DEVICE_TYPE",
+    "PUBLIC_ASSET_DTO_SCHEMA",
+    "PUBLIC_ASSET_VULNERABILITY_DTO_SCHEMA",
+    "PUBLIC_DISTRIBUTION_DTO_SCHEMA",
     "PUBLIC_DISTRIBUTION_DTO_TYPE",
     "PUBLIC_PRODUCT_DTO_SCHEMA",
+    "PUBLIC_PRODUCT_FIX_DTO_SCHEMA",
     "PUBLIC_VULNERABILITY_DTO_SCHEMA",
     "RECOMMENDATION_SCHEMA",
     "RELATED_FILE_INFO_TYPE",
