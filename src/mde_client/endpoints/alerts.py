@@ -1,3 +1,18 @@
+"""Microsoft Defender for Endpoint alerts endpoint models and client surface.
+
+This module defines:
+- `AlertsQuery`, `AlertCreateQuery`, and `AlertUpdateQuery` request models.
+- `*Results` wrappers mapped to Arrow schemas for alerts and related entities.
+- `AlertsEndpoint` methods for retrieving alerts and related domains, files,
+  IPs, machines, and users.
+
+Most endpoint methods return lazy `BaseResults` subclasses and defer HTTP
+requests until a terminal materialization method is called. Create/update
+operations are declared but currently marked as not implemented.
+
+Note: Needs further Testing and implementation of POST methods for alert creation and updates.
+"""
+
 from datetime import datetime
 from typing import Literal, Any
 

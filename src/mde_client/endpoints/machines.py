@@ -1,3 +1,16 @@
+"""Microsoft Defender for Endpoint machines endpoint models and client surface.
+
+This module defines:
+- `MachinesQuery`: an OData-style query model for filtering machine listings.
+- `*Results` wrappers: lazy result containers bound to Arrow schemas.
+- `MachinesEndpoint`: endpoint methods for machine retrieval and related resources,
+  including logon users, alerts, software, vulnerabilities, recommendations,
+  missing KBs, and lookup helpers (`findbyip`, `tag`).
+
+Endpoint methods return lazy `BaseResults` subclasses and do not issue HTTP
+requests until a terminal materialization method is called.
+"""
+
 from __future__ import annotations
 
 import logging
