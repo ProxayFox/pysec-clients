@@ -40,23 +40,25 @@ class MachinesQuery(BaseQuery):
     so invalid values are caught before hitting the wire.
 
     Example:
-        query = MachinesQuery(healthStatus="Active", pageSize=500)
+    ```python
+    query = MachinesQuery(healthStatus="Active", pageSize=500)
+    query = MachinesQuery(exposureLevel=["Medium", "High"], pageSize=500)
+    ```
     """
-
-    computerDnsName: str | None = None
+    computerDnsName: str | list[str] | None = None
     id: str | list[str] | None = None
-    version: str | None = None
-    deviceValue: LEVELTYPE | None = None
+    version: str | list[str] | None = None
+    deviceValue: LEVELTYPE | list[LEVELTYPE] | None = None
     aadDeviceId: str | list[str] | None = None
     machineTags: str | list[str] | None = None
     lastSeen: datetime | None = None
-    exposureLevel: LEVELTYPE | None = None
-    onboardingStatus: ONBOARDINGTYPE | None = None
-    lastIpAddress: str | None = None
-    healthStatus: HEALTHTYPE | None = None
-    osPlatform: str | None = None
-    riskScore: LEVELTYPE | None = None
-    rbacGroupId: str | None = None
+    exposureLevel: LEVELTYPE | list[LEVELTYPE] | None = None
+    onboardingStatus: ONBOARDINGTYPE | list[ONBOARDINGTYPE] | None = None
+    lastIpAddress: str | list[str] | None = None
+    healthStatus: HEALTHTYPE | list[HEALTHTYPE] | None = None
+    osPlatform: str | list[str] | None = None
+    riskScore: LEVELTYPE | list[LEVELTYPE] | None = None
+    rbacGroupId: str | list[str] | None = None
 
 
 class MachineResults(BaseResults):
