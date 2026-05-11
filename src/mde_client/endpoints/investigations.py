@@ -4,9 +4,7 @@ from datetime import datetime
 
 from .base import BaseQuery, BaseEndpoint, BaseResults
 from ..schemas import INVESTIGATION_SCHEMA
-from ..models.investigation_models import (
-    INVESTIGATION_STATE,
-)
+from ..models.enums import INVESTIGATION_STATE
 
 
 class InvestigationsQuery(BaseQuery):

@@ -18,7 +18,7 @@ from __future__ import annotations
 import logging
 
 from datetime import datetime, timezone
-from typing import Literal, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from .base import BaseQuery, BaseEndpoint, BaseResults
 from ..schemas import (
@@ -30,24 +30,18 @@ from ..schemas import (
     RECOMMENDATION_SCHEMA,
     PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
 )
+from ..models.enums import (
+    DEVICE_VALUE,
+    EXPOSURE_LEVEL,
+    MACHINE_HEALTH_STATUS,
+    ONBOARDING_STATUS,
+    RISK_SCORE,
+)
 
 if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionResults
 
 log = logging.getLogger(__name__)
-
-LEVELTYPE = Literal["None", "Informational", "Low", "Medium", "High"]
-ONBOARDINGTYPE = Literal[
-    "Onboarded", "CanBeOnboarded", "Unsupported", "InsufficientInfo"
-]
-HEALTHTYPE = Literal[
-    "Active",
-    "Inactive",
-    "ImpairedCommunication",
-    "NoSensorData",
-    "NoSensorDataImpairedCommunication",
-    "Unknown",
-]
 
 
 class MachinesQuery(BaseQuery):
@@ -67,16 +61,16 @@ class MachinesQuery(BaseQuery):
     computerDnsName: str | list[str] | None = None
     id: str | list[str] | None = None
     version: str | list[str] | None = None
-    deviceValue: LEVELTYPE | list[LEVELTYPE] | None = None
+    deviceValue: DEVICE_VALUE | list[DEVICE_VALUE] | None = None
     aadDeviceId: str | list[str] | None = None
     machineTags: str | list[str] | None = None
     lastSeen: datetime | None = None
-    exposureLevel: LEVELTYPE | list[LEVELTYPE] | None = None
-    onboardingStatus: ONBOARDINGTYPE | list[ONBOARDINGTYPE] | None = None
+    exposureLevel: EXPOSURE_LEVEL | list[EXPOSURE_LEVEL] | None = None
+    onboardingStatus: ONBOARDING_STATUS | list[ONBOARDING_STATUS] | None = None
     lastIpAddress: str | list[str] | None = None
-    healthStatus: HEALTHTYPE | list[HEALTHTYPE] | None = None
+    healthStatus: MACHINE_HEALTH_STATUS | list[MACHINE_HEALTH_STATUS] | None = None
     osPlatform: str | list[str] | None = None
-    riskScore: LEVELTYPE | list[LEVELTYPE] | None = None
+    riskScore: RISK_SCORE | list[RISK_SCORE] | None = None
     rbacGroupId: str | list[str] | None = None
 
 

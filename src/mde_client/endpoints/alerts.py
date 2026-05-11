@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Literal, Any
+from typing import Any
 
 from .base import BaseQuery, BaseEndpoint, BaseResults
 from ..schemas import (
@@ -30,50 +30,15 @@ from ..schemas import (
     MACHINE_SCHEMA,
     USER_SCHEMA,
 )
+from ..models.enums import (
+    ALERT_CLASSIFICATION,
+    ALERT_DETERMINATION,
+    ALERT_SEVERITY,
+    ALERT_STATUS,
+    IOA_CATEGORY,
+)
 
 log = logging.getLogger(__name__)
-
-STATUS_TYPES = Literal["Unknown", "New", "InProgress", "Resolved"]
-SEVERITY_TYPES = Literal["UnSpecified", "Informational", "Low", "Medium", "High"]
-CLASIFICATION_TYPES = Literal[
-    "TruePositive", "Informational", "expected activity", "FalsePositive"
-]
-CATAGORY_TYPES = Literal[
-    "General",
-    "CommandAndControl",
-    "Collection",
-    "CredentialAccess",
-    "DefenseEvasion",
-    "Discovery",
-    "Exfiltration",
-    "Exploit",
-    "Execution",
-    "InitialAccess",
-    "LateralMovement",
-    "Malware",
-    "Persistence",
-    "PrivilegeEscalation",
-    "Ransomware",
-    "SuspiciousActivity",
-]
-DETERMINATION_TYPE = Literal[
-    # True positive:
-    "MultiStagedAttack",
-    "MaliciousUserActivity",
-    "CompromisedUser",
-    "Malware",
-    "Phishing",
-    "UnwantedSoftware",
-    # Informational, expected activity:
-    "SecurityTesting",
-    "LineOfBusinessApplication",
-    "ConfirmedUserActivity",
-    # False positive:
-    "Clean",
-    "InsufficientData",
-    # Other:
-    "Other",
-]
 
 
 class AlertsQuery(BaseQuery):
@@ -98,8 +63,8 @@ class AlertsQuery(BaseQuery):
     assignedTo: str | list[str] | None = None
     detectionSource: str | list[str] | None = None
     lastEventTime: datetime | None = None
-    status: STATUS_TYPES | list[STATUS_TYPES] | None = None
-    severity: SEVERITY_TYPES | list[SEVERITY_TYPES] | None = None
+    status: ALERT_STATUS | list[ALERT_STATUS] | None = None
+    severity: ALERT_SEVERITY | list[ALERT_SEVERITY] | None = None
     category: str | list[str] | None = None
 
 
@@ -117,11 +82,12 @@ class AlertCreateQuery(BaseQuery):
     eventTime: datetime
     reportId: str
     machineId: str
-    severity: STATUS_TYPES
+
+    severity: ALERT_STATUS
     title: str
     description: str
     recommendedAction: str
-    category: CATAGORY_TYPES
+    category: IOA_CATEGORY
 
     def model_post_init(self, __context: Any) -> None:
         """Validate that the category is not 'Unknown' because alert creation does not allow 'Unknown' category."""
@@ -133,10 +99,10 @@ class AlertCreateQuery(BaseQuery):
 
 class AlertUpdateQuery(BaseQuery):
     id: str | list[str]
-    status: STATUS_TYPES
+    status: ALERT_STATUS
     assignedTo: str
-    classification: CLASIFICATION_TYPES
-    determination: DETERMINATION_TYPE
+    classification: ALERT_CLASSIFICATION
+    determination: ALERT_DETERMINATION
     comment: str
 
     def model_post_init(self, __context: Any) -> None:

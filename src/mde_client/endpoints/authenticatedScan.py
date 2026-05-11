@@ -20,7 +20,6 @@ until a terminal materialization method is called.
 from __future__ import annotations
 
 import logging
-from typing import Literal
 
 
 from .base import BaseQuery, BaseEndpoint, BaseResults, BasePayload
@@ -30,11 +29,9 @@ from ..schemas import (
     DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA,
 )
 from ..models.auth_params_models import SCANAUTHENTICATIONPARAMS
+from ..models.enums import AUTH_SCAN_TYPE, TARGET_TYPE
 
 log = logging.getLogger(__name__)
-
-SCAN_TYPE = Literal["Network", "Windows", "Linux", "AdvancedActive"]
-TARGET_TYPE = Literal["Ip", "Hostname", "Combined"]
 
 
 class DeviceAuthenticatedAgentsQuery(BaseQuery):
@@ -107,7 +104,7 @@ class AuthenticatedDefinitionsAlterPayload(BaseQuery):
     page_size: int | None = None
 
     id: str | None = None
-    scanType: SCAN_TYPE | None = None
+    scanType: AUTH_SCAN_TYPE | None = None
     scanName: str | None = None
     isActive: bool | None = None
     targets: list[str] | None = None
