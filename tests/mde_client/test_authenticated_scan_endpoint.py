@@ -112,7 +112,7 @@ class TestDefinitionsHistory:
             }
         )
 
-        records = endpoint.definition_history("scan-1").to_json()
+        records = endpoint.definition_history("scan-1").to_dicts()
 
         assert records[0]["scanDefinitionId"] == "scan-1"
         assert endpoint.calls[0][0] == "POST"

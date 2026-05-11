@@ -142,19 +142,19 @@ class TestStreamingPagination:
         page2 = [{"id": "3", "name": "c"}]
         results = _make_results([page1, page2])
 
-        records = results.to_json()
+        records = results.to_dicts()
         assert len(records) == 3
         assert records[0]["id"] == "1"
         assert records[2]["id"] == "3"
 
     def test_single_page(self) -> None:
         results = _make_results([[{"id": "x", "name": "y"}]])
-        records = results.to_json()
+        records = results.to_dicts()
         assert len(records) == 1
 
     def test_empty_response(self) -> None:
         results = _make_results([[]])
-        records = results.to_json()
+        records = results.to_dicts()
         assert records == []
 
 
@@ -171,16 +171,16 @@ class TestCaching:
         results = _FakeMachineResults(endpoint, {}, _TEST_SCHEMA)
 
         # First terminal call fetches
-        _ = results.to_json()
+        _ = results.to_dicts()
         first_count = endpoint.counter[0]
 
         # Second terminal call (different format) must not fetch again
         _ = results.to_arrow()
         assert endpoint.counter[0] == first_count
 
-    def test_to_json_and_to_arrow_return_same_data(self) -> None:
+    def test_to_dicts_and_to_arrow_return_same_data(self) -> None:
         results = _make_results([[{"id": "1", "name": "same"}]])
-        json_data = results.to_json()
+        json_data = results.to_dicts()
         arrow_data = results.to_arrow().to_pylist()
         assert json_data == arrow_data
 
@@ -200,11 +200,11 @@ class TestRefresh:
         endpoint = _FakeEndpoint([page, page], chain_pages=False)
         results = _FakeMachineResults(endpoint, {}, _TEST_SCHEMA)
 
-        _ = results.to_json()
+        _ = results.to_dicts()
         first_count = endpoint.counter[0]
 
         # refresh + terminal call must fetch again
-        _ = results.refresh().to_json()
+        _ = results.refresh().to_dicts()
         assert endpoint.counter[0] == first_count + 1
 
     def test_refresh_is_chainable_with_different_formats(self) -> None:
@@ -215,14 +215,14 @@ class TestRefresh:
 
 
 # ------------------------------------------------------------------
-# 5. to_json() works without pyarrow/polars extras
+# 5. to_dicts() works without pyarrow/polars extras
 # ------------------------------------------------------------------
 
 
 class TestToJsonBaseInstall:
-    def test_to_json_returns_list_of_dicts(self) -> None:
+    def test_to_dicts_returns_list_of_dicts(self) -> None:
         results = _make_results([[{"id": "1", "name": "hello"}]])
-        data = results.to_json()
+        data = results.to_dicts()
         assert isinstance(data, list)
         assert isinstance(data[0], dict)
         assert data[0]["name"] == "hello"

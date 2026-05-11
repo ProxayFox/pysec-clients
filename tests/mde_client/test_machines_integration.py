@@ -178,7 +178,7 @@ class TestMachineDetails:
         if reason:
             pytest.skip(reason)
 
-        client_record = mde_client.machines.get(machine_id).to_json()[0]
+        client_record = mde_client.machines.get(machine_id).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="machine details")
 
 
@@ -196,7 +196,7 @@ class TestLogonUsers:
             pytest.skip("No logon users returned for this machine")
 
         direct = resp["value"][0]
-        client_record = mde_client.machines.logonusers(machine_id).to_json()[0]
+        client_record = mde_client.machines.logonusers(machine_id).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="logon users")
 
 
@@ -214,7 +214,7 @@ class TestAlerts:
             pytest.skip("No alerts returned for this machine")
 
         direct = resp["value"][0]
-        client_record = mde_client.machines.alerts(machine_id).to_json()[0]
+        client_record = mde_client.machines.alerts(machine_id).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="alerts")
 
 
@@ -232,7 +232,7 @@ class TestSoftware:
             pytest.skip("No software returned for this machine")
 
         direct = resp["value"][0]
-        client_record = mde_client.machines.software(machine_id).to_json()[0]
+        client_record = mde_client.machines.software(machine_id).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="software")
 
 
@@ -251,7 +251,7 @@ class TestVulnerabilities:
 
         direct = resp["value"][0]
         direct.pop("@odata.type", None)
-        client_record = mde_client.machines.vulnerabilities(machine_id).to_json()[0]
+        client_record = mde_client.machines.vulnerabilities(machine_id).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="vulnerabilities")
 
 
@@ -269,7 +269,7 @@ class TestRecommendations:
             pytest.skip("No recommendations returned for this machine")
 
         direct = resp["value"][0]
-        client_record = mde_client.machines.recommendations(machine_id).to_json()[0]
+        client_record = mde_client.machines.recommendations(machine_id).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="recommendations")
 
 
@@ -287,7 +287,7 @@ class TestMissingKBs:
             pytest.skip("No missing KBs returned for this machine")
 
         direct = resp["value"][0]
-        client_record = mde_client.machines.getmissingkbs(machine_id).to_json()[0]
+        client_record = mde_client.machines.getmissingkbs(machine_id).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="missing KBs")
 
 
@@ -298,7 +298,7 @@ class TestFindByIP:
         machine_ip_and_timestamp: tuple[str, datetime, dict],
     ) -> None:
         ip, timestamp_dt, direct = machine_ip_and_timestamp
-        client_record = mde_client.machines.findbyip(ip, timestamp_dt).to_json()[0]
+        client_record = mde_client.machines.findbyip(ip, timestamp_dt).to_dicts()[0]
         _assert_response_matches(client_record, direct, context=f"findbyip ({ip})")
 
 
@@ -319,5 +319,5 @@ class TestMachineTags:
         direct = resp["value"][0]
         client_record = mde_client.machines.tag(
             machine_tag, useStartsWithFilter=True
-        ).to_json()[0]
+        ).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="machine tags")
