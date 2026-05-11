@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 from http_to_arrow import ArrowRecordContainer
 
 from ..auth import MSALAuth
+from ..schemas import EXPORT_FILES_RESPONSE_SCHEMA
 
 
 class BaseQuery(BaseModel):
@@ -160,9 +161,44 @@ class BaseResults:
             raise ImportError("Install with: uv add mde-client[polars]") from None
         return self._ensure_fetched().to_polars_frame()
 
-    def refresh(self) -> "BaseResults":
+    def refresh(self) -> BaseResults:
         self._container = None
         return self
+
+
+class BaseFileExportResults(BaseResults):
+    """Base class for results that export files.
+
+    These endpoints return a URL to download a file, rather than returning data
+    directly. The file is typically in CSV format, but may be in other formats
+    depending on the endpoint.
+
+    TODO: We need to implement the file download logic in the `download` method, which will involve making an HTTP request to the download URL and returning the file content as bytes.
+    We may also want to add helper methods to parse the file content into a more usable format (e.g. pandas DataFrame) depending on the use case.
+    """
+
+    SCHEMA = EXPORT_FILES_RESPONSE_SCHEMA
+
+    def download(self) -> bytes:
+        """Download the file content as bytes."""
+        # response = self._endpoint._request(
+        #     self._method,
+        #     self._path,
+        #     params=self._params,
+        #     **self._request_kwargs,
+        # )
+        # response.raise_for_status()
+        # body = response.json()
+        # download_url = body.get("downloadUrl")
+        # if not download_url:
+        #     raise ValueError("Response does not contain downloadUrl")
+        # download_response = httpx.get(download_url)
+        # download_response.raise_for_status()
+        # return download_response.content
+
+        raise NotImplementedError(
+            "File download functionality is not yet implemented. Please contact the maintainers if you need this functionality."
+        )
 
 
 class BaseEndpoint:

@@ -18,7 +18,7 @@ from __future__ import annotations
 import logging
 
 from datetime import datetime, timezone
-from typing import Literal
+from typing import Literal, TYPE_CHECKING
 
 from .base import BaseQuery, BaseEndpoint, BaseResults
 from ..schemas import (
@@ -30,6 +30,9 @@ from ..schemas import (
     RECOMMENDATION_SCHEMA,
     PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
 )
+
+if TYPE_CHECKING:
+    from .browserExtension import BrowserExtensionResults
 
 log = logging.getLogger(__name__)
 
@@ -221,6 +224,35 @@ class MachinesEndpoint(BaseEndpoint):
             "useStartsWithFilter": str(useStartsWithFilter).lower(),
         }
         return MachineResults(self, params, path=path)
+
+    # === Browser Extension related endpoints ===
+    # Browser Extension endpoints are on the MachinesEndpoint, intended to use the browserExtensions() method to access, but we can also expose them here if needed.
+    def _browserExtensionsInventoryByMachine(self) -> BrowserExtensionResults:
+        """Get browser extensions for a machine.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions#1-export-browser-extensions-assessment-json-response
+        """
+        from .browserExtension import BrowserExtensionResults
+
+        path = f"{self._PATH}/BrowserExtensionsInventoryByMachine"
+        return BrowserExtensionResults(self, {}, path=path)
+
+    def _browserextensionsinventoryExport(self) -> BrowserExtensionResults:
+        """Get browser extensions for a machine.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions#2-export-browser-extension-assessment-via-files
+        """
+        # from .browserExtension import BrowserExtensionResults
+
+        # path = f"{self._PATH}/browserextensionsinventoryExport"
+        # return BrowserExtensionResults(self, {}, path=path)
+        raise NotImplementedError(
+            "This endpoint is not yet implemented, as it requires handling file downloads which is not yet implemented in the client."
+        )
 
 
 class MachineNotFoundError(Exception):
