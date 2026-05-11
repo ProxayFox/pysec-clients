@@ -115,23 +115,6 @@ class ActionParam:
     optional: bool  # has Org.OData.Core.V1.OptionalParameter annotation
 
 
-@dataclass(frozen=True)
-class ActionPayloadSpec:
-    """Generate a Pydantic BasePayload from bound action parameters."""
-
-    action_name: str
-    class_name: str
-    binding_type: str  # full OData type of the binding parameter
-
-
-@dataclass(frozen=True)
-class SupportModuleSpec:
-    """One generated support-model module under src/mde_client/models/."""
-
-    enums: dict[str, str]  # XML enum name → Python alias name (UPPER_SNAKE)
-    action_payloads: list[ActionPayloadSpec]
-
-
 # Narrow, opt-in request-model generation for contract-defined request payload
 # shapes that we do not want to hand-maintain in endpoint modules.
 REQUEST_MODEL_SPECS: dict[str, RequestModelSpec] = {
@@ -156,22 +139,9 @@ REQUEST_MODEL_PRIMITIVES: dict[str, str] = {
     "Edm.Guid": "str",
 }
 
-# Narrow, opt-in support-model generation for contract-derived enum aliases
-# and action payload models that we do not want to hand-maintain.
-SUPPORT_MODULE_SPECS: dict[str, SupportModuleSpec] = {
-    "investigation_models": SupportModuleSpec(
-        enums={
-            "InvestigationState": "INVESTIGATION_STATE",
-            "KnownRequestSource": "KNOWN_REQUEST_SOURCE",
-        },
-        action_payloads=[
-            ActionPayloadSpec(
-                action_name="StartInvestigation",
-                class_name="InvestigationStartPayload",
-                binding_type="microsoft.windowsDefenderATP.api.Machine",
-            ),
-        ],
-    ),
+# Enum types to skip from auto-generation — oddly-named or internal.
+SKIP_ENUM_TYPES: set[str] = {
+    "microsoft.windowsDefenderATP.api",  # anomalous namespace-as-name entry
 }
 
 
@@ -283,8 +253,8 @@ class MDEMetadata:
         self.response_complex_types: set[str] = set()
         # child short name → parent short name
         self.base_types: dict[str, str] = {}
-        # action name → list of non-binding ActionParam
-        self.actions: dict[str, list[ActionParam]] = {}
+        # (action_name, binding_short_type) → list of non-binding ActionParam
+        self.actions: dict[tuple[str, str], list[ActionParam]] = {}
 
         for el in root.iter(f"{{{MDE_NS}}}EnumType"):
             name = el.get("Name", "")
@@ -317,6 +287,13 @@ class MDEMetadata:
             for el in root.iter(f"{{{MDE_NS}}}{kind}"):
                 action_name = el.get("Name", "")
 
+                # ── Resolve binding type ─────────────────────────────────
+                binding_el = el.find(f"{{{MDE_NS}}}Parameter[@Name='bindingParameter']")
+                binding_type = (
+                    binding_el.get("Type", "") if binding_el is not None else ""
+                )
+                binding_short = strip_prefix(unwrap_collection(binding_type))
+
                 # ── Action parameter capture ─────────────────────────────
                 params: list[ActionParam] = []
                 for param_el in el.findall(f"{{{MDE_NS}}}Parameter"):
@@ -339,18 +316,12 @@ class MDEMetadata:
                         )
                     )
                 if params:
-                    self.actions[action_name] = params
+                    self.actions[(action_name, binding_short)] = params
 
                 # ── Response complex type capture ────────────────────────
                 return_el = el.find(f"{{{MDE_NS}}}ReturnType")
                 if return_el is None:
-                    binding_el = el.find(
-                        f"{{{MDE_NS}}}Parameter[@Name='bindingParameter']"
-                    )
-                    binding_type = (
-                        binding_el.get("Type", "") if binding_el is not None else ""
-                    )
-                    override_key = (el.get("Name", ""), binding_type)
+                    override_key = (action_name, binding_type)
                     override_type = NO_RETURN_ACTION_RESPONSE_OVERRIDES.get(
                         override_key
                     )
@@ -813,58 +784,72 @@ class RequestModelCodeGen:
 
 
 class SupportModelCodeGen:
-    """Generates non-Arrow support models: enum Literal aliases and action payload classes."""
+    """Auto-discovers all enums and action payloads from the contract.
+
+    Generates:
+      - ``enums.py``: one UPPER_SNAKE Literal alias per EnumType
+      - ``action_payloads.py``: one BasePayload subclass per bound action
+    """
 
     def __init__(self, meta: MDEMetadata) -> None:
         self.meta = meta
+
+    # -- helpers ---------------------------------------------------------------
 
     def _literal_block(self, enum_name: str, alias_name: str) -> str:
         members = self.meta.enum_members[enum_name]
         joined = ", ".join(f'"{m}"' for m in members)
         return f"{alias_name} = Literal[{joined}]"
 
-    def _python_type_expr(self, odata_t: str, enum_aliases: dict[str, str]) -> str:
+    def _python_type_expr(self, odata_t: str) -> str:
         if odata_t.startswith("Collection("):
             inner = odata_t[len("Collection(") : -1]
-            return f"list[{self._python_type_expr(inner, enum_aliases)}]"
+            return f"list[{self._python_type_expr(inner)}]"
         if odata_t in REQUEST_MODEL_PRIMITIVES:
             return REQUEST_MODEL_PRIMITIVES[odata_t]
         short = strip_prefix(odata_t)
-        if short in enum_aliases:
-            return enum_aliases[short]
         if short in self.meta.enum_types:
-            return "str"
+            return to_const(short)
         return "str"
 
+    def _action_payload_class_name(self, action_name: str, binding_short: str) -> str:
+        """Derive a unique class name for an action payload.
+
+        If the action name is unique across all binding types, use
+        ``<ActionName>Payload``.  Otherwise, disambiguate with the
+        short binding type: ``<ActionName><BindingShort>Payload``.
+        """
+        overload_count = sum(
+            1 for (aname, _) in self.meta.actions if aname == action_name
+        )
+        if overload_count > 1:
+            return f"{action_name}{binding_short}Payload"
+        return f"{action_name}Payload"
+
     def _action_payload_block(
-        self, spec: ActionPayloadSpec, enum_aliases: dict[str, str]
+        self, action_name: str, binding_short: str, params: list[ActionParam]
     ) -> str:
-        params = self.meta.actions.get(spec.action_name, [])
-        lines = [f"class {spec.class_name}(BasePayload):"]
+        class_name = self._action_payload_class_name(action_name, binding_short)
+        lines = [f"class {class_name}(BasePayload):"]
         if not params:
             lines.append("    pass")
             return "\n".join(lines)
 
         for p in params:
-            py_type = self._python_type_expr(p.odata_type, enum_aliases)
+            py_type = self._python_type_expr(p.odata_type)
             if p.optional:
                 lines.append(f"    {p.name}: {py_type} | None = None")
             else:
                 lines.append(f"    {p.name}: {py_type}")
         return "\n".join(lines)
 
-    def _collect_enum_deps(self, spec: SupportModuleSpec) -> dict[str, str]:
-        """Collect all enum aliases needed: explicit + transitive from action params."""
-        aliases: dict[str, str] = dict(spec.enums)
-        for ap in spec.action_payloads:
-            for p in self.meta.actions.get(ap.action_name, []):
-                short = strip_prefix(unwrap_collection(p.odata_type))
-                if short in self.meta.enum_types and short not in aliases:
-                    aliases[short] = to_const(short)
-        return aliases
+    # -- enums.py --------------------------------------------------------------
 
-    def generate(self, module_name: str, spec: SupportModuleSpec) -> str:
-        enum_aliases = self._collect_enum_deps(spec)
+    def generate_enums(self) -> str:
+        """Generate enums.py with ALL Literal aliases from the contract."""
+        sorted_enums = sorted(
+            (name for name in self.meta.enum_types if name not in SKIP_ENUM_TYPES),
+        )
 
         parts: list[str] = [
             "# AUTO-GENERATED by scripts/mde_contract.py — do not edit manually.",
@@ -875,29 +860,11 @@ class SupportModelCodeGen:
             "",
         ]
 
-        needs_base_payload = bool(spec.action_payloads)
-        if needs_base_payload:
-            parts.append("from mde_client.endpoints.base import BasePayload")
-            parts.append("")
+        blocks = [self._literal_block(name, to_const(name)) for name in sorted_enums]
+        parts.append("\n".join(blocks))
+        parts.append("")
 
-        if enum_aliases:
-            parts.append(
-                "\n".join(
-                    self._literal_block(name, alias)
-                    for name, alias in enum_aliases.items()
-                )
-            )
-            parts.append("")
-
-        for ap_spec in spec.action_payloads:
-            parts.append("")
-            parts.append(self._action_payload_block(ap_spec, enum_aliases))
-            parts.append("")
-
-        all_entries: list[str] = [*enum_aliases.values()]
-        for ap_spec in spec.action_payloads:
-            all_entries.append(ap_spec.class_name)
-
+        all_entries = [to_const(name) for name in sorted_enums]
         parts.append("__all__ = [")
         parts.extend(f'    "{entry}",' for entry in all_entries)
         parts.append("]")
@@ -905,20 +872,69 @@ class SupportModelCodeGen:
 
         return "\n".join(parts)
 
-    def generate_init(self, module_specs: dict[str, SupportModuleSpec]) -> str:
+    # -- action_payloads.py ----------------------------------------------------
+
+    def generate_action_payloads(self) -> str:
+        """Generate action_payloads.py with ALL BasePayload subclasses."""
+        sorted_actions = sorted(self.meta.actions.items())
+
+        # Collect enum deps referenced by action params
+        enum_deps: dict[str, str] = {}
+        for (_aname, _btype), params in sorted_actions:
+            for p in params:
+                short = strip_prefix(unwrap_collection(p.odata_type))
+                if short in self.meta.enum_types and short not in enum_deps:
+                    enum_deps[short] = to_const(short)
+
+        parts: list[str] = [
+            "# AUTO-GENERATED by scripts/mde_contract.py — do not edit manually.",
+            "# Re-run the script to regenerate when MDE $metadata changes.",
+            "from __future__ import annotations",
+            "",
+        ]
+
+        if enum_deps:
+            imports = ", ".join(sorted(enum_deps.values()))
+            parts.append(f"from mde_client.models.enums import {imports}")
+            parts.append("")
+
+        parts.append("from mde_client.endpoints.base import BasePayload")
+        parts.append("")
+
+        class_names: list[str] = []
+        for (aname, bshort), params in sorted_actions:
+            parts.append("")
+            parts.append(self._action_payload_block(aname, bshort, params))
+            class_names.append(self._action_payload_class_name(aname, bshort))
+
+        parts.append("")
+        parts.append("")
+        parts.append("__all__ = [")
+        parts.extend(f'    "{cn}",' for cn in class_names)
+        parts.append("]")
+        parts.append("")
+
+        return "\n".join(parts)
+
+    # -- models/__init__.py ----------------------------------------------------
+
+    def generate_init(self) -> str:
         """Generate models/__init__.py with PEP 562 lazy loading."""
         name_to_module: dict[str, str] = {}
-        for module_name, spec in module_specs.items():
-            enum_aliases = self._collect_enum_deps(spec)
-            for alias in enum_aliases.values():
-                name_to_module[alias] = module_name
-            for ap_spec in spec.action_payloads:
-                name_to_module[ap_spec.class_name] = module_name
 
-        # Add request-model exports
+        # Enum exports → enums module
+        for name in sorted(self.meta.enum_types - SKIP_ENUM_TYPES):
+            name_to_module[to_const(name)] = "enums"
+
+        # Action payload exports → action_payloads module
+        for (aname, bshort), _params in sorted(self.meta.actions.items()):
+            class_name = self._action_payload_class_name(aname, bshort)
+            name_to_module[class_name] = "action_payloads"
+
+        # Request-model exports
         for root_name, rm_spec in REQUEST_MODEL_SPECS.items():
             descendants = self.meta.concrete_descendants(root_name)
-            enum_names = []
+            enum_names: list[str] = []
             seen: set[str] = set()
             for tn in [root_name, *descendants]:
                 for prop in self.meta.declared_props_for(tn):
@@ -937,17 +953,17 @@ class SupportModelCodeGen:
             seen_modules.setdefault(module, []).append(name)
 
         type_checking_lines: list[str] = []
-        for module, names in seen_modules.items():
+        for module, names in sorted(seen_modules.items()):
             if len(names) == 1:
                 type_checking_lines.append(f"    from .{module} import {names[0]}")
             else:
-                joined = ",\n        ".join(names)
+                joined = ",\n        ".join(sorted(names))
                 type_checking_lines.append(
                     f"    from .{module} import (\n        {joined},\n    )"
                 )
 
         registry_lines: list[str] = ["_NAME_TO_MODULE: dict[str, str] = {"]
-        for name, module in name_to_module.items():
+        for name, module in sorted(name_to_module.items()):
             registry_lines.append(f'    "{name}": "{module}",')
         registry_lines.append("}")
 
@@ -1144,20 +1160,33 @@ def main() -> None:
 
     support_model_count = 0
 
-    for module_name, module_spec in SUPPORT_MODULE_SPECS.items():
-        source = support_model_gen.generate(module_name, module_spec)
-        out_path = MODELS_OUTPUT_DIR / f"{module_name}.py"
-        expected_model_paths.add(out_path)
+    # enums.py — all Literal aliases auto-discovered from contract
+    enums_source = support_model_gen.generate_enums()
+    enums_path = MODELS_OUTPUT_DIR / "enums.py"
+    expected_model_paths.add(enums_path)
 
-        if args.dry_run:
-            sep = "─" * 60
-            print(f"\n{sep}\n# {out_path}\n{sep}")
-            print(source)
-        else:
-            out_path.write_text(source, encoding="utf-8")
-            print(f"  ✓ {out_path}")
+    if args.dry_run:
+        sep = "─" * 60
+        print(f"\n{sep}\n# {enums_path}\n{sep}")
+        print(enums_source)
+    else:
+        enums_path.write_text(enums_source, encoding="utf-8")
+        print(f"  ✓ {enums_path}")
+    support_model_count += 1
 
-        support_model_count += 1
+    # action_payloads.py — all BasePayload subclasses auto-discovered
+    payloads_source = support_model_gen.generate_action_payloads()
+    payloads_path = MODELS_OUTPUT_DIR / "action_payloads.py"
+    expected_model_paths.add(payloads_path)
+
+    if args.dry_run:
+        sep = "─" * 60
+        print(f"\n{sep}\n# {payloads_path}\n{sep}")
+        print(payloads_source)
+    else:
+        payloads_path.write_text(payloads_source, encoding="utf-8")
+        print(f"  ✓ {payloads_path}")
+    support_model_count += 1
 
     # ── schemas/__init__.py ───────────────────────────────────────────────────
 
@@ -1174,7 +1203,7 @@ def main() -> None:
 
     # ── models/__init__.py ────────────────────────────────────────────────────
 
-    models_init_source = support_model_gen.generate_init(SUPPORT_MODULE_SPECS)
+    models_init_source = support_model_gen.generate_init()
     models_init_path = MODELS_OUTPUT_DIR / "__init__.py"
 
     if args.dry_run:
