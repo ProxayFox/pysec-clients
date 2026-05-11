@@ -105,7 +105,11 @@ class BasePayload(BaseModel):
 
 
 class BaseResults:
-    """Base results container for API endpoints."""
+    """Base results wrapper for API endpoints.
+    
+    This class provides lazy evaluation of results, deferring HTTP requests until
+    a terminal method is called (e.g. ``to_dicts``, ``to_arrow``, ``to_polars``, ``refresh``).
+    """
 
     SCHEMA: pa.Schema
 
@@ -131,6 +135,7 @@ class BaseResults:
 
     @staticmethod
     def _records_from_body(body: Any) -> list[dict[str, Any]]:
+        """Extract a list of record dicts from the response body, handling various nesting patterns."""
         if isinstance(body, list):
             return body
         if isinstance(body, dict):
@@ -142,6 +147,7 @@ class BaseResults:
         return []
 
     def _ensure_fetched(self) -> ArrowRecordContainer:
+        """Fetch results from the API if they haven't been fetched already, and return a populated container."""
         if self._container is None:
             self._container = ArrowRecordContainer(
                 schema=self.SCHEMA,
@@ -233,9 +239,11 @@ class BaseResults:
         return None
 
     def to_dicts(self) -> list[dict]:
+        """Materialize results into a list of dicts."""
         return self._ensure_fetched().to_table().to_pylist()
 
     def to_arrow(self) -> pa.Table:
+        """Materialize results into a PyArrow Table."""
         try:
             import pyarrow  # noqa: F401
         except ImportError:
@@ -243,6 +251,7 @@ class BaseResults:
         return self._ensure_fetched().to_table()
 
     def to_polars(self) -> pl.DataFrame:
+        """Materialize results into a Polars DataFrame."""
         try:
             import polars  # noqa: F401
         except ImportError:
@@ -250,16 +259,13 @@ class BaseResults:
         return self._ensure_fetched().to_polars_frame()
 
     def refresh(self) -> BaseResults:
+        """Clear any cached results, forcing the next materialization to re-query the API."""
         self._container = None
         return self
 
 
 class BaseEndpoint:
-    """Base class for API endpoints.
-
-    Not intended to be used directly. Endpoint clients should inherit from this
-    and implement their own methods.
-    """
+    """Base class for API endpoints."""
 
     _PATH: str = ""
 

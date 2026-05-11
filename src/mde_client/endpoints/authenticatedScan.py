@@ -36,20 +36,19 @@ log = logging.getLogger(__name__)
 
 class DeviceAuthenticatedAgentsQuery(BaseQuery):
     """Query parameters for the /api/DeviceAuthenticatedScanAgents endpoint.
-
-    All fields are optional, omitted fields are simply not sent.
-    Pydantic enforces the constraints (ge/le) at construction time,
-    so invalid values are caught before hitting the wire.
-
-    Doesn't appear to be any filters for this endpoint,
-    but the class is left here for consistency and future-proofing.
+    Endpoint doesn't have any documented query parameters, but this class is left here for consistency and future-proofing.
     """
 
     pass
 
 
 class AuthenticatedScanHistoryQuery(BaseQuery):
-    """OData query parameters for authenticated scan history actions."""
+    """OData query parameters for authenticated scan history actions.
+    
+    Args:
+        - page_size(None): Number of items to return per page. Forced to None in the endpoint
+        - model_config(dict): Forbid extra fields to prevent accidentally including query parameters in the request body of POST endpoints that use this query model for pagination.
+    """
 
     model_config = {"extra": "forbid"}
     page_size: int | None = None
@@ -57,13 +56,7 @@ class AuthenticatedScanHistoryQuery(BaseQuery):
 
 class AuthenticatedDefinitionsQuery(BaseQuery):
     """Query parameters for the /api/DeviceAuthenticatedScanDefinitions endpoint.
-
-    All fields are optional, omitted fields are simply not sent.
-    Pydantic enforces the constraints (ge/le) at construction time,
-    so invalid values are caught before hitting the wire.
-
-    Doesn't appear to be any filters for this endpoint,
-    but the class is left here for consistency and future-proofing.
+    Endpoint doesn't have any documented query parameters, but this class is left here for consistency and future-proofing.
     """
 
     pass
@@ -90,13 +83,8 @@ class ScanHistoryBySessionRequestPayload(BasePayload):
 
 class AuthenticatedDefinitionsAlterPayload(BaseQuery):
     """Query parameters for Add, update, or delete a scan definition on the /api/DeviceAuthenticatedScanDefinitions endpoint.
-
-    All fields are optional, omitted fields are simply not sent.
-    Pydantic enforces the constraints (ge/le) at construction time,
-    so invalid values are caught before hitting the wire.
-
-    Note: This is a placeholder class for future implementation of update operations on authenticated scan definitions.
-    The specific fields and validation logic will depend on the requirements of the update operations once they are defined.
+    
+    page_size(None): Forced to None in the endpoint
     """
 
     # Not actually a parameter for this endpoint,
@@ -115,18 +103,31 @@ class AuthenticatedDefinitionsAlterPayload(BaseQuery):
 
 
 class AuthenticatedDefinitionsResults(BaseResults):
+    """Results wrapper for authenticated scan definitions queries."""
     SCHEMA = DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA
 
 
 class AuthenticatedScanHistoryResults(BaseResults):
+    """Results wrapper for authenticated scan history queries."""
     SCHEMA = AUTH_SCAN_HISTORY_CONTRACT_SCHEMA
 
 
 class DeviceAuthenticatedAgentsQueryResults(BaseResults):
+    """Results wrapper for device authenticated scan agents queries."""
     SCHEMA = DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA
 
 
 class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
+    """Endpoint for managing authenticated scan definitions.
+    
+    Methods:
+        - get_all: Get all authenticated scan definitions.
+        - definition_history: Get scan history by definition IDs.
+        - session_history: Get scan history by session IDs.
+        - add: Add a new authenticated scan definition.
+        - update: Update an existing authenticated scan definition.
+        - delete: Delete existing authenticated scan definition.
+    """
     _PATH = "/api/DeviceAuthenticatedScanDefinitions"
 
     def get_all(

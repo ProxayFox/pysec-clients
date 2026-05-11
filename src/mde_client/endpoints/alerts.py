@@ -46,10 +46,6 @@ log = logging.getLogger(__name__)
 class AlertsQuery(BaseQuery):
     """Query parameters for the /api/alerts endpoint.
 
-    All fields are optional — omitted fields are simply not sent.
-    Pydantic enforces the constraints (ge/le) at construction time,
-    so invalid values are caught before hitting the wire.
-
     Example:
     ```python
         query = AlertsQuery(severity="Medium", pageSize=500)
@@ -71,13 +67,11 @@ class AlertsQuery(BaseQuery):
 
 
 class AlertCreateQuery(BaseQuery):
-    """Query parameters for creating an alert by reference.
-
-    All fields are required.
-
+    """Query parameters for creating an alert by reference. **All fields are required.**
+    
     Example:
     ```python
-        query = AlertCreateQuery(referenceId="12345", referenceType="CustomReference")
+        query = AlertCreateQuery(referenceId="12345", referenceType="CustomReference" ... , category="Malware")
     ```
     """
 
@@ -100,64 +94,106 @@ class AlertCreateQuery(BaseQuery):
 
 
 class AlertsResults(BaseResults):
+    """Results from the /api/alerts endpoint."""
     SCHEMA = ALERT_SCHEMA
 
 
 class DomainResults(BaseResults):
+    """Results from the /api/alerts/{id}/domains endpoint."""
     SCHEMA = DOMAIN_SCHEMA
 
 
 class FileResults(BaseResults):
+    """Results from the /api/alerts/{id}/files endpoint."""
     SCHEMA = FILE_SCHEMA
 
 
 class IPResults(BaseResults):
+    """Results from the /api/alerts/{id}/ips endpoint."""
     SCHEMA = IP_SCHEMA
 
 
 class MachineResults(BaseResults):
+    """Results from the /api/alerts/{id}/machines endpoint."""
     SCHEMA = MACHINE_SCHEMA
 
 
 class UserResults(BaseResults):
+    """Results from the /api/alerts/{id}/user endpoint."""
     SCHEMA = USER_SCHEMA
 
 
 class AlertsEndpoint(BaseEndpoint):
+    """Client for the /api/alerts endpoint.
+    
+    Methods:
+        - get_all: Get all alerts matching the query parameters.
+        - get: Get a single alert by ID.
+        - domains: Get the domains associated with an alert.
+        - files: Get the files associated with an alert.
+        - ips: Get the IPs associated with an alert.
+        - machines: Get the machines associated with an alert.
+        - user: Get the user associated with an alert.
+        - createAlertByReference: Create an alert by reference.
+        - batchUpdate: Batch update alerts.
+        - update: Update alerts (alias for batch update).
+    """
+    
     _PATH = "/api/alerts"
 
     def get_all(self, query: AlertsQuery | None = None) -> AlertsResults:
-        """Get all alerts matching the query parameters."""
+        """Get all alerts matching the query parameters.
+        
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alerts
+        """
         params = query.to_odata_filters if query else {}
         return AlertsResults(self, params)
 
     def get(self, id: str) -> AlertsResults:
-        """Get a single alert by ID."""
+        """Get a single alert by ID.
+        
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-info-by-id
+        """
         path = f"{self._PATH}/{id}"
         return AlertsResults(self, {}, path=path, single=True)
 
     def domains(self, id: str) -> DomainResults:
-        """Get the domains associated with an alert."""
+        """Get the domains associated with an alert.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-domain-info
+        """
         path = f"{self._PATH}/{id}/domains"
         return DomainResults(self, {}, path=path)
 
     def files(self, id: str) -> FileResults:
-        """Get the files associated with an alert."""
+        """Get the files associated with an alert.
+        
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-files-info
+        """
         path = f"{self._PATH}/{id}/files"
         return FileResults(self, {}, path=path)
 
     def ips(self, id: str) -> IPResults:
-        """Get the IPs associated with an alert."""
+        """Get the IPs associated with an alert.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-ip-info
+        """
         path = f"{self._PATH}/{id}/ips"
         return IPResults(self, {}, path=path)
 
     def machines(self, id: str) -> MachineResults:
-        """Get the machines associated with an alert."""
+        """Get the machines associated with an alert.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-machine-info
+        """
         path = f"{self._PATH}/{id}/machines"
         return MachineResults(self, {}, path=path)
 
     def user(self, id: str) -> UserResults:
-        """Get the user associated with an alert."""
+        """Get the user associated with an alert.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-user-info
+        """
         path = f"{self._PATH}/{id}/user"
         return UserResults(self, {}, path=path)
 

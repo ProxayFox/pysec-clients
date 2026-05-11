@@ -79,30 +79,37 @@ class MachinesQuery(BaseQuery):
 
 
 class MachineResults(BaseResults):
+    """Results from the /api/machines endpoint."""
     SCHEMA = MACHINE_SCHEMA
 
 
 class LogonUserResults(BaseResults):
+    """Results from the /api/machines/{id}/logonusers endpoint."""
     SCHEMA = USER_SCHEMA
 
 
 class AlertResults(BaseResults):
+    """Results from the /api/machines/{id}/alerts endpoint."""
     SCHEMA = ALERT_SCHEMA
 
 
 class SoftwareResults(BaseResults):
+    """Results from the /api/machines/{id}/software endpoint."""
     SCHEMA = SOFTWARE_SCHEMA
 
 
 class VulnerabilityResults(BaseResults):
+    """Results from the /api/machines/{id}/vulnerabilities endpoint."""
     SCHEMA = VULNERABILITY_SCHEMA
 
 
 class RecommendationResults(BaseResults):
+    """Results from the /api/machines/{id}/recommendations endpoint."""
     SCHEMA = RECOMMENDATION_SCHEMA
 
 
 class PublicProductFixResults(BaseResults):
+    """Results from the /api/machines/{id}/getmissingkbs endpoint."""
     SCHEMA = PUBLIC_PRODUCT_FIX_DTO_SCHEMA
 
 

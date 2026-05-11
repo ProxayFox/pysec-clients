@@ -26,7 +26,7 @@ from ..schemas import ASSET_BROWSER_EXTENSION_SCHEMA, BROWSER_EXTENSIONS_SCHEMA
 
 
 class BrowserExtensionsPermissionsInfoQuery(BaseQuery):
-    """Query for the /api/machines/permissionsinfo endpoint."""
+    """OData query parameters for the api/browserextensions/permissionsinfo endpoint."""
 
     id: str | None = None
     name: str | None = None
@@ -44,13 +44,13 @@ class BrowserExtensionResults(BaseResults):
 
 
 class BrowserExtensionsPermissionsInfoResults(BaseResults):
-    """Results from the /api/machines/permissionsinfo endpoint."""
+    """Results from the /api/browserextensions/permissionsinfo endpoint."""
 
     SCHEMA = BROWSER_EXTENSIONS_SCHEMA
 
 
 class BrowserExtensionEndpoint(BaseEndpoint):
-    """Endpoint for /api/machines/BrowserExtensionsInventoryByMachine"""
+    """Client for browser extension inventory endpoints."""
 
     _PATH = "/api/browserextensions"
 
