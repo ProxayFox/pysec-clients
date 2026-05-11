@@ -6,6 +6,19 @@ AUTH_PARAMS_BASE_TYPE: pa.StructType = pa.struct(
     [
         pa.field("keyVaultUri", pa.string()),
         pa.field("keyVaultSecretName", pa.string()),
+        pa.field("type", pa.string()),
+        pa.field("username", pa.string()),
+        pa.field("password", pa.string()),
+        pa.field("domain", pa.string()),
+        pa.field("isgmsaUser", pa.bool_()),
+        pa.field("packetPrivacy", pa.bool_()),
+        pa.field("packetIntegrity", pa.bool_()),
+        pa.field("privateKey", pa.string()),
+        pa.field("communityString", pa.string()),
+        pa.field("authProtocol", pa.string()),
+        pa.field("authPassword", pa.string()),
+        pa.field("privProtocol", pa.string()),
+        pa.field("privPassword", pa.string()),
     ]
 )
 
@@ -60,7 +73,7 @@ DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA: pa.Schema = pa.schema(
         pa.field("scanType", pa.string(), nullable=False),
         pa.field("scanName", pa.string()),
         pa.field("isActive", pa.bool_(), nullable=False),
-        pa.field("scanAuthenticationParams", pa.string()),
+        pa.field("scanAuthenticationParams", AUTH_PARAMS_BASE_TYPE),
         pa.field("target", pa.string()),
         pa.field("scannerAgent", AGENT_CONTRACT_TYPE),
         pa.field("orgId", pa.string()),
