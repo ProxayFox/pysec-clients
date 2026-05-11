@@ -20,6 +20,7 @@ from __future__ import annotations
 import httpx
 import asyncio
 import pyarrow as pa
+import polars as pl
 from datetime import datetime
 from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
@@ -27,6 +28,7 @@ from http_to_arrow import ArrowRecordContainer
 
 from ..auth import MSALAuth
 from ..schemas import EXPORT_FILES_RESPONSE_SCHEMA
+from ..viaFiles import ViaFiles
 
 
 class BaseQuery(BaseModel):
@@ -112,11 +114,13 @@ class BaseResults:
         *,
         path: str | None = None,  # overrides endpoint._PATH for sub-resources
         single: bool = False,  # True when endpoint returns a bare object, not a collection
+        files: bool = False,  # True when endpoint returns file export results
         method: str = "GET",
         request_kwargs: dict[str, Any] | None = None,
     ) -> None:
         self._endpoint = endpoint
         self._params = params
+        self._files = files
         self._path = path or endpoint._PATH
         self._single = single
         self._method = method
@@ -152,6 +156,25 @@ class BaseResults:
             )
             response.raise_for_status()
             self._container.extend(self._records_from_body(response.json()))
+            del response  # free memory
+        elif self._files:
+            # For file export endpoints, we expect a single record containing the download URL
+            response = self._endpoint._request(
+                self._method,
+                self._path,
+                params=self._params,
+                **self._request_kwargs,
+            )
+            response.raise_for_status()
+
+            file_tbl: ArrowRecordContainer = ArrowRecordContainer(
+                schema=EXPORT_FILES_RESPONSE_SCHEMA
+            )
+            file_tbl.extend(self._records_from_body(response.json()))
+
+            self._container = self._files_to_container(file_tbl.to_polars)
+            del file_tbl, response  # free memory
+
         elif self._params.get("$top") or self._params.get("$skip"):
             # If $top or $skip is specified, we should not paginate
             response = self._endpoint._request(
@@ -162,6 +185,7 @@ class BaseResults:
             )
             response.raise_for_status()
             self._container.extend(self._records_from_body(response.json()))
+            del response  # free memory
         else:
             self._endpoint._paginate_into(
                 self._path,
@@ -173,7 +197,24 @@ class BaseResults:
 
         return self._container
 
-    def to_json(self) -> list[dict]:
+    def _files_to_container(self, files: pl.DataFrame) -> ArrowRecordContainer:
+        """Download export blobs via async streaming and return a populated container."""
+        urls: list[str] = (
+            files.get_column("exportFiles").explode().drop_nulls().to_list()
+        )
+        if not urls:
+            return ArrowRecordContainer(schema=self.SCHEMA)
+
+        container = ArrowRecordContainer(
+            schema=self.SCHEMA,
+            unknown_field_policy="drop",
+            coercion_policy="coerce",
+        )
+        via = ViaFiles()
+        asyncio.run(via.download_export_files(urls, container))
+        return container
+
+    def to_dicts(self) -> list[dict]:
         return self._ensure_fetched().to_table().to_pylist()
 
     def to_arrow(self) -> pa.Table:
@@ -183,7 +224,7 @@ class BaseResults:
             raise ImportError("Install with: uv add mde-client[arrow]") from None
         return self._ensure_fetched().to_table()
 
-    def to_polars(self):
+    def to_polars(self) -> pl.DataFrame:
         try:
             import polars  # noqa: F401
         except ImportError:
@@ -193,41 +234,6 @@ class BaseResults:
     def refresh(self) -> BaseResults:
         self._container = None
         return self
-
-
-class BaseFileExportResults(BaseResults):
-    """Base class for results that export files.
-
-    These endpoints return a URL to download a file, rather than returning data
-    directly. The file is typically in CSV format, but may be in other formats
-    depending on the endpoint.
-
-    TODO: We need to implement the file download logic in the `download` method, which will involve making an HTTP request to the download URL and returning the file content as bytes.
-    We may also want to add helper methods to parse the file content into a more usable format (e.g. pandas DataFrame) depending on the use case.
-    """
-
-    SCHEMA = EXPORT_FILES_RESPONSE_SCHEMA
-
-    def download(self) -> bytes:
-        """Download the file content as bytes."""
-        # response = self._endpoint._request(
-        #     self._method,
-        #     self._path,
-        #     params=self._params,
-        #     **self._request_kwargs,
-        # )
-        # response.raise_for_status()
-        # body = response.json()
-        # download_url = body.get("downloadUrl")
-        # if not download_url:
-        #     raise ValueError("Response does not contain downloadUrl")
-        # download_response = httpx.get(download_url)
-        # download_response.raise_for_status()
-        # return download_response.content
-
-        raise NotImplementedError(
-            "File download functionality is not yet implemented. Please contact the maintainers if you need this functionality."
-        )
 
 
 class BaseEndpoint:
