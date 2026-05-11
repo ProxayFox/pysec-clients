@@ -57,6 +57,7 @@ class _FakeDefinitionsEndpoint(AuthenticatedDefinitionsEndpoint):
 class TestAuthenticatedScanHistoryQuery:
     def test_defaults_do_not_include_page_size(self) -> None:
         params = AuthenticatedScanHistoryQuery().to_odata_filters
+        print(params)
         assert "pageSize" not in params
 
     def test_top_and_skip_are_forwarded(self) -> None:
@@ -67,11 +68,11 @@ class TestAuthenticatedScanHistoryQuery:
 
 class TestDefinitionsHistory:
     def test_returns_history_results(self) -> None:
-        result = _make_definitions_endpoint().history("scan-1")
+        result = _make_definitions_endpoint().definition_history("scan-1")
         assert isinstance(result, AuthenticatedScanHistoryResults)
 
     def test_history_uses_definitions_action_path(self) -> None:
-        result = _make_definitions_endpoint().history("scan-1")
+        result = _make_definitions_endpoint().definition_history("scan-1")
         assert (
             result._path
             == "/api/DeviceAuthenticatedScanDefinitions/GetScanHistoryByScanDefinitionId"
@@ -79,8 +80,8 @@ class TestDefinitionsHistory:
         assert result._method == "POST"
         assert result._request_kwargs == {"json": {"ScanDefinitionIds": ["scan-1"]}}
 
-    def test_history_by_session_uses_session_action_path(self) -> None:
-        result = _make_definitions_endpoint().history_by_session(["session-1"])
+    def test_session_history_uses_session_action_path(self) -> None:
+        result = _make_definitions_endpoint().session_history(["session-1"])
         assert (
             result._path
             == "/api/DeviceAuthenticatedScanDefinitions/GetScanHistoryBySessionId"
@@ -107,7 +108,7 @@ class TestDefinitionsHistory:
             }
         )
 
-        records = endpoint.history("scan-1").to_json()
+        records = endpoint.definition_history("scan-1").to_json()
 
         assert records[0]["scanDefinitionId"] == "scan-1"
         assert endpoint.calls[0][0] == "POST"
@@ -116,13 +117,3 @@ class TestDefinitionsHistory:
             == "/api/DeviceAuthenticatedScanDefinitions/GetScanHistoryByScanDefinitionId"
         )
         assert endpoint.calls[0][2]["json"] == {"ScanDefinitionIds": ["scan-1"]}
-
-
-class TestAgentsHistoryShim:
-    def test_agents_history_delegates_to_definitions_path(self) -> None:
-        result = _make_agents_endpoint().history("scan-1")
-        assert isinstance(result, AuthenticatedScanHistoryResults)
-        assert (
-            result._path
-            == "/api/DeviceAuthenticatedScanDefinitions/GetScanHistoryByScanDefinitionId"
-        )
