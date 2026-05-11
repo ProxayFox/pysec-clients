@@ -80,6 +80,20 @@ SKIP_ENTITIES: set[str] = {
     "PostDeviceGroupsRequest",
 }
 
+# Bound actions that omit ReturnType in the published metadata but still return
+# contract-defined payload shapes at runtime. The override value is the XML
+# type name that should be treated as the response root for schema generation.
+NO_RETURN_ACTION_RESPONSE_OVERRIDES: dict[tuple[str, str], str] = {
+    (
+        "GetScanHistoryBySessionId",
+        "Collection(microsoft.windowsDefenderATP.api.DeviceAuthenticatedScanDefinition)",
+    ): "AuthScanHistoryContract",
+    (
+        "GetScanHistoryByScanDefinitionId",
+        "Collection(microsoft.windowsDefenderATP.api.DeviceAuthenticatedScanDefinition)",
+    ): "AuthScanHistoryContract",
+}
+
 
 # ── Naming helpers ────────────────────────────────────────────────────────────
 
@@ -214,9 +228,22 @@ class MDEMetadata:
             for el in root.iter(f"{{{MDE_NS}}}{kind}"):
                 return_el = el.find(f"{{{MDE_NS}}}ReturnType")
                 if return_el is None:
-                    continue
+                    binding_el = el.find(
+                        f"{{{MDE_NS}}}Parameter[@Name='bindingParameter']"
+                    )
+                    binding_type = (
+                        binding_el.get("Type", "") if binding_el is not None else ""
+                    )
+                    override_key = (el.get("Name", ""), binding_type)
+                    override_type = NO_RETURN_ACTION_RESPONSE_OVERRIDES.get(
+                        override_key
+                    )
+                    if override_type is None:
+                        continue
+                    return_type = override_type
+                else:
+                    return_type = return_el.get("Type", "")
 
-                return_type = return_el.get("Type", "")
                 short_name = strip_prefix(unwrap_collection(return_type))
 
                 if (
