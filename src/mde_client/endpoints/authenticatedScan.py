@@ -1,148 +1,21 @@
 from __future__ import annotations
 
 import logging
-from typing import Annotated, Literal
+from typing import Literal
 
-from pydantic import BaseModel, Field
 
-from .base import BaseQuery, BaseEndpoint, BaseResults
+from .base import BaseQuery, BaseEndpoint, BaseResults, BasePayload
 from ..schemas import (
     AUTH_SCAN_HISTORY_CONTRACT_SCHEMA,
     DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
     DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA,
 )
+from ..schemas.auth_params_models import SCANAUTHENTICATIONPARAMS
 
 log = logging.getLogger(__name__)
 
-# ── Auth-param type literals (mirror upstream enum values) ────────────────────
-
-WINDOWS_AUTH_TYPE = Literal["Negotiate", "Kerberos", "Ntlm"]
-LINUX_AUTH_TYPE = Literal["Password", "PrivateKey"]
-SNMP_AUTH_TYPE = Literal["CommunityString", "NoAuthNoPriv", "AuthNoPriv", "AuthPriv"]
 SCAN_TYPE = Literal["Network", "Windows", "Linux", "AdvancedActive"]
 TARGET_TYPE = Literal["Ip", "Hostname", "Combined"]
-
-# ── Auth-param request models ─────────────────────────────────────────────────
-
-
-class _AuthParamsBase(BaseModel):
-    """Shared key-vault fields present on every auth-param variant."""
-
-    model_config = {"extra": "forbid"}
-
-    keyVaultUri: str | None = None
-    keyVaultSecretName: str | None = None
-
-
-class WindowsAuthParams(_AuthParamsBase):
-    """Windows authentication parameters.
-
-    **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
-    """
-
-    type: WINDOWS_AUTH_TYPE
-    username: str | None = None
-    password: str | None = None
-    domain: str | None = None
-    isgmsaUser: bool = False
-    packetPrivacy: bool = False
-    packetIntegrity: bool = False
-
-
-class LinuxAuthParams(_AuthParamsBase):
-    """Linux authentication parameters.
-
-    **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
-    """
-
-    type: LINUX_AUTH_TYPE
-    username: str | None = None
-    password: str | None = None
-    privateKey: str | None = None
-
-
-class SnmpAuthParams(_AuthParamsBase):
-    """SNMP authentication parameters.
-
-    **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
-    """
-
-    type: SNMP_AUTH_TYPE
-    communityString: str | None = None
-    username: str | None = None
-    authProtocol: str | None = None
-    authPassword: str | None = None
-    privProtocol: str | None = None
-    privPassword: str | None = None
-
-
-ScanAuthenticationParams = Annotated[
-    WindowsAuthParams | LinuxAuthParams | SnmpAuthParams,
-    Field(discriminator="type"),
-]
-
-# ── Scanner agent model ──────────────────────────────────────────────────────
-
-
-class ScannerAgentRef(BaseModel):
-    """Reference to a scanner agent device."""
-
-    model_config = {"extra": "forbid"}
-
-    id: str
-    machineId: str | None = None
-
-
-class ScanHistoryByDefinitionRequest(BaseModel):
-    """Request body for scan history by definition."""
-
-    model_config = {"extra": "forbid"}
-    ScanDefinitionIds: list[str]
-
-
-class ScanHistoryBySessionRequest(BaseModel):
-    """Request body for scan history by session."""
-
-    model_config = {"extra": "forbid"}
-    SessionIds: list[str]
-
-
-class AuthenticatedDefinitionsQuery(BaseQuery):
-    """Query parameters for the /api/DeviceAuthenticatedScanDefinitions endpoint.
-
-    All fields are optional, omitted fields are simply not sent.
-    Pydantic enforces the constraints (ge/le) at construction time,
-    so invalid values are caught before hitting the wire.
-
-    Doesn't appear to be any filters for this endpoint,
-    but the class is left here for consistency and future-proofing.
-    """
-
-    pass
-
-
-class AuthenticatedDefinitionsAlterPayload(BaseQuery):
-    """Query parameters for Add, update, or delete a scan definition on the /api/DeviceAuthenticatedScanDefinitions endpoint.
-
-    All fields are optional, omitted fields are simply not sent.
-    Pydantic enforces the constraints (ge/le) at construction time,
-    so invalid values are caught before hitting the wire.
-
-    Note: This is a placeholder class for future implementation of update operations on authenticated scan definitions.
-    The specific fields and validation logic will depend on the requirements of the update operations once they are defined.
-    """
-
-    id: str | None = None
-    scanType: SCAN_TYPE | None = None
-    scanName: str | None = None
-    isActive: bool | None = None
-    targets: list[str] | None = None
-    intervalInHours: int | None = None
-    targetType: TARGET_TYPE | None = None
-    scannerAgent: ScannerAgentRef | None = None
-    scanAuthenticationParams: (
-        WindowsAuthParams | LinuxAuthParams | SnmpAuthParams | None
-    ) = None
 
 
 class DeviceAuthenticatedAgentsQuery(BaseQuery):
@@ -162,9 +35,67 @@ class DeviceAuthenticatedAgentsQuery(BaseQuery):
 class AuthenticatedScanHistoryQuery(BaseQuery):
     """OData query parameters for authenticated scan history actions."""
 
-    # Override default page_size to exclude it from queries, as the endpoint doesn't support it.
-    page_size: int | None = None
     model_config = {"extra": "forbid"}
+    page_size: int | None = None
+
+
+class AuthenticatedDefinitionsQuery(BaseQuery):
+    """Query parameters for the /api/DeviceAuthenticatedScanDefinitions endpoint.
+
+    All fields are optional, omitted fields are simply not sent.
+    Pydantic enforces the constraints (ge/le) at construction time,
+    so invalid values are caught before hitting the wire.
+
+    Doesn't appear to be any filters for this endpoint,
+    but the class is left here for consistency and future-proofing.
+    """
+
+    pass
+
+
+class ScannerAgentRefPayload(BasePayload):
+    """Reference to a scanner agent device."""
+
+    id: str
+    machineId: str | None = None
+
+
+class ScanHistoryByDefinitionRequestPayload(BasePayload):
+    """Request body for scan history by definition."""
+
+    ScanDefinitionIds: list[str]
+
+
+class ScanHistoryBySessionRequestPayload(BasePayload):
+    """Request body for scan history by session."""
+
+    SessionIds: list[str]
+
+
+class AuthenticatedDefinitionsAlterPayload(BaseQuery):
+    """Query parameters for Add, update, or delete a scan definition on the /api/DeviceAuthenticatedScanDefinitions endpoint.
+
+    All fields are optional, omitted fields are simply not sent.
+    Pydantic enforces the constraints (ge/le) at construction time,
+    so invalid values are caught before hitting the wire.
+
+    Note: This is a placeholder class for future implementation of update operations on authenticated scan definitions.
+    The specific fields and validation logic will depend on the requirements of the update operations once they are defined.
+    """
+
+    # Not actually a parameter for this endpoint,
+    # but included here to test that extraneous fields are properly excluded from the request body.
+    page_size: int | None = None
+
+    id: str | None = None
+    scanType: SCAN_TYPE | None = None
+    scanName: str | None = None
+    isActive: bool | None = None
+    targets: list[str] | None = None
+    intervalInHours: int | None = None
+    targetType: TARGET_TYPE | None = None
+    scannerAgent: ScannerAgentRefPayload | None = None
+    scanAuthenticationParams: SCANAUTHENTICATIONPARAMS | None = None
 
 
 class AuthenticatedDefinitionsResults(BaseResults):
@@ -202,7 +133,7 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-scan-history-by-definition
         """
         params = query.to_odata_filters if query else {}
-        payload = ScanHistoryByDefinitionRequest(
+        payload = ScanHistoryByDefinitionRequestPayload(
             ScanDefinitionIds=self._id_list(ids)
         ).model_dump()
         path = f"{self._PATH}/GetScanHistoryByScanDefinitionId"
@@ -224,7 +155,7 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-scan-history-by-session
         """
         params = query.to_odata_filters if query else {}
-        payload = ScanHistoryBySessionRequest(
+        payload = ScanHistoryBySessionRequestPayload(
             SessionIds=self._id_list(ids)
         ).model_dump()
         path = f"{self._PATH}/GetScanHistoryBySessionId"
@@ -263,7 +194,7 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         """
         return AuthenticatedDefinitionsResults(
             self,
-            {}, 
+            {},
             method="PATCH",
             request_kwargs={"json": payload.model_dump(exclude_none=True)},
         )
