@@ -22,7 +22,7 @@ class BaseQuery(BaseModel):
         query = BaseQuery(page_size=500)
     """
 
-    page_size: int = Field(default=10000, ge=1, le=10000)
+    page_size: int | None = Field(default=10000, ge=1, le=10000)
     top: int | None = Field(default=None, ge=1, le=10000)
     skip: int | None = Field(default=None, ge=0)
     # TODO: custom_query: str | list[str] | None = None
@@ -177,6 +177,10 @@ class BaseEndpoint:
     def __init__(self, http: httpx.Client, auth: MSALAuth) -> None:
         self._http = http
         self._auth = auth
+
+    @staticmethod
+    def _id_list(ids: str | list[str]) -> list[str]:
+        return [ids] if isinstance(ids, str) else ids
 
     async def _arequest(self, method: str, path: str, **kwargs) -> httpx.Response:
         """Make an authenticated async request, refreshing the token as needed."""
