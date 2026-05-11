@@ -38,8 +38,11 @@ from ..models.enums import (
     RISK_SCORE,
 )
 
+from ..models.action_payloads import StartInvestigationPayload
+
 if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionResults
+    from .investigations import InvestigationResults
 
 log = logging.getLogger(__name__)
 
@@ -247,16 +250,17 @@ class MachinesEndpoint(BaseEndpoint):
         )
 
     # === Investigations related endpoints ===
-    def _startInvestigation(self, id: str) -> None:
+    def _startInvestigation(self, id: str, payload: StartInvestigationPayload | None = None) -> InvestigationResults:
         """Start Investigation
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
         """
-        # path = f"{self._PATH}/{id}/startInvestigation"
-        raise NotImplementedError(
-            "This endpoint is not yet implemented, as it requires a POST request with a JSON body, "
-            "which is a bit different from the other methods which are all GET requests with query parameters. "
-            "We may need to create a new method on the BaseEndpoint class to handle POST requests with JSON bodies."
+        path = f"{self._PATH}/{id}/startInvestigation"
+        return InvestigationResults(
+            self, {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump() if payload else {}}
         )
 
 

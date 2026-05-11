@@ -3,11 +3,13 @@ from __future__ import annotations
 from datetime import datetime
 
 from .base import BaseQuery, BaseEndpoint, BaseResults
+from .machines import MachinesEndpoint
 from ..schemas import INVESTIGATION_SCHEMA
 from ..models.enums import INVESTIGATION_STATE
+from ..models.action_payloads import StartInvestigationPayload
 
 
-class InvestigationsQuery(BaseQuery):
+class InvestigationQuery(BaseQuery):
     """Query parameters for the /api/investigations endpoint.
 
     All fields are optional — omitted fields are simply not sent.
@@ -16,8 +18,8 @@ class InvestigationsQuery(BaseQuery):
 
     Example:
     ```python
-    query = InvestigationsQuery(status="Active", pageSize=500)
-    query = InvestigationsQuery(severity=["Medium", "High"], pageSize=500)
+    query = InvestigationQuery(status="Active", pageSize=500)
+    query = InvestigationQuery(severity=["Medium", "High"], pageSize=500)
     ```
     """
 
@@ -39,7 +41,7 @@ class InvestigationsEndpoint(BaseEndpoint):
 
     _PATH = "/api/investigations"
 
-    def get_all(self, query: InvestigationsQuery | None = None) -> InvestigationResults:
+    def get_all(self, query: InvestigationQuery | None = None) -> InvestigationResults:
         """Get investigations with optional filters.
 
         **Docs:**
@@ -57,8 +59,9 @@ class InvestigationsEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}"
         return InvestigationResults(self, {}, path=path, single=True)
 
-    def startInvestigation(self, deviceId: str) -> None:
+    def startInvestigation(self, deviceId: str, payload: StartInvestigationPayload | None = None) -> InvestigationResults:
         """Start an investigation.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
         """
+        return MachinesEndpoint(self._http, self._auth)._startInvestigation(deviceId, payload)
