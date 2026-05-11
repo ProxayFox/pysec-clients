@@ -60,6 +60,7 @@ class MachinesQuery(BaseQuery):
     query = MachinesQuery(exposureLevel=["Medium", "High"], pageSize=500)
     ```
     """
+
     computerDnsName: str | list[str] | None = None
     id: str | list[str] | None = None
     version: str | list[str] | None = None
