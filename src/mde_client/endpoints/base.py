@@ -4,6 +4,7 @@ import httpx
 import asyncio
 import pyarrow as pa
 from datetime import datetime
+from typing import Any
 from pydantic import BaseModel, Field
 from http_to_arrow import ArrowRecordContainer
 
@@ -81,12 +82,28 @@ class BaseResults:
         *,
         path: str | None = None,  # overrides endpoint._PATH for sub-resources
         single: bool = False,  # True when endpoint returns a bare object, not a collection
+        method: str = "GET",
+        request_kwargs: dict[str, Any] | None = None,
     ) -> None:
         self._endpoint = endpoint
         self._params = params
         self._path = path or endpoint._PATH
         self._single = single
+        self._method = method
+        self._request_kwargs = dict(request_kwargs or {})
         self._container: ArrowRecordContainer | None = None
+
+    @staticmethod
+    def _records_from_body(body: Any) -> list[dict[str, Any]]:
+        if isinstance(body, list):
+            return body
+        if isinstance(body, dict):
+            value = body.get("value", body)
+            if isinstance(value, list):
+                return value
+            if isinstance(value, dict):
+                return [value]
+        return []
 
     def _ensure_fetched(self) -> ArrowRecordContainer:
         if self._container is None:
@@ -98,20 +115,31 @@ class BaseResults:
 
         if self._single:
             response = self._endpoint._request(
-                "GET",
+                self._method,
                 self._path,
                 params=self._params,
+                **self._request_kwargs,
             )
             response.raise_for_status()
-            self._container.extend([response.json()])
+            self._container.extend(self._records_from_body(response.json()))
         elif self._params.get("$top") or self._params.get("$skip"):
             # If $top or $skip is specified, we should not paginate
-            response = self._endpoint._request("GET", self._path, params=self._params)
+            response = self._endpoint._request(
+                self._method,
+                self._path,
+                params=self._params,
+                **self._request_kwargs,
+            )
             response.raise_for_status()
-            body: dict = response.json()
-            self._container.extend(body.get("value", []))
+            self._container.extend(self._records_from_body(response.json()))
         else:
-            self._endpoint._paginate_into(self._path, self._params, self._container)
+            self._endpoint._paginate_into(
+                self._path,
+                self._params,
+                self._container,
+                method=self._method,
+                request_kwargs=self._request_kwargs,
+            )
 
         return self._container
 
@@ -164,16 +192,29 @@ class BaseEndpoint:
         """Async Wrapper for _arequest to be used in sync methods."""
         return asyncio.run(self._arequest(method, path, **kwargs))
 
-    async def _apaginate(self, path: str, params: dict[str, str]) -> list[dict]:
+    async def _apaginate(
+        self,
+        path: str,
+        params: dict[str, str],
+        *,
+        method: str = "GET",
+        request_kwargs: dict[str, Any] | None = None,
+    ) -> list[dict]:
         """Walk OData @odata.nextLink pagination and return all records."""
         all_records: list[dict] = []
         next_url: str | None = None
+        request_kwargs = request_kwargs or {}
 
         while True:
             if next_url:
-                response = await self._arequest("GET", next_url)
+                response = await self._arequest(method, next_url, **request_kwargs)
             else:
-                response = await self._arequest("GET", path, params=params)
+                response = await self._arequest(
+                    method,
+                    path,
+                    params=params,
+                    **request_kwargs,
+                )
 
             response.raise_for_status()
             body: dict = response.json()
@@ -187,7 +228,14 @@ class BaseEndpoint:
 
         return all_records
 
-    def _paginate(self, path: str, params: dict[str, str]) -> list[dict]:
+    def _paginate(
+        self,
+        path: str,
+        params: dict[str, str],
+        *,
+        method: str = "GET",
+        request_kwargs: dict[str, Any] | None = None,
+    ) -> list[dict]:
         """Async Wrapper for _paginate to be used in sync methods."""
 
         # If the caller specified $top or $skip, we should not paginate
@@ -197,13 +245,23 @@ class BaseEndpoint:
                 "Use _request instead, or remove $top/$skip to enable pagination."
             )
 
-        return asyncio.run(self._apaginate(path, params))
+        return asyncio.run(
+            self._apaginate(
+                path,
+                params,
+                method=method,
+                request_kwargs=request_kwargs,
+            )
+        )
 
     async def _apaginate_into(
         self,
         path: str,
         params: dict[str, str],
         container: ArrowRecordContainer,
+        *,
+        method: str = "GET",
+        request_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Walk OData @odata.nextLink pagination, streaming each page into *container*.
 
@@ -212,12 +270,18 @@ class BaseEndpoint:
         ``container.extend()``.
         """
         next_url: str | None = None
+        request_kwargs = request_kwargs or {}
 
         while True:
             if next_url:
-                response = await self._arequest("GET", next_url)
+                response = await self._arequest(method, next_url, **request_kwargs)
             else:
-                response = await self._arequest("GET", path, params=params)
+                response = await self._arequest(
+                    method,
+                    path,
+                    params=params,
+                    **request_kwargs,
+                )
 
             response.raise_for_status()
             body: dict = response.json()
@@ -232,6 +296,9 @@ class BaseEndpoint:
         path: str,
         params: dict[str, str],
         container: ArrowRecordContainer,
+        *,
+        method: str = "GET",
+        request_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Sync wrapper for ``_apaginate_into``."""
 
@@ -242,4 +309,12 @@ class BaseEndpoint:
                 "Use _request instead, or remove $top/$skip to enable pagination."
             )
 
-        asyncio.run(self._apaginate_into(path, params, container))
+        asyncio.run(
+            self._apaginate_into(
+                path,
+                params,
+                container,
+                method=method,
+                request_kwargs=request_kwargs,
+            )
+        )
