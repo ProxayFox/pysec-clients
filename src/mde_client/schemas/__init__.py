@@ -45,6 +45,7 @@ if TYPE_CHECKING:
     from .device_authenticated_scan_agent import DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA
     from .device_authenticated_scan_definition import (
         DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
+        AUTH_PARAMS_BASE_TYPE,
         AGENT_CONTRACT_TYPE,
         SCAN_STATE_TYPE,
         ADVANCED_ACTIVE_CONFIGURATION_TYPE,
@@ -143,6 +144,7 @@ _NAME_TO_MODULE: dict[str, str] = {
     "DELTA_ASSET_VULNERABILITY_SCHEMA": "delta_asset_vulnerability",
     "DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA": "device_authenticated_scan_agent",
     "DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA": "device_authenticated_scan_definition",
+    "AUTH_PARAMS_BASE_TYPE": "device_authenticated_scan_definition",
     "AGENT_CONTRACT_TYPE": "device_authenticated_scan_definition",
     "SCAN_STATE_TYPE": "device_authenticated_scan_definition",
     "ADVANCED_ACTIVE_CONFIGURATION_TYPE": "device_authenticated_scan_definition",
@@ -227,6 +229,7 @@ __all__ = [
     "ASSET_NON_CPE_SOFTWARE_SCHEMA",
     "ASSET_SOFTWARE_SCHEMA",
     "ASSET_VULNERABILITY_SCHEMA",
+    "AUTH_PARAMS_BASE_TYPE",
     "BASELINE_CONFIGURATION_DTO_TYPE",
     "BASELINE_CONFIGURATION_SCHEMA",
     "BASELINE_EXCEPTION_DEVICE_DTO_TYPE",
