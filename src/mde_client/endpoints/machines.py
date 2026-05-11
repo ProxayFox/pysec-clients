@@ -43,6 +43,7 @@ from ..models.action_payloads import StartInvestigationPayload
 if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionResults
     from .investigations import InvestigationResults
+    from .deviceAvHealth import DeviceAVHealthResults
 
 log = logging.getLogger(__name__)
 
@@ -241,13 +242,22 @@ class MachinesEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions#2-export-browser-extension-assessment-via-files
         """
-        # from .browserExtension import BrowserExtensionResults
+        from .browserExtension import BrowserExtensionResults
 
-        # path = f"{self._PATH}/browserextensionsinventoryExport"
-        # return BrowserExtensionResults(self, {}, path=path)
-        raise NotImplementedError(
-            "This endpoint is not yet implemented, as it requires handling file downloads which is not yet implemented in the client."
-        )
+        path = f"{self._PATH}/browserextensionsinventoryExport"
+        return BrowserExtensionResults(self, {}, path=path, files=True)
+
+    def _infoGatheringExport(self) -> DeviceAVHealthResults:
+        """Get device AV health report as a file.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api#2-export-health-reporting-via-files
+        """
+        from .deviceAvHealth import DeviceAVHealthResults
+
+        path = f"{self._PATH}/InfoGatheringExport"
+        return DeviceAVHealthResults(self, {}, path=path, files=True)
 
     # === Investigations related endpoints ===
     def _startInvestigation(

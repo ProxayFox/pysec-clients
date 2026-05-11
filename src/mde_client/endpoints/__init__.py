@@ -22,19 +22,24 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from .alerts import AlertsEndpoint
-    from .browserExtension import BrowserExtensionEndpoint
-    from .machines import MachinesEndpoint
     from .authenticatedScan import (
         AuthenticatedDefinitionsEndpoint,
         DeviceAuthenticatedAgentsEndpoint,
     )
+    from .browserExtension import BrowserExtensionEndpoint
+    from .deviceAvHealth import DeviceAVHealthEndpoint
+    from .investigations import InvestigationsEndpoint
+    from .machines import MachinesEndpoint
+
 
 _NAME_TO_MODULE = {
     "AlertsEndpoint": "alerts",
-    "BrowserExtensionEndpoint": "browserExtension",
-    "MachinesEndpoint": "machines",
     "AuthenticatedDefinitionsEndpoint": "authenticatedScan",
     "DeviceAuthenticatedAgentsEndpoint": "authenticatedScan",
+    "BrowserExtensionEndpoint": "browserExtension",
+    "DeviceAVHealthEndpoint": "deviceAvHealth",
+    "InvestigationsEndpoint": "investigations",
+    "MachinesEndpoint": "machines",
 }
 
 
@@ -58,6 +63,10 @@ __all__ = [
     "AlertsEndpoint",
     # Browser Extension
     "BrowserExtensionEndpoint",
+    # Device AV Health
+    "DeviceAVHealthEndpoint",
+    # Investigations
+    "InvestigationsEndpoint",
     # Machines
     "MachinesEndpoint",
     # Authenticated Scan

@@ -31,11 +31,13 @@ from ..schemas import (
     USER_SCHEMA,
 )
 from ..models.enums import (
-    ALERT_CLASSIFICATION,
-    ALERT_DETERMINATION,
     ALERT_SEVERITY,
     ALERT_STATUS,
     IOA_CATEGORY,
+)
+from ..models.action_payloads import (
+    CreateAlertByReferencePayload,
+    BatchUpdateAlertPayload,
 )
 
 log = logging.getLogger(__name__)
@@ -94,22 +96,6 @@ class AlertCreateQuery(BaseQuery):
         if "Unknown" in self.category:
             raise ValueError(
                 "Category cannot be 'Unknown'. Please choose a valid category."
-            )
-
-
-class AlertUpdateQuery(BaseQuery):
-    id: str | list[str]
-    status: ALERT_STATUS
-    assignedTo: str
-    classification: ALERT_CLASSIFICATION
-    determination: ALERT_DETERMINATION
-    comment: str
-
-    def model_post_init(self, __context: Any) -> None:
-        """Validate that the status is not 'UnSpecified' because alert update does not allow 'UnSpecified' status."""
-        if "UnSpecified" in self.status:
-            raise ValueError(
-                "Status cannot be 'UnSpecified'. Please choose a valid status."
             )
 
 
@@ -176,51 +162,28 @@ class AlertsEndpoint(BaseEndpoint):
         return UserResults(self, {}, path=path)
 
     def createAlertByReference(
-        self, referenceId: str, referenceType: str
+        self, payload: CreateAlertByReferencePayload
     ) -> AlertsResults:
         """Create alert
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/create-alert-by-reference
-
-        TODO: implement this method. It requires a POST request with a JSON body,
-        which is a bit different from the other methods which are all GET requests with query parameters.
-        We may need to create a new method on the BaseEndpoint class to handle POST requests with JSON bodies.
         """
-        # path = f"{self._PATH}/CreateAlertByReference"
-        raise NotImplementedError(
-            "This endpoint is not yet implemented. Please contact the maintainers if you need this functionality."
-        )
+        path = f"{self._PATH}/CreateAlertByReference"
+        params = payload.model_dump()
+        return AlertsResults(self, params, path=path, single=True, method="POST")
 
-    def batchUpdate(self, updates: list[dict]) -> None:
+    def batchUpdate(self, payload: BatchUpdateAlertPayload) -> AlertsResults:
         """Batch update alerts
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/batch-update-alerts
-
-        TODO: implement this method. It requires a POST request with a JSON body,
-        which is a bit different from the other methods which are all GET requests with query parameters.
-        We may need to create a new method on the BaseEndpoint class to handle POST requests with JSON bodies.
         """
-        # path = f"{self._PATH}/batchUpdate"
-        raise NotImplementedError(
-            "This endpoint is not yet implemented. Please contact the maintainers if you need this functionality."
-        )
+        path = f"{self._PATH}/batchUpdate"
+        params = payload.model_dump()
+        return AlertsResults(self, params, path=path, single=True, method="POST")
 
-    def update(self, query: AlertUpdateQuery) -> None:
-        """Update an alert's status and/or assigned user
+    def update(self, payload: BatchUpdateAlertPayload) -> AlertsResults:
+        """Update alerts (alias for batch update)
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/update-alert
-
-        TODO: implement this method. It requires a POST request with a JSON body,
-        which is a bit different from the other methods which are all GET requests with query parameters.
-        We may need to create a new method on the BaseEndpoint class to handle POST requests with JSON bodies.
         """
-        if isinstance(query.id, list):
-            raise ValueError(
-                "AlertUpdateQuery.id must be a single string, not a list, for the single update method.\n"
-                "Use the batchUpdate method for updating multiple alerts at once."
-            )
-
-        # path = f"{self._PATH}/{query.id}"
-        raise NotImplementedError(
-            "This endpoint is not yet implemented. Please contact the maintainers if you need this functionality."
-        )
+        return self.batchUpdate(payload)

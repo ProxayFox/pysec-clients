@@ -74,10 +74,9 @@ class BrowserExtensionEndpoint(BaseEndpoint):
 
         TODO: Need to Implement file download and parsing logic to handle this endpoint
         """
-        # return MachinesEndpoint(self._http, self._auth)._browserextensionsinventoryExport()
-        raise NotImplementedError(
-            "This endpoint is not yet implemented, as it requires handling file downloads which is not yet implemented in the client."
-        )
+        return MachinesEndpoint(
+            self._http, self._auth
+        )._browserextensionsinventoryExport()
 
     def permissionsinfo(
         self, query: BrowserExtensionsPermissionsInfoQuery | None = None

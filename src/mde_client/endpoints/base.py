@@ -28,7 +28,7 @@ from http_to_arrow import ArrowRecordContainer
 
 from ..auth import MSALAuth
 from ..schemas import EXPORT_FILES_RESPONSE_SCHEMA
-from ..viaFiles import ViaFiles
+from ..viaFiles import RecordTransform, ViaFiles
 
 
 class BaseQuery(BaseModel):
@@ -105,6 +105,8 @@ class BasePayload(BaseModel):
 
 
 class BaseResults:
+    """Base results container for API endpoints."""
+
     SCHEMA: pa.Schema
 
     def __init__(
@@ -172,7 +174,14 @@ class BaseResults:
             )
             file_tbl.extend(self._records_from_body(response.json()))
 
-            self._container = self._files_to_container(file_tbl.to_polars)
+            urls = (
+                file_tbl.to_polars_frame()
+                .get_column("exportFiles")
+                .explode()
+                .drop_nulls()
+                .to_list()
+            )
+            self._container = self._files_to_container(urls)
             del file_tbl, response  # free memory
 
         elif self._params.get("$top") or self._params.get("$skip"):
@@ -197,22 +206,31 @@ class BaseResults:
 
         return self._container
 
-    def _files_to_container(self, files: pl.DataFrame) -> ArrowRecordContainer:
+    def _files_to_container(self, urls: list[str]) -> ArrowRecordContainer:
         """Download export blobs via async streaming and return a populated container."""
-        urls: list[str] = (
-            files.get_column("exportFiles").explode().drop_nulls().to_list()
-        )
-        if not urls:
-            return ArrowRecordContainer(schema=self.SCHEMA)
-
         container = ArrowRecordContainer(
             schema=self.SCHEMA,
             unknown_field_policy="drop",
             coercion_policy="coerce",
         )
-        via = ViaFiles()
-        asyncio.run(via.download_export_files(urls, container))
+
+        asyncio.run(
+            ViaFiles().download_export_files(
+                urls,
+                container,
+                record_transform=self._normalize_export_record(),
+            )
+        )
         return container
+
+    @staticmethod
+    def _normalize_export_record() -> RecordTransform | None:
+        """Return an optional transform applied to each export-file record.
+
+        Subclasses override this when the export NDJSON nests payload data
+        inside a wrapper key (e.g. ``DeviceGatheredInfo``).
+        """
+        return None
 
     def to_dicts(self) -> list[dict]:
         return self._ensure_fetched().to_table().to_pylist()
