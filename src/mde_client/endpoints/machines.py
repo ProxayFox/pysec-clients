@@ -252,14 +252,19 @@ class MachinesEndpoint(BaseEndpoint):
             "This endpoint is not yet implemented, as it requires handling file downloads which is not yet implemented in the client."
         )
 
-
     # === Investigations related endpoints ===
     def _startInvestigation(self, id: str) -> None:
         """Start Investigation
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
         """
-        path = f"{self._PATH}/{id}/startInvestigation"
+        # path = f"{self._PATH}/{id}/startInvestigation"
+        raise NotImplementedError(
+            "This endpoint is not yet implemented, as it requires a POST request with a JSON body, "
+            "which is a bit different from the other methods which are all GET requests with query parameters. "
+            "We may need to create a new method on the BaseEndpoint class to handle POST requests with JSON bodies."
+        )
+
 
 class MachineNotFoundError(Exception):
     def __init__(self, machine_id: str) -> None:
