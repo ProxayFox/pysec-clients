@@ -111,11 +111,19 @@ class DeviceAVHealthResults(BaseResults):
                     scans = orjson.loads(av_scan_raw)
                     quick = scans.get("Quick") or {}
                     full = scans.get("Full") or {}
-                    nested.setdefault("quickScanResult", quick.get("ScanStatus") or scan_empty)
-                    nested.setdefault("quickScanError", quick.get("ErrorCode") or scan_empty)
+                    nested.setdefault(
+                        "quickScanResult", quick.get("ScanStatus") or scan_empty
+                    )
+                    nested.setdefault(
+                        "quickScanError", quick.get("ErrorCode") or scan_empty
+                    )
                     nested.setdefault("quickScanTime", quick.get("Timestamp"))
-                    nested.setdefault("fullScanResult", full.get("ScanStatus") or scan_empty)
-                    nested.setdefault("fullScanError", full.get("ErrorCode") or scan_empty)
+                    nested.setdefault(
+                        "fullScanResult", full.get("ScanStatus") or scan_empty
+                    )
+                    nested.setdefault(
+                        "fullScanError", full.get("ErrorCode") or scan_empty
+                    )
                     nested.setdefault("fullScanTime", full.get("Timestamp"))
                 except Exception:
                     pass

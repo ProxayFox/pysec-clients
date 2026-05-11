@@ -44,7 +44,7 @@ class DeviceAuthenticatedAgentsQuery(BaseQuery):
 
 class AuthenticatedScanHistoryQuery(BaseQuery):
     """OData query parameters for authenticated scan history actions.
-    
+
     Args:
         - page_size(None): Number of items to return per page. Forced to None in the endpoint
         - model_config(dict): Forbid extra fields to prevent accidentally including query parameters in the request body of POST endpoints that use this query model for pagination.
@@ -83,7 +83,7 @@ class ScanHistoryBySessionRequestPayload(BasePayload):
 
 class AuthenticatedDefinitionsAlterPayload(BaseQuery):
     """Query parameters for Add, update, or delete a scan definition on the /api/DeviceAuthenticatedScanDefinitions endpoint.
-    
+
     page_size(None): Forced to None in the endpoint
     """
 
@@ -104,22 +104,25 @@ class AuthenticatedDefinitionsAlterPayload(BaseQuery):
 
 class AuthenticatedDefinitionsResults(BaseResults):
     """Results wrapper for authenticated scan definitions queries."""
+
     SCHEMA = DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA
 
 
 class AuthenticatedScanHistoryResults(BaseResults):
     """Results wrapper for authenticated scan history queries."""
+
     SCHEMA = AUTH_SCAN_HISTORY_CONTRACT_SCHEMA
 
 
 class DeviceAuthenticatedAgentsQueryResults(BaseResults):
     """Results wrapper for device authenticated scan agents queries."""
+
     SCHEMA = DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA
 
 
 class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
     """Endpoint for managing authenticated scan definitions.
-    
+
     Methods:
         - get_all: Get all authenticated scan definitions.
         - definition_history: Get scan history by definition IDs.
@@ -128,6 +131,7 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         - update: Update an existing authenticated scan definition.
         - delete: Delete existing authenticated scan definition.
     """
+
     _PATH = "/api/DeviceAuthenticatedScanDefinitions"
 
     def get_all(

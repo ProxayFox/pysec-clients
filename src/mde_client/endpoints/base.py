@@ -106,7 +106,7 @@ class BasePayload(BaseModel):
 
 class BaseResults:
     """Base results wrapper for API endpoints.
-    
+
     This class provides lazy evaluation of results, deferring HTTP requests until
     a terminal method is called (e.g. ``to_dicts``, ``to_arrow``, ``to_polars``, ``refresh``).
     """

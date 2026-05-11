@@ -68,7 +68,7 @@ class AlertsQuery(BaseQuery):
 
 class AlertCreateQuery(BaseQuery):
     """Query parameters for creating an alert by reference. **All fields are required.**
-    
+
     Example:
     ```python
         query = AlertCreateQuery(referenceId="12345", referenceType="CustomReference" ... , category="Malware")
@@ -95,37 +95,43 @@ class AlertCreateQuery(BaseQuery):
 
 class AlertsResults(BaseResults):
     """Results from the /api/alerts endpoint."""
+
     SCHEMA = ALERT_SCHEMA
 
 
 class DomainResults(BaseResults):
     """Results from the /api/alerts/{id}/domains endpoint."""
+
     SCHEMA = DOMAIN_SCHEMA
 
 
 class FileResults(BaseResults):
     """Results from the /api/alerts/{id}/files endpoint."""
+
     SCHEMA = FILE_SCHEMA
 
 
 class IPResults(BaseResults):
     """Results from the /api/alerts/{id}/ips endpoint."""
+
     SCHEMA = IP_SCHEMA
 
 
 class MachineResults(BaseResults):
     """Results from the /api/alerts/{id}/machines endpoint."""
+
     SCHEMA = MACHINE_SCHEMA
 
 
 class UserResults(BaseResults):
     """Results from the /api/alerts/{id}/user endpoint."""
+
     SCHEMA = USER_SCHEMA
 
 
 class AlertsEndpoint(BaseEndpoint):
     """Client for the /api/alerts endpoint.
-    
+
     Methods:
         - get_all: Get all alerts matching the query parameters.
         - get: Get a single alert by ID.
@@ -138,12 +144,12 @@ class AlertsEndpoint(BaseEndpoint):
         - batchUpdate: Batch update alerts.
         - update: Update alerts (alias for batch update).
     """
-    
+
     _PATH = "/api/alerts"
 
     def get_all(self, query: AlertsQuery | None = None) -> AlertsResults:
         """Get all alerts matching the query parameters.
-        
+
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alerts
         """
         params = query.to_odata_filters if query else {}
@@ -151,7 +157,7 @@ class AlertsEndpoint(BaseEndpoint):
 
     def get(self, id: str) -> AlertsResults:
         """Get a single alert by ID.
-        
+
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-info-by-id
         """
         path = f"{self._PATH}/{id}"
@@ -167,7 +173,7 @@ class AlertsEndpoint(BaseEndpoint):
 
     def files(self, id: str) -> FileResults:
         """Get the files associated with an alert.
-        
+
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-files-info
         """
         path = f"{self._PATH}/{id}/files"

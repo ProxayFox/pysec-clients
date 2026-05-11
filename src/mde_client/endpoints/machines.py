@@ -81,36 +81,43 @@ class MachinesQuery(BaseQuery):
 
 class MachineResults(BaseResults):
     """Results from the /api/machines endpoint."""
+
     SCHEMA = MACHINE_SCHEMA
 
 
 class LogonUserResults(BaseResults):
     """Results from the /api/machines/{id}/logonusers endpoint."""
+
     SCHEMA = USER_SCHEMA
 
 
 class AlertResults(BaseResults):
     """Results from the /api/machines/{id}/alerts endpoint."""
+
     SCHEMA = ALERT_SCHEMA
 
 
 class SoftwareResults(BaseResults):
     """Results from the /api/machines/{id}/software endpoint."""
+
     SCHEMA = SOFTWARE_SCHEMA
 
 
 class VulnerabilityResults(BaseResults):
     """Results from the /api/machines/{id}/vulnerabilities endpoint."""
+
     SCHEMA = VULNERABILITY_SCHEMA
 
 
 class RecommendationResults(BaseResults):
     """Results from the /api/machines/{id}/recommendations endpoint."""
+
     SCHEMA = RECOMMENDATION_SCHEMA
 
 
 class PublicProductFixResults(BaseResults):
     """Results from the /api/machines/{id}/getmissingkbs endpoint."""
+
     SCHEMA = PUBLIC_PRODUCT_FIX_DTO_SCHEMA
 
 
@@ -264,10 +271,10 @@ class MachinesEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment#1-export-certificate-assessment-json-response
         """
         from .certificateInventory import CertificateInventoryResults
-        
+
         path = f"{self._PATH}/certificateAssessmentByMachine"
         return CertificateInventoryResults(self, {}, path=path)
-    
+
     def _certificateAssessmentExport(self) -> CertificateInventoryResults:
         """Get the certificate inventory for a machine as a file.
 
@@ -276,7 +283,7 @@ class MachinesEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment#2-export-certificate-assessment-via-files
         """
         from .certificateInventory import CertificateInventoryResults
-        
+
         path = f"{self._PATH}/certificateAssessmentExport"
         return CertificateInventoryResults(self, {}, path=path, files=True)
 
