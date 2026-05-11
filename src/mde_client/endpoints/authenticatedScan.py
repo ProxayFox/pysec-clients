@@ -93,29 +93,10 @@ class ScannerAgentRef(BaseModel):
     machineId: str | None = None
 
 
-class AuthenticatedScanHistoryQuery(BaseModel):
-    """OData query parameters for authenticated scan history actions."""
-
-    model_config = {"extra": "forbid"}
-
-    top: int | None = Field(default=None, ge=1, le=10000)
-    skip: int | None = Field(default=None, ge=0)
-
-    @property
-    def to_odata_filters(self) -> dict[str, str]:
-        params: dict[str, str] = {}
-        if self.top is not None:
-            params["$top"] = str(self.top)
-        if self.skip is not None:
-            params["$skip"] = str(self.skip)
-        return params
-
-
 class ScanHistoryByDefinitionRequest(BaseModel):
     """Request body for scan history by definition."""
 
     model_config = {"extra": "forbid"}
-
     ScanDefinitionIds: list[str]
 
 
@@ -123,12 +104,7 @@ class ScanHistoryBySessionRequest(BaseModel):
     """Request body for scan history by session."""
 
     model_config = {"extra": "forbid"}
-
     SessionIds: list[str]
-
-
-def _as_id_list(ids: str | list[str]) -> list[str]:
-    return [ids] if isinstance(ids, str) else ids
 
 
 class AuthenticatedDefinitionsQuery(BaseQuery):
@@ -145,7 +121,7 @@ class AuthenticatedDefinitionsQuery(BaseQuery):
     pass
 
 
-class AuthenticatedDefinitionsAlterQuery(BaseQuery):
+class AuthenticatedDefinitionsAlterPayload(BaseQuery):
     """Query parameters for Add, update, or delete a scan definition on the /api/DeviceAuthenticatedScanDefinitions endpoint.
 
     All fields are optional, omitted fields are simply not sent.
@@ -183,6 +159,14 @@ class DeviceAuthenticatedAgentsQuery(BaseQuery):
     pass
 
 
+class AuthenticatedScanHistoryQuery(BaseQuery):
+    """OData query parameters for authenticated scan history actions."""
+
+    # Override default page_size to exclude it from queries, as the endpoint doesn't support it.
+    page_size: int | None = None
+    model_config = {"extra": "forbid"}
+
+
 class AuthenticatedDefinitionsResults(BaseResults):
     SCHEMA = DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA
 
@@ -208,7 +192,7 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         params = query.to_odata_filters if query else {}
         return AuthenticatedDefinitionsResults(self, params)
 
-    def history(
+    def definition_history(
         self,
         ids: str | list[str],
         query: AuthenticatedScanHistoryQuery | None = None,
@@ -219,7 +203,7 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         """
         params = query.to_odata_filters if query else {}
         payload = ScanHistoryByDefinitionRequest(
-            ScanDefinitionIds=_as_id_list(ids)
+            ScanDefinitionIds=self._id_list(ids)
         ).model_dump()
         path = f"{self._PATH}/GetScanHistoryByScanDefinitionId"
         return AuthenticatedScanHistoryResults(
@@ -230,7 +214,7 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
             request_kwargs={"json": payload},
         )
 
-    def history_by_session(
+    def session_history(
         self,
         ids: str | list[str],
         query: AuthenticatedScanHistoryQuery | None = None,
@@ -240,7 +224,9 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-scan-history-by-session
         """
         params = query.to_odata_filters if query else {}
-        payload = ScanHistoryBySessionRequest(SessionIds=_as_id_list(ids)).model_dump()
+        payload = ScanHistoryBySessionRequest(
+            SessionIds=self._id_list(ids)
+        ).model_dump()
         path = f"{self._PATH}/GetScanHistoryBySessionId"
         return AuthenticatedScanHistoryResults(
             self,
@@ -251,7 +237,7 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         )
 
     def add(
-        self, query: AuthenticatedDefinitionsAlterQuery
+        self, payload: AuthenticatedDefinitionsAlterPayload
     ) -> AuthenticatedDefinitionsResults:
         """Add a new authenticated scan definition.
 
@@ -259,13 +245,15 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-add-a-new-scan
         """
-        # return AuthenticatedDefinitionsResults(self, {})
-        raise NotImplementedError(
-            "Add operation for authenticated scan definitions is not yet implemented."
+        return AuthenticatedDefinitionsResults(
+            self,
+            {},
+            method="POST",
+            request_kwargs={"json": payload.model_dump(exclude_none=True)},
         )
 
     def update(
-        self, query: AuthenticatedDefinitionsAlterQuery
+        self, payload: AuthenticatedDefinitionsAlterPayload
     ) -> AuthenticatedDefinitionsResults:
         """Update an existing authenticated scan definition.
 
@@ -273,27 +261,25 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-update-a-scan
         """
-        # if not query.id:
-        # raise ValueError("ID is required for updating an authenticated scan definition.")
-        # path = f"{self._PATH}/{query.id}"
-
-        # return AuthenticatedDefinitionsResults(self, {}, path=path)
-        raise NotImplementedError(
-            "Update operation for authenticated scan definitions is not yet implemented."
+        return AuthenticatedDefinitionsResults(
+            self,
+            {}, 
+            method="PATCH",
+            request_kwargs={"json": payload.model_dump(exclude_none=True)},
         )
 
-    def delete(self, ids: str | list[str]) -> AuthenticatedDefinitionsAlterQuery:
+    def delete(self, ids: str | list[str]) -> AuthenticatedDefinitionsResults:
         """Delete existing authenticated scan definition.
 
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-delete-scans
         """
-        # ids = [ids] if isinstance(ids, str) else ids
-        # path = f"{self._PATH}/BatchDelete"
-        # return AuthenticatedDefinitionsAlterQuery()
-        raise NotImplementedError(
-            "Delete operation for authenticated scan definitions is not yet implemented."
+        return AuthenticatedDefinitionsResults(
+            self,
+            {},
+            method="POST",
+            request_kwargs={"json": {"ScanDefinitionIds": self._id_list(ids)}},
         )
 
 
@@ -317,14 +303,3 @@ class DeviceAuthenticatedAgentsEndpoint(BaseEndpoint):
         """
         path = f"{self._PATH}/{id}"
         return DeviceAuthenticatedAgentsQueryResults(self, {}, path=path, single=True)
-
-    def history(
-        self,
-        ids: str | list[str],
-        query: AuthenticatedScanHistoryQuery | None = None,
-    ) -> AuthenticatedScanHistoryResults:
-        """Compatibility shim for the definitions-bound scan history action."""
-        return AuthenticatedDefinitionsEndpoint(self._http, self._auth).history(
-            ids,
-            query,
-        )
