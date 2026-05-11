@@ -9,27 +9,27 @@ help:
     @just --list
 
 # --- Development ---
-lint path=".":
-    uv run ruff check {{path}}
+lint path="." +args="":
+    uv run ruff check {{path}} {{args}}
 
-lint-fix path=".":
-    uv run ruff check --fix {{path}}
+lint-fix path="." +args="":
+    uv run ruff check --fix {{path}} {{args}}
 
-format path=".":
-    uv run ruff format {{path}}
+format path="." +args="":
+    uv run ruff format {{path}} {{args}}
 
-format-check path=".":
-    uv run ruff format --check {{path}}
+format-check path="." +args="":
+    uv run ruff format --check {{path}} {{args}}
 
 #  --- Testing ---
 test path="tests/" +args="":
     uv run pytest -q {{path}} {{args}}
 
-test-all path="tests/":
-    uv run pytest --runslow -q {{path}}
+test-all path="tests/" +args="":
+    uv run pytest --runslow -q {{path}} {{args}}
 
-typecheck path=".":
-    uv run ty check --project {{path}}
+typecheck path="." +args="":
+    uv run ty check --project {{path}} {{args}}
     uvx pyright --threads
 
 # --- Quality CI/CD Gate ---
@@ -40,11 +40,11 @@ quality:
     just test --skip-integration
 
 # Similar to Quality, but only targets schema validation
-quality-schema path="src/mde_client/schemas" tests="tests/mde_client/test_schema_validator.py":
-    if ! just lint {{path}}; then just lint-fix {{path}}; fi
-    if ! just format-check {{path}}; then just format {{path}}; fi
-    just typecheck {{path}}
-    just test {{tests}} --skip-integration
+quality-schema schemas="src/mde_client/schemas" models="src/mde_client/models" schemas_tests="tests/mde_client/test_schema_validator.py" models_tests="tests/mde_client/test_investigation_models.py":
+    if ! just lint {{schemas}} {{models}}; then just lint-fix {{schemas}} {{models}}; fi
+    if ! just format-check {{schemas}} {{models}}; then just format {{schemas}} {{models}}; fi
+    just typecheck {{schemas}} {{models}}
+    just test {{schemas_tests}} {{models_tests}} --skip-integration
 
 # Like Quality, but also includes integration tests that require Azure credentials. Use with caution in CI/CD pipelines.
 quality-full:
