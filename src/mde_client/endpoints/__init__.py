@@ -26,8 +26,11 @@ if TYPE_CHECKING:
         AuthenticatedDefinitionsEndpoint,
         DeviceAuthenticatedAgentsEndpoint,
     )
+    from .base import BaseEndpoint
     from .browserExtension import BrowserExtensionEndpoint
+    from .certificateInventory import CertificateInventoryEndpoint
     from .deviceAvHealth import DeviceAVHealthEndpoint
+    from .domain import DomainEndpoint
     from .investigations import InvestigationsEndpoint
     from .machines import MachinesEndpoint
 
@@ -36,8 +39,11 @@ _NAME_TO_MODULE = {
     "AlertsEndpoint": "alerts",
     "AuthenticatedDefinitionsEndpoint": "authenticatedScan",
     "DeviceAuthenticatedAgentsEndpoint": "authenticatedScan",
+    "BaseEndpoint": "base",
     "BrowserExtensionEndpoint": "browserExtension",
+    "CertificateInventoryEndpoint": "certificateInventory",
     "DeviceAVHealthEndpoint": "deviceAvHealth",
+    "DomainEndpoint": "domain",
     "InvestigationsEndpoint": "investigations",
     "MachinesEndpoint": "machines",
 }
@@ -61,15 +67,21 @@ def __getattr__(name: str) -> object:
 __all__ = [
     # Alerts
     "AlertsEndpoint",
+    # Authenticated Scan
+    "AuthenticatedDefinitionsEndpoint",
+    "DeviceAuthenticatedAgentsEndpoint",
+    # Base Endpoint
+    "BaseEndpoint",
     # Browser Extension
     "BrowserExtensionEndpoint",
+    # Certificate Inventory
+    "CertificateInventoryEndpoint",
     # Device AV Health
     "DeviceAVHealthEndpoint",
+    # Domain
+    "DomainEndpoint",
     # Investigations
     "InvestigationsEndpoint",
     # Machines
     "MachinesEndpoint",
-    # Authenticated Scan
-    "AuthenticatedDefinitionsEndpoint",
-    "DeviceAuthenticatedAgentsEndpoint",
 ]

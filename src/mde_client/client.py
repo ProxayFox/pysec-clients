@@ -2,8 +2,17 @@ import msal
 import httpx
 
 from .auth import MSALAuth
-from .endpoints.base import BaseEndpoint
-from .endpoints.machines import MachinesEndpoint
+from .endpoints import (
+    AlertsEndpoint,
+    AuthenticatedDefinitionsEndpoint,
+    BaseEndpoint,
+    BrowserExtensionEndpoint,
+    CertificateInventoryEndpoint,
+    DeviceAVHealthEndpoint,
+    DomainEndpoint,
+    InvestigationsEndpoint,
+    MachinesEndpoint,
+)
 
 
 class MDEClient:
@@ -59,8 +68,36 @@ class MDEClient:
     # ------------------------------------------------------------------
 
     @property
+    def alerts(self) -> AlertsEndpoint:
+        return AlertsEndpoint(self._http, self._auth)
+
+    @property
+    def authenticated_scan(self) -> AuthenticatedDefinitionsEndpoint:
+        return AuthenticatedDefinitionsEndpoint(self._http, self._auth)
+
+    @property
     def misc(self) -> BaseEndpoint:
         return BaseEndpoint(self._http, self._auth)
+
+    @property
+    def browser_extension(self) -> BrowserExtensionEndpoint:
+        return BrowserExtensionEndpoint(self._http, self._auth)
+
+    @property
+    def certificate_inventory(self) -> CertificateInventoryEndpoint:
+        return CertificateInventoryEndpoint(self._http, self._auth)
+
+    @property
+    def device_av_health(self) -> DeviceAVHealthEndpoint:
+        return DeviceAVHealthEndpoint(self._http, self._auth)
+
+    @property
+    def domain(self) -> DomainEndpoint:
+        return DomainEndpoint(self._http, self._auth)
+
+    @property
+    def investigations(self) -> InvestigationsEndpoint:
+        return InvestigationsEndpoint(self._http, self._auth)
 
     @property
     def machines(self) -> MachinesEndpoint:
