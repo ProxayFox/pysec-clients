@@ -6,13 +6,18 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import httpx
+import pytest
+from pydantic import ValidationError
 
 from mde_client.endpoints.authenticatedScan import (
+    AuthenticatedDefinitionsAlterPayload,
     AuthenticatedDefinitionsEndpoint,
     AuthenticatedScanHistoryQuery,
     AuthenticatedScanHistoryResults,
     DeviceAuthenticatedAgentsEndpoint,
 )
+
+from mde_client.schemas.auth_params_models import WindowsAuthParams
 
 
 def _make_definitions_endpoint() -> AuthenticatedDefinitionsEndpoint:
@@ -57,7 +62,6 @@ class _FakeDefinitionsEndpoint(AuthenticatedDefinitionsEndpoint):
 class TestAuthenticatedScanHistoryQuery:
     def test_defaults_do_not_include_page_size(self) -> None:
         params = AuthenticatedScanHistoryQuery().to_odata_filters
-        print(params)
         assert "pageSize" not in params
 
     def test_top_and_skip_are_forwarded(self) -> None:
@@ -117,3 +121,55 @@ class TestDefinitionsHistory:
             == "/api/DeviceAuthenticatedScanDefinitions/GetScanHistoryByScanDefinitionId"
         )
         assert endpoint.calls[0][2]["json"] == {"ScanDefinitionIds": ["scan-1"]}
+
+
+class TestAuthParamPayloads:
+    def test_generated_windows_auth_model_serializes_for_request_body(self) -> None:
+        payload = AuthenticatedDefinitionsAlterPayload(
+            scanAuthenticationParams=WindowsAuthParams(
+                type="Negotiate",
+                username="contoso\\svc-scan",
+            )
+        )
+
+        body = payload.model_dump(exclude_none=True)
+
+        assert "page_size" not in body
+        assert body["scanAuthenticationParams"] == {
+            "type": "Negotiate",
+            "username": "contoso\\svc-scan",
+            "isgmsaUser": False,
+            "packetPrivacy": False,
+            "packetIntegrity": False,
+        }
+
+    def test_discriminated_union_accepts_linux_payload(self) -> None:
+        payload = AuthenticatedDefinitionsAlterPayload.model_validate(
+            {
+                "scanAuthenticationParams": {
+                    "type": "PrivateKey",
+                    "username": "scanner",
+                    "privateKey": "PRIVATE KEY",
+                }
+            }
+        )
+
+        body = payload.model_dump(exclude_none=True)
+
+        assert body["scanAuthenticationParams"] == {
+            "type": "PrivateKey",
+            "username": "scanner",
+            "privateKey": "PRIVATE KEY",
+        }
+
+    def test_variant_specific_extra_fields_are_rejected(self) -> None:
+        with pytest.raises(ValidationError):
+            AuthenticatedDefinitionsAlterPayload.model_validate(
+                {
+                    "scanAuthenticationParams": {
+                        "type": "PrivateKey",
+                        "username": "scanner",
+                        "domain": "CONTOSO",
+                    }
+                }
+            )

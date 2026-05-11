@@ -33,6 +33,7 @@ import os
 import re
 import subprocess
 import xml.etree.ElementTree as ET
+from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
 
@@ -92,6 +93,39 @@ NO_RETURN_ACTION_RESPONSE_OVERRIDES: dict[tuple[str, str], str] = {
         "GetScanHistoryByScanDefinitionId",
         "Collection(microsoft.windowsDefenderATP.api.DeviceAuthenticatedScanDefinition)",
     ): "AuthScanHistoryContract",
+}
+
+
+@dataclass(frozen=True)
+class RequestModelSpec:
+    module: str
+    base_model: str
+    union_name: str
+    discriminator: str
+
+
+# Narrow, opt-in request-model generation for contract-defined request payload
+# shapes that we do not want to hand-maintain in endpoint modules.
+REQUEST_MODEL_SPECS: dict[str, RequestModelSpec] = {
+    "AuthParamsBase": RequestModelSpec(
+        module="auth_params_models",
+        base_model="_AuthParamsBase",
+        union_name="SCANAUTHENTICATIONPARAMS",
+        discriminator="type",
+    ),
+}
+
+REQUEST_MODEL_PRIMITIVES: dict[str, str] = {
+    "Edm.String": "str",
+    "Edm.Int16": "int",
+    "Edm.Int32": "int",
+    "Edm.Int64": "int",
+    "Edm.Boolean": "bool",
+    "Edm.Double": "float",
+    "Edm.Single": "float",
+    "Edm.Byte": "int",
+    "Edm.SByte": "int",
+    "Edm.Guid": "str",
 }
 
 
@@ -195,6 +229,7 @@ class MDEMetadata:
         root = ET.parse(path).getroot()
 
         self.enum_types: set[str] = set()
+        self.enum_members: dict[str, list[str]] = {}
         self.abstract_types: set[str] = set()
         # short name → list of <Property> elements (no <NavigationProperty>)
         self.complex_types: dict[str, list[ET.Element]] = {}
@@ -204,7 +239,13 @@ class MDEMetadata:
         self.base_types: dict[str, str] = {}
 
         for el in root.iter(f"{{{MDE_NS}}}EnumType"):
-            self.enum_types.add(el.get("Name", ""))
+            name = el.get("Name", "")
+            self.enum_types.add(name)
+            self.enum_members[name] = [
+                member.get("Name", "")
+                for member in el.findall(f"{{{MDE_NS}}}Member")
+                if member.get("Name")
+            ]
 
         for el in root.iter(f"{{{MDE_NS}}}ComplexType"):
             name = el.get("Name", "")
@@ -271,6 +312,12 @@ class MDEMetadata:
             self.entity_types.get(type_name) or self.complex_types.get(type_name) or []
         )
         return props
+
+    def declared_props_for(self, type_name: str) -> list[ET.Element]:
+        """Return only properties declared directly on *type_name*."""
+        return (
+            self.entity_types.get(type_name) or self.complex_types.get(type_name) or []
+        )
 
     def concrete_descendants(self, abstract_name: str) -> list[str]:
         """Return concrete ComplexType names that directly derive from *abstract_name*."""
@@ -563,6 +610,133 @@ class SchemaCodeGen:
         return "\n".join(lines)
 
 
+class RequestModelCodeGen:
+    def __init__(self, meta: MDEMetadata) -> None:
+        self.meta = meta
+
+    def _literal_block(self, enum_name: str) -> str:
+        members = self.meta.enum_members[enum_name]
+        joined = ", ".join(f'"{member}"' for member in members)
+        return f"{to_const(enum_name)} = Literal[{joined}]"
+
+    def _python_type_expr(self, odata_t: str) -> str:
+        if odata_t.startswith("Collection("):
+            inner = odata_t[len("Collection(") : -1]
+            return f"list[{self._python_type_expr(inner)}]"
+
+        if odata_t in REQUEST_MODEL_PRIMITIVES:
+            return REQUEST_MODEL_PRIMITIVES[odata_t]
+
+        short = strip_prefix(odata_t)
+
+        if short in self.meta.enum_types:
+            return to_const(short)
+        if short in self.meta.complex_types:
+            return short
+
+        raise ValueError(f"Unsupported request-model field type: {odata_t}")
+
+    def _field_line(self, prop: ET.Element, indent: int = 4) -> str:
+        name = prop.get("Name", "")
+        odata_t = prop.get("Type", "Edm.String")
+        nullable = prop.get("Nullable", "true").lower() != "false"
+        py_type = self._python_type_expr(odata_t)
+        pad = " " * indent
+
+        if nullable:
+            return f"{pad}{name}: {py_type} | None = None"
+        if odata_t == "Edm.Boolean":
+            return f"{pad}{name}: bool = False"
+        return f"{pad}{name}: {py_type}"
+
+    def _enum_names_for(self, type_names: list[str]) -> list[str]:
+        enum_names: list[str] = []
+        seen: set[str] = set()
+        for type_name in type_names:
+            for prop in self.meta.declared_props_for(type_name):
+                short = strip_prefix(unwrap_collection(prop.get("Type", "")))
+                if short in self.meta.enum_types and short not in seen:
+                    seen.add(short)
+                    enum_names.append(short)
+        return enum_names
+
+    def _model_block(
+        self,
+        model_name: str,
+        base_name: str,
+        props: list[ET.Element],
+        *,
+        base_model: bool = False,
+    ) -> str:
+        lines = [f"class {model_name}({base_name}):"]
+        if base_model:
+            lines.append('    model_config = {"extra": "forbid"}')
+            lines.append("")
+        for prop in props:
+            lines.append(self._field_line(prop))
+        return "\n".join(lines)
+
+    def generate(self, root_name: str, spec: RequestModelSpec) -> str:
+        descendants = self.meta.concrete_descendants(root_name)
+        enum_names = self._enum_names_for([root_name, *descendants])
+
+        parts: list[str] = [
+            "# AUTO-GENERATED by scripts/mde_contract.py — do not edit manually.",
+            "# Re-run the script to regenerate when MDE $metadata changes.",
+            "from __future__ import annotations",
+            "",
+            "from typing import Annotated, Literal",
+            "",
+            "from pydantic import BaseModel, Field",
+            "",
+        ]
+
+        if enum_names:
+            parts.append("\n".join(self._literal_block(name) for name in enum_names))
+            parts.append("")
+
+        parts.append(
+            self._model_block(
+                spec.base_model,
+                "BaseModel",
+                self.meta.declared_props_for(root_name),
+                base_model=True,
+            )
+        )
+        parts.append("")
+
+        for descendant in descendants:
+            parts.append(
+                self._model_block(
+                    descendant,
+                    spec.base_model,
+                    self.meta.declared_props_for(descendant),
+                )
+            )
+            parts.append("")
+
+        union_expr = " | ".join(descendants)
+        parts.append(
+            f"{spec.union_name} = Annotated[\n"
+            f"    {union_expr},\n"
+            f'    Field(discriminator="{spec.discriminator}"),\n'
+            "]"
+        )
+        parts.append("")
+
+        all_entries = [
+            *(to_const(enum_name) for enum_name in enum_names),
+            *descendants,
+            spec.union_name,
+        ]
+        parts.append("__all__ = [")
+        parts.extend(f'    "{entry}",' for entry in all_entries)
+        parts.append("]")
+        parts.append("")
+
+        return "\n".join(parts)
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 
@@ -625,6 +799,7 @@ def main() -> None:
 
     meta = MDEMetadata(XML_SOURCE)
     gen = SchemaCodeGen(meta)
+    request_model_gen = RequestModelCodeGen(meta)
 
     available_schema_types = sorted(
         (set(meta.entity_types) - SKIP_ENTITIES) | meta.response_complex_types
@@ -647,7 +822,8 @@ def main() -> None:
     # ── Per-entity schema files ───────────────────────────────────────────────
 
     expected_paths: set[Path] = set()
-    count = 0
+    schema_count = 0
+    request_model_count = 0
 
     for type_name in types_to_generate:
         source = gen.generate(type_name)
@@ -662,7 +838,31 @@ def main() -> None:
             out_path.write_text(source, encoding="utf-8")
             print(f"  ✓ {out_path}")
 
-        count += 1
+        schema_count += 1
+
+    request_model_roots = [
+        root_name
+        for root_name in REQUEST_MODEL_SPECS
+        if not args.entity
+        or root_name == args.entity
+        or root_name in meta.referenced_complex_types(args.entity)
+    ]
+
+    for root_name in request_model_roots:
+        spec = REQUEST_MODEL_SPECS[root_name]
+        source = request_model_gen.generate(root_name, spec)
+        out_path = OUTPUT_DIR / f"{spec.module}.py"
+        expected_paths.add(out_path)
+
+        if args.dry_run:
+            sep = "─" * 60
+            print(f"\n{sep}\n# {out_path}\n{sep}")
+            print(source)
+        else:
+            out_path.write_text(source, encoding="utf-8")
+            print(f"  ✓ {out_path}")
+
+        request_model_count += 1
 
     # ── __init__.py ───────────────────────────────────────────────────────────
 
@@ -687,7 +887,10 @@ def main() -> None:
     # ── Quality gate ──────────────────────────────────────────────────────────
 
     if not args.dry_run:
-        print(f"\n{count} schema file(s) + __init__.py written to {OUTPUT_DIR}/")
+        print(
+            f"\n{schema_count} schema file(s), {request_model_count} request model module(s), "
+            f"and __init__.py written to {OUTPUT_DIR}/"
+        )
         run_quality()
 
 

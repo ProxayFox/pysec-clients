@@ -5,7 +5,7 @@ import asyncio
 import pyarrow as pa
 from datetime import datetime
 from typing import Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from http_to_arrow import ArrowRecordContainer
 
 from ..auth import MSALAuth
@@ -71,6 +71,18 @@ class BaseQuery(BaseModel):
             params["$filter"] = " and ".join(filter_list)
 
         return params
+
+
+class BasePayload(BaseModel):
+    """Base payload for API endpoints.
+
+    Not all endpoints use a request body, but for those that do, the payload
+    should inherit from this class. This is currently just a placeholder for
+    consistency and future-proofing, as there are no common fields or logic
+    defined here yet.
+    """
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class BaseResults:
