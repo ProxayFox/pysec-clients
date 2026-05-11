@@ -44,6 +44,7 @@ if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionResults
     from .investigations import InvestigationResults
     from .deviceAvHealth import DeviceAVHealthResults
+    from .certificateInventory import CertificateInventoryResults
 
 log = logging.getLogger(__name__)
 
@@ -254,6 +255,32 @@ class MachinesEndpoint(BaseEndpoint):
         path = f"{self._PATH}/browserextensionsinventoryExport"
         return BrowserExtensionResults(self, {}, path=path, files=True)
 
+    # === Certificate Inventory related endpoints ===
+    def _certificateAssessmentByMachine(self) -> CertificateInventoryResults:
+        """Get the certificate inventory for a machine.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment#1-export-certificate-assessment-json-response
+        """
+        from .certificateInventory import CertificateInventoryResults
+        
+        path = f"{self._PATH}/certificateAssessmentByMachine"
+        return CertificateInventoryResults(self, {}, path=path)
+    
+    def _certificateAssessmentExport(self) -> CertificateInventoryResults:
+        """Get the certificate inventory for a machine as a file.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment#2-export-certificate-assessment-via-files
+        """
+        from .certificateInventory import CertificateInventoryResults
+        
+        path = f"{self._PATH}/certificateAssessmentExport"
+        return CertificateInventoryResults(self, {}, path=path, files=True)
+
+    # === Device AV Health related endpoints ===
     def _infoGatheringExport(self) -> DeviceAVHealthResults:
         """Get device AV health report as a file.
 
