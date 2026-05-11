@@ -133,13 +133,11 @@ class MachinesEndpoint(BaseEndpoint):
         params = query.to_odata_filters if query else {}
         return MachineResults(self, params)
 
-    def get(self, id: str | None = None) -> MachineResults:
+    def get(self, id: str) -> MachineResults:
         """Get machine by ID
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-by-id
         """
-        if id is None:
-            raise ValueError("id must be provided")
         path = f"{self._PATH}/{id}"
         return MachineResults(self, {}, path=path, single=True)
 
@@ -254,6 +252,14 @@ class MachinesEndpoint(BaseEndpoint):
             "This endpoint is not yet implemented, as it requires handling file downloads which is not yet implemented in the client."
         )
 
+
+    # === Investigations related endpoints ===
+    def _startInvestigation(self, id: str) -> None:
+        """Start Investigation
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
+        """
+        path = f"{self._PATH}/{id}/startInvestigation"
 
 class MachineNotFoundError(Exception):
     def __init__(self, machine_id: str) -> None:
