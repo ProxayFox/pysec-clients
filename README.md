@@ -22,6 +22,7 @@ Each vendor package lives under `src/` as its own installable workspace member, 
 git clone <repo-url>
 cd pysec-clients
 uv sync --all-packages --all-groups
+just hooks-install
 just quality
 ```
 
@@ -60,7 +61,19 @@ just test          # uv run pytest -q
 just test-all      # uv run pytest --runslow -q
 just typecheck     # uv run ty check --project . && uvx pyright --threads
 just quality       # lint, format-check/format, typecheck, test
+just hooks-install # install pre-commit hook that runs `just quality`
+just hooks-run     # run the hook manually against all files
 ```
+
+### Pre-commit Hook
+
+The repository ships a `.pre-commit-config.yaml` that runs `just quality` before every commit.
+Install it once with `just hooks-install`.
+
+Because the quality gate auto-fixes lint and formatting issues, the hook may rewrite files and abort the commit.
+When that happens, review the changes, re-stage the updated files, and commit again.
+
+The hook can be bypassed with `git commit --no-verify`, but this is discouraged.
 
 Documentation tasks also exist in `justfile`:
 

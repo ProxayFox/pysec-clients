@@ -32,6 +32,13 @@ typecheck path="." +args="":
     uv run ty check --project {{path}} {{args}}
     uvx pyright --threads
 
+# --- Git Hooks ---
+hooks-install:
+    uv run pre-commit install
+
+hooks-run +args="":
+    uv run pre-commit run --all-files {{args}}
+
 # --- Quality CI/CD Gate ---
 quality:
     if ! just lint; then just lint-fix; fi
