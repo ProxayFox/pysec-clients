@@ -15,7 +15,8 @@ import codecs
 import logging
 import os
 import zlib
-from typing import Any
+from collections.abc import AsyncIterator, Callable
+from typing import Any, Protocol, runtime_checkable
 from urllib.parse import urlsplit, urlunsplit
 
 import aiohttp
@@ -25,6 +26,23 @@ from pydantic import BaseModel
 
 log = logging.getLogger(__name__)
 
+#: Callable that transforms a single parsed export record.
+type RecordTransform = Callable[[dict[str, Any]], dict[str, Any]]
+
+
+@runtime_checkable
+class StreamableResponse(Protocol):
+    """Minimal interface consumed by :meth:`ViaFiles._stream_export_records`."""
+
+    @property
+    def content(self) -> _StreamableContent: ...
+
+
+class _StreamableContent(Protocol):
+    """Minimal interface for the ``content`` property of a ``StreamableResponse``."""
+
+    def iter_chunked(self, n: int) -> AsyncIterator[bytes]: ...
+
 
 class EmptyExportBlobError(RuntimeError):
     """Raised when an export blob returns 200 OK but contains no records."""
@@ -33,10 +51,10 @@ class EmptyExportBlobError(RuntimeError):
 class ViaFilesConfig(BaseModel):
     """Tuning knobs for :class:`ViaFiles` export downloads."""
 
-    download_workers: int = os.cpu_count() or 1
+    download_workers: int = max(1, int((os.cpu_count() or 1) * 0.75))
     client_timeout: int = 300
     retry_attempts: int = 3
-    retry_delay_seconds: int = 5
+    retry_delay_seconds: int = 10
     download_chunk_size: int = int(1024 * 1024 * 2.5)  # 2.5 MiB
     parse_batch_size: int = 5000
 
@@ -52,10 +70,6 @@ class ViaFiles:
     def __init__(self, config: ViaFilesConfig | None = None) -> None:
         self._config = config or ViaFilesConfig()
 
-    # ------------------------------------------------------------------
-    # Helpers
-    # ------------------------------------------------------------------
-
     @staticmethod
     def _redact_url(url: str) -> str:
         """Return *url* with the query string stripped to avoid logging SAS tokens."""
@@ -65,15 +79,12 @@ class ViaFiles:
         except Exception:
             return "[redacted-url]"
 
-    # ------------------------------------------------------------------
-    # Record streaming / parsing
-    # ------------------------------------------------------------------
-
     async def _stream_export_records(
         self,
-        response: aiohttp.ClientResponse,
+        response: StreamableResponse,
         f_url: str,
         record_queue: asyncio.Queue[list[dict[str, Any]] | None],
+        record_transform: RecordTransform | None = None,
     ) -> int:
         """Stream, decompress, and parse a single export blob into queued batches."""
 
@@ -115,7 +126,10 @@ class ViaFiles:
                 if not stripped_line:
                     continue
 
-                records_batch.append(orjson.loads(stripped_line))
+                record = orjson.loads(stripped_line)
+                if record_transform is not None:
+                    record = record_transform(record)
+                records_batch.append(record)
                 total_records += 1
 
                 if len(records_batch) >= self._config.parse_batch_size:
@@ -158,10 +172,6 @@ class ViaFiles:
         log.info("%d records found in %s.", total_records, self._redact_url(f_url))
         return total_records
 
-    # ------------------------------------------------------------------
-    # Consumer task
-    # ------------------------------------------------------------------
-
     async def _append_export_records(
         self,
         record_queue: asyncio.Queue[list[dict[str, Any]] | None],
@@ -177,16 +187,13 @@ class ViaFiles:
             finally:
                 record_queue.task_done()
 
-    # ------------------------------------------------------------------
-    # Per-file download with retry
-    # ------------------------------------------------------------------
-
     async def _download_export_file(
         self,
         session: aiohttp.ClientSession,
         f_url: str,
         semaphore: asyncio.Semaphore,
         record_queue: asyncio.Queue[list[dict[str, Any]] | None],
+        record_transform: RecordTransform | None = None,
     ) -> None:
         """Download and parse a single export blob with retry logic."""
         last_error: Exception | None = None
@@ -199,6 +206,7 @@ class ViaFiles:
                         response,
                         f_url,
                         record_queue,
+                        record_transform,
                     )
                     if record_count == 0:
                         raise EmptyExportBlobError(
@@ -240,14 +248,12 @@ class ViaFiles:
                 f"after {self._config.retry_attempts} attempts"
             ) from last_error
 
-    # ------------------------------------------------------------------
-    # Public entry point
-    # ------------------------------------------------------------------
-
     async def download_export_files(
         self,
         urls: list[str],
         container: ArrowRecordContainer,
+        *,
+        record_transform: RecordTransform | None = None,
     ) -> ArrowRecordContainer:
         """Download export blobs concurrently and stream records into *container*.
 
@@ -255,6 +261,9 @@ class ViaFiles:
             urls: SAS-signed blob URLs returned by an MDE ``exportFiles`` response.
             container: Pre-configured :class:`ArrowRecordContainer` that records
                 are streamed into.
+            record_transform: Optional callable applied to each parsed JSON
+                record before it is batched.  Use this to flatten nested
+                export formats (e.g. ``DeviceGatheredInfo``).
 
         Returns:
             The same *container*, now populated with the parsed records.
@@ -271,7 +280,13 @@ class ViaFiles:
         try:
             async with aiohttp.ClientSession(timeout=timeout) as session:
                 tasks = [
-                    self._download_export_file(session, f_url, semaphore, record_queue)
+                    self._download_export_file(
+                        session,
+                        f_url,
+                        semaphore,
+                        record_queue,
+                        record_transform,
+                    )
                     for f_url in urls
                 ]
                 if tasks:
