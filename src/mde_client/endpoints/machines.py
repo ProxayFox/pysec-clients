@@ -250,17 +250,20 @@ class MachinesEndpoint(BaseEndpoint):
         )
 
     # === Investigations related endpoints ===
-    def _startInvestigation(self, id: str, payload: StartInvestigationPayload | None = None) -> InvestigationResults:
+    def _startInvestigation(
+        self, id: str, payload: StartInvestigationPayload | None = None
+    ) -> InvestigationResults:
         """Start Investigation
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
         """
         path = f"{self._PATH}/{id}/startInvestigation"
         return InvestigationResults(
-            self, {},
+            self,
+            {},
             path=path,
             method="POST",
-            request_kwargs={"json": payload.model_dump() if payload else {}}
+            request_kwargs={"json": payload.model_dump() if payload else {}},
         )
 
 

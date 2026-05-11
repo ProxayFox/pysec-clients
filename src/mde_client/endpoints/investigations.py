@@ -59,9 +59,13 @@ class InvestigationsEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}"
         return InvestigationResults(self, {}, path=path, single=True)
 
-    def startInvestigation(self, deviceId: str, payload: StartInvestigationPayload | None = None) -> InvestigationResults:
+    def startInvestigation(
+        self, deviceId: str, payload: StartInvestigationPayload | None = None
+    ) -> InvestigationResults:
         """Start an investigation.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
         """
-        return MachinesEndpoint(self._http, self._auth)._startInvestigation(deviceId, payload)
+        return MachinesEndpoint(self._http, self._auth)._startInvestigation(
+            deviceId, payload
+        )
