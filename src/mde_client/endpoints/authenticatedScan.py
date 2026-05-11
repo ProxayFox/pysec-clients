@@ -29,7 +29,7 @@ from ..schemas import (
     DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
     DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA,
 )
-from ..schemas.auth_params_models import SCANAUTHENTICATIONPARAMS
+from ..models.auth_params_models import SCANAUTHENTICATIONPARAMS
 
 log = logging.getLogger(__name__)
 

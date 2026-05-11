@@ -17,7 +17,7 @@ from mde_client.endpoints.authenticatedScan import (
     DeviceAuthenticatedAgentsEndpoint,
 )
 
-from mde_client.schemas.auth_params_models import WindowsAuthParams
+from mde_client.models.auth_params_models import WindowsAuthParams
 
 
 def _make_definitions_endpoint() -> AuthenticatedDefinitionsEndpoint:

@@ -1,34 +1,13 @@
 from __future__ import annotations
 
-import logging
+from datetime import datetime
 
-from datetime import datetime, timezone
-from typing import Literal, TYPE_CHECKING
-
-from .base import BasePayload, BaseQuery, BaseEndpoint, BaseResults
+from .base import BaseQuery, BaseEndpoint, BaseResults
 from ..schemas import INVESTIGATION_SCHEMA
-from .machines import MachinesEndpoint
+from ..models.investigation_models import (
+    INVESTIGATION_STATE,
+)
 
-STATE_TYPE = Literal[
-    "Unknown", 
-    "Terminated", 
-    "SuccessfullyRemediated", 
-    "Benign", 
-    "Failed", 
-    "PartiallyRemediated", 
-    "Running", 
-    "PendingApproval", 
-    "PendingResource", 
-    "PartiallyInvestigated", 
-    "TerminatedByUser", 
-    "TerminatedBySystem", 
-    "Queued", 
-    "InnerFailure", 
-    "PreexistingAlert", 
-    "UnsupportedOs", 
-    "UnsupportedAlertType", 
-    "SuppressedAlert"
-]
 
 class InvestigationsQuery(BaseQuery):
     """Query parameters for the /api/investigations endpoint.
@@ -46,24 +25,17 @@ class InvestigationsQuery(BaseQuery):
 
     id: str | list[str] | None = None
     startTime: datetime | None = None
-    state: STATE_TYPE | list[STATE_TYPE] | None = None
+    state: INVESTIGATION_STATE | list[INVESTIGATION_STATE] | None = None
     machineId: str | list[str] | None = None
     triggeringAlertId: str | list[str] | None = None
 
-class InvestigationStartPayload(BasePayload):
-    """Payload for starting an investigation."""
-
-    machineId: str
-    Comment: str
-    ExternalId: str | None = None
-    RequestSource: str | None = None
-    Title: str | None = None
 
 class InvestigationResults(BaseResults):
     """Results from the /api/investigations endpoint."""
 
     SCHEMA = INVESTIGATION_SCHEMA
-    
+
+
 class InvestigationsEndpoint(BaseEndpoint):
     """Endpoint for /api/investigations"""
 
@@ -77,7 +49,7 @@ class InvestigationsEndpoint(BaseEndpoint):
         """
         params = query.to_odata_filters if query else {}
         return InvestigationResults(self, params)
-    
+
     def get(self, id: str) -> InvestigationResults:
         """Get a specific investigation by ID.
 
@@ -86,10 +58,9 @@ class InvestigationsEndpoint(BaseEndpoint):
         """
         path = f"{self._PATH}/{id}"
         return InvestigationResults(self, {}, path=path, single=True)
-    
+
     def startInvestigation(self, deviceId: str) -> None:
         """Start an investigation.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
         """
-                

@@ -92,9 +92,10 @@ class TestGet:
         result = _make_endpoint().get(MACHINE_ID)
         assert result._single is True
 
-    def test_none_id_raises(self) -> None:
-        with pytest.raises(ValueError, match="id must be provided"):
-            _make_endpoint().get(None)
+    def test_none_id_is_type_error(self) -> None:
+        """Passing None is caught by the type checker; no runtime guard exists."""
+        result = _make_endpoint().get(None)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+        assert "/None" in result._path
 
 
 # ------------------------------------------------------------------

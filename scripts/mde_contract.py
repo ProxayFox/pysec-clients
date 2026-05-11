@@ -43,6 +43,7 @@ import pyarrow as pa
 
 XML_SOURCE = Path("tests/mde_client/fixtures/mde_metadata.xml")
 OUTPUT_DIR = Path("src/mde_client/schemas")
+MODELS_OUTPUT_DIR = Path("src/mde_client/models")
 METADATA_MAX_AGE = timedelta(days=7)
 
 MDE_NS = "http://docs.oasis-open.org/odata/ns/edm"
@@ -104,6 +105,33 @@ class RequestModelSpec:
     discriminator: str
 
 
+@dataclass(frozen=True)
+class ActionParam:
+    """Parsed non-binding parameter from an OData Action element."""
+
+    name: str
+    odata_type: str
+    nullable: bool
+    optional: bool  # has Org.OData.Core.V1.OptionalParameter annotation
+
+
+@dataclass(frozen=True)
+class ActionPayloadSpec:
+    """Generate a Pydantic BasePayload from bound action parameters."""
+
+    action_name: str
+    class_name: str
+    binding_type: str  # full OData type of the binding parameter
+
+
+@dataclass(frozen=True)
+class SupportModuleSpec:
+    """One generated support-model module under src/mde_client/models/."""
+
+    enums: dict[str, str]  # XML enum name → Python alias name (UPPER_SNAKE)
+    action_payloads: list[ActionPayloadSpec]
+
+
 # Narrow, opt-in request-model generation for contract-defined request payload
 # shapes that we do not want to hand-maintain in endpoint modules.
 REQUEST_MODEL_SPECS: dict[str, RequestModelSpec] = {
@@ -126,6 +154,24 @@ REQUEST_MODEL_PRIMITIVES: dict[str, str] = {
     "Edm.Byte": "int",
     "Edm.SByte": "int",
     "Edm.Guid": "str",
+}
+
+# Narrow, opt-in support-model generation for contract-derived enum aliases
+# and action payload models that we do not want to hand-maintain.
+SUPPORT_MODULE_SPECS: dict[str, SupportModuleSpec] = {
+    "investigation_models": SupportModuleSpec(
+        enums={
+            "InvestigationState": "INVESTIGATION_STATE",
+            "KnownRequestSource": "KNOWN_REQUEST_SOURCE",
+        },
+        action_payloads=[
+            ActionPayloadSpec(
+                action_name="StartInvestigation",
+                class_name="InvestigationStartPayload",
+                binding_type="microsoft.windowsDefenderATP.api.Machine",
+            ),
+        ],
+    ),
 }
 
 
@@ -237,6 +283,8 @@ class MDEMetadata:
         self.response_complex_types: set[str] = set()
         # child short name → parent short name
         self.base_types: dict[str, str] = {}
+        # action name → list of non-binding ActionParam
+        self.actions: dict[str, list[ActionParam]] = {}
 
         for el in root.iter(f"{{{MDE_NS}}}EnumType"):
             name = el.get("Name", "")
@@ -267,6 +315,33 @@ class MDEMetadata:
 
         for kind in ("Function", "Action"):
             for el in root.iter(f"{{{MDE_NS}}}{kind}"):
+                action_name = el.get("Name", "")
+
+                # ── Action parameter capture ─────────────────────────────
+                params: list[ActionParam] = []
+                for param_el in el.findall(f"{{{MDE_NS}}}Parameter"):
+                    pname = param_el.get("Name", "")
+                    if pname == "bindingParameter":
+                        continue
+                    has_optional = (
+                        param_el.find(
+                            f"{{{MDE_NS}}}Annotation[@Term='Org.OData.Core.V1.OptionalParameter']"
+                        )
+                        is not None
+                    )
+                    params.append(
+                        ActionParam(
+                            name=pname,
+                            odata_type=param_el.get("Type", "Edm.String"),
+                            nullable=param_el.get("Nullable", "true").lower()
+                            != "false",
+                            optional=has_optional,
+                        )
+                    )
+                if params:
+                    self.actions[action_name] = params
+
+                # ── Response complex type capture ────────────────────────
                 return_el = el.find(f"{{{MDE_NS}}}ReturnType")
                 if return_el is None:
                     binding_el = el.find(
@@ -737,6 +812,201 @@ class RequestModelCodeGen:
         return "\n".join(parts)
 
 
+class SupportModelCodeGen:
+    """Generates non-Arrow support models: enum Literal aliases and action payload classes."""
+
+    def __init__(self, meta: MDEMetadata) -> None:
+        self.meta = meta
+
+    def _literal_block(self, enum_name: str, alias_name: str) -> str:
+        members = self.meta.enum_members[enum_name]
+        joined = ", ".join(f'"{m}"' for m in members)
+        return f"{alias_name} = Literal[{joined}]"
+
+    def _python_type_expr(self, odata_t: str, enum_aliases: dict[str, str]) -> str:
+        if odata_t.startswith("Collection("):
+            inner = odata_t[len("Collection(") : -1]
+            return f"list[{self._python_type_expr(inner, enum_aliases)}]"
+        if odata_t in REQUEST_MODEL_PRIMITIVES:
+            return REQUEST_MODEL_PRIMITIVES[odata_t]
+        short = strip_prefix(odata_t)
+        if short in enum_aliases:
+            return enum_aliases[short]
+        if short in self.meta.enum_types:
+            return "str"
+        return "str"
+
+    def _action_payload_block(
+        self, spec: ActionPayloadSpec, enum_aliases: dict[str, str]
+    ) -> str:
+        params = self.meta.actions.get(spec.action_name, [])
+        lines = [f"class {spec.class_name}(BasePayload):"]
+        if not params:
+            lines.append("    pass")
+            return "\n".join(lines)
+
+        for p in params:
+            py_type = self._python_type_expr(p.odata_type, enum_aliases)
+            if p.optional:
+                lines.append(f"    {p.name}: {py_type} | None = None")
+            else:
+                lines.append(f"    {p.name}: {py_type}")
+        return "\n".join(lines)
+
+    def _collect_enum_deps(self, spec: SupportModuleSpec) -> dict[str, str]:
+        """Collect all enum aliases needed: explicit + transitive from action params."""
+        aliases: dict[str, str] = dict(spec.enums)
+        for ap in spec.action_payloads:
+            for p in self.meta.actions.get(ap.action_name, []):
+                short = strip_prefix(unwrap_collection(p.odata_type))
+                if short in self.meta.enum_types and short not in aliases:
+                    aliases[short] = to_const(short)
+        return aliases
+
+    def generate(self, module_name: str, spec: SupportModuleSpec) -> str:
+        enum_aliases = self._collect_enum_deps(spec)
+
+        parts: list[str] = [
+            "# AUTO-GENERATED by scripts/mde_contract.py — do not edit manually.",
+            "# Re-run the script to regenerate when MDE $metadata changes.",
+            "from __future__ import annotations",
+            "",
+            "from typing import Literal",
+            "",
+        ]
+
+        needs_base_payload = bool(spec.action_payloads)
+        if needs_base_payload:
+            parts.append("from mde_client.endpoints.base import BasePayload")
+            parts.append("")
+
+        if enum_aliases:
+            parts.append(
+                "\n".join(
+                    self._literal_block(name, alias)
+                    for name, alias in enum_aliases.items()
+                )
+            )
+            parts.append("")
+
+        for ap_spec in spec.action_payloads:
+            parts.append("")
+            parts.append(self._action_payload_block(ap_spec, enum_aliases))
+            parts.append("")
+
+        all_entries: list[str] = [*enum_aliases.values()]
+        for ap_spec in spec.action_payloads:
+            all_entries.append(ap_spec.class_name)
+
+        parts.append("__all__ = [")
+        parts.extend(f'    "{entry}",' for entry in all_entries)
+        parts.append("]")
+        parts.append("")
+
+        return "\n".join(parts)
+
+    def generate_init(self, module_specs: dict[str, SupportModuleSpec]) -> str:
+        """Generate models/__init__.py with PEP 562 lazy loading."""
+        name_to_module: dict[str, str] = {}
+        for module_name, spec in module_specs.items():
+            enum_aliases = self._collect_enum_deps(spec)
+            for alias in enum_aliases.values():
+                name_to_module[alias] = module_name
+            for ap_spec in spec.action_payloads:
+                name_to_module[ap_spec.class_name] = module_name
+
+        # Add request-model exports
+        for root_name, rm_spec in REQUEST_MODEL_SPECS.items():
+            descendants = self.meta.concrete_descendants(root_name)
+            enum_names = []
+            seen: set[str] = set()
+            for tn in [root_name, *descendants]:
+                for prop in self.meta.declared_props_for(tn):
+                    short = strip_prefix(unwrap_collection(prop.get("Type", "")))
+                    if short in self.meta.enum_types and short not in seen:
+                        seen.add(short)
+                        enum_names.append(short)
+            for en in enum_names:
+                name_to_module[to_const(en)] = rm_spec.module
+            for d in descendants:
+                name_to_module[d] = rm_spec.module
+            name_to_module[rm_spec.union_name] = rm_spec.module
+
+        seen_modules: dict[str, list[str]] = {}
+        for name, module in name_to_module.items():
+            seen_modules.setdefault(module, []).append(name)
+
+        type_checking_lines: list[str] = []
+        for module, names in seen_modules.items():
+            if len(names) == 1:
+                type_checking_lines.append(f"    from .{module} import {names[0]}")
+            else:
+                joined = ",\n        ".join(names)
+                type_checking_lines.append(
+                    f"    from .{module} import (\n        {joined},\n    )"
+                )
+
+        registry_lines: list[str] = ["_NAME_TO_MODULE: dict[str, str] = {"]
+        for name, module in name_to_module.items():
+            registry_lines.append(f'    "{name}": "{module}",')
+        registry_lines.append("}")
+
+        all_entries = ",\n    ".join(f'"{n}"' for n in sorted(name_to_module))
+
+        lines: list[str] = [
+            "# AUTO-GENERATED by scripts/mde_contract.py — do not edit manually.",
+            "# Re-run the script to regenerate when MDE $metadata changes.",
+            "from __future__ import annotations",
+            "",
+            "import importlib",
+            "from typing import TYPE_CHECKING",
+            "",
+            "if TYPE_CHECKING:",
+            *type_checking_lines,
+            "",
+            *registry_lines,
+            "",
+            "",
+            "def __getattr__(name: str) -> object:",
+            '    """Lazily import model constants on first access (PEP 562).',
+            "",
+            "    The resolved value is written back into the module's globals so",
+            "    subsequent accesses skip this function entirely.",
+            '    """',
+            "    module_name = _NAME_TO_MODULE.get(name)",
+            "    if module_name is None:",
+            '        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")',
+            "    module = importlib.import_module(f'.{module_name}', __name__)",
+            "    value = getattr(module, name)",
+            "    globals()[name] = value  # cache: subsequent access bypasses __getattr__",
+            "    return value",
+            "",
+            "",
+            "__all__ = [",
+            f"    {all_entries},",
+            "]",
+            "",
+        ]
+
+        return "\n".join(lines)
+
+
+def cleanup_stale_models(expected_paths: set[Path]) -> None:
+    """Remove AUTO-GENERATED model files that are no longer in the expected set."""
+    for path in sorted(MODELS_OUTPUT_DIR.glob("*.py")):
+        if path.name == "__init__.py":
+            continue
+        if path in expected_paths:
+            continue
+        try:
+            first_line = path.read_text(encoding="utf-8").split("\n", 1)[0]
+        except OSError:
+            continue
+        if _GENERATED_HEADER in first_line:
+            path.unlink()
+            print(f"  🗑  removed stale {path.name}")
+
+
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 
@@ -800,6 +1070,7 @@ def main() -> None:
     meta = MDEMetadata(XML_SOURCE)
     gen = SchemaCodeGen(meta)
     request_model_gen = RequestModelCodeGen(meta)
+    support_model_gen = SupportModelCodeGen(meta)
 
     available_schema_types = sorted(
         (set(meta.entity_types) - SKIP_ENTITIES) | meta.response_complex_types
@@ -818,17 +1089,17 @@ def main() -> None:
 
     if not args.dry_run:
         OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+        MODELS_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     # ── Per-entity schema files ───────────────────────────────────────────────
 
-    expected_paths: set[Path] = set()
+    expected_schema_paths: set[Path] = set()
     schema_count = 0
-    request_model_count = 0
 
     for type_name in types_to_generate:
         source = gen.generate(type_name)
         out_path = OUTPUT_DIR / (camel_to_snake(type_name) + ".py")
-        expected_paths.add(out_path)
+        expected_schema_paths.add(out_path)
 
         if args.dry_run:
             sep = "─" * 60
@@ -839,6 +1110,11 @@ def main() -> None:
             print(f"  ✓ {out_path}")
 
         schema_count += 1
+
+    # ── Request model files (written to models/) ──────────────────────────────
+
+    expected_model_paths: set[Path] = set()
+    request_model_count = 0
 
     request_model_roots = [
         root_name
@@ -851,8 +1127,8 @@ def main() -> None:
     for root_name in request_model_roots:
         spec = REQUEST_MODEL_SPECS[root_name]
         source = request_model_gen.generate(root_name, spec)
-        out_path = OUTPUT_DIR / f"{spec.module}.py"
-        expected_paths.add(out_path)
+        out_path = MODELS_OUTPUT_DIR / f"{spec.module}.py"
+        expected_model_paths.add(out_path)
 
         if args.dry_run:
             sep = "─" * 60
@@ -864,7 +1140,26 @@ def main() -> None:
 
         request_model_count += 1
 
-    # ── __init__.py ───────────────────────────────────────────────────────────
+    # ── Support model files (written to models/) ─────────────────────────────
+
+    support_model_count = 0
+
+    for module_name, module_spec in SUPPORT_MODULE_SPECS.items():
+        source = support_model_gen.generate(module_name, module_spec)
+        out_path = MODELS_OUTPUT_DIR / f"{module_name}.py"
+        expected_model_paths.add(out_path)
+
+        if args.dry_run:
+            sep = "─" * 60
+            print(f"\n{sep}\n# {out_path}\n{sep}")
+            print(source)
+        else:
+            out_path.write_text(source, encoding="utf-8")
+            print(f"  ✓ {out_path}")
+
+        support_model_count += 1
+
+    # ── schemas/__init__.py ───────────────────────────────────────────────────
 
     init_source = gen.generate_init(all_schema_types)
     init_path = OUTPUT_DIR / "__init__.py"
@@ -877,19 +1172,33 @@ def main() -> None:
         init_path.write_text(init_source, encoding="utf-8")
         print(f"  ✓ {init_path}")
 
+    # ── models/__init__.py ────────────────────────────────────────────────────
+
+    models_init_source = support_model_gen.generate_init(SUPPORT_MODULE_SPECS)
+    models_init_path = MODELS_OUTPUT_DIR / "__init__.py"
+
+    if args.dry_run:
+        sep = "─" * 60
+        print(f"\n{sep}\n# {models_init_path}\n{sep}")
+        print(models_init_source)
+    else:
+        models_init_path.write_text(models_init_source, encoding="utf-8")
+        print(f"  ✓ {models_init_path}")
+
     # ── Stale file cleanup ────────────────────────────────────────────────────
     # Only on full runs (not --entity) so we don't remove files we didn't intend
     # to touch. Skipped in dry-run mode.
 
     if not args.entity and not args.dry_run:
-        cleanup_stale_schemas(expected_paths)
+        cleanup_stale_schemas(expected_schema_paths)
+        cleanup_stale_models(expected_model_paths)
 
     # ── Quality gate ──────────────────────────────────────────────────────────
 
     if not args.dry_run:
         print(
             f"\n{schema_count} schema file(s), {request_model_count} request model module(s), "
-            f"and __init__.py written to {OUTPUT_DIR}/"
+            f"{support_model_count} support model module(s) written."
         )
         run_quality()
 
