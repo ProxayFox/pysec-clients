@@ -245,13 +245,86 @@ class MDEMetadata:
         )
         return props
 
+    def concrete_descendants(self, abstract_name: str) -> list[str]:
+        """Return concrete ComplexType names that directly derive from *abstract_name*."""
+        return [
+            child
+            for child, parent in self.base_types.items()
+            if parent == abstract_name
+            and child in self.complex_types
+            and child not in self.abstract_types
+        ]
+
+    def _normalize_odata_for_compat(self, odata_t: str) -> str:
+        """Normalize an OData type for Arrow-level compatibility comparison.
+
+        Different enum type names all map to ``pa.string()``, so they are
+        treated as equivalent for merge-safety checks.
+        """
+        if odata_t.startswith("Collection("):
+            inner = odata_t[len("Collection(") : -1]
+            return f"Collection({self._normalize_odata_for_compat(inner)})"
+        short = strip_prefix(odata_t)
+        if short in self.enum_types:
+            return "Edm.String"
+        return odata_t
+
+    def can_merge_abstract(self, abstract_name: str) -> bool:
+        """True when all concrete descendants share compatible field types.
+
+        "Compatible" means every field name that appears in more than one
+        descendant maps to the same Arrow type.  When this holds the
+        descendants can be flattened into a single nullable Arrow struct.
+        """
+        descendants = self.concrete_descendants(abstract_name)
+        if not descendants:
+            return False
+
+        field_types: dict[str, str] = {}
+        for desc in descendants:
+            for prop in self.props_for(desc):
+                name = prop.get("Name", "")
+                odata_t = self._normalize_odata_for_compat(prop.get("Type", ""))
+                if name in field_types and field_types[name] != odata_t:
+                    return False
+                field_types[name] = odata_t
+        return True
+
+    def merged_abstract_props(self, abstract_name: str) -> list[ET.Element]:
+        """Return the union of properties across base + all concrete descendants.
+
+        Every field is made nullable in the merged view because any given
+        response will only populate the subset for its concrete subtype.
+        Ordering: base fields first, then descendant-only fields in
+        discovery order.
+        """
+        seen_names: set[str] = set()
+        merged: list[ET.Element] = []
+
+        for prop in self.props_for(abstract_name):
+            name = prop.get("Name", "")
+            if name not in seen_names:
+                seen_names.add(name)
+                merged.append(prop)
+
+        for desc in self.concrete_descendants(abstract_name):
+            for prop in self.props_for(desc):
+                name = prop.get("Name", "")
+                if name not in seen_names:
+                    seen_names.add(name)
+                    merged.append(prop)
+
+        return merged
+
     def referenced_complex_types(
         self, type_name: str, _seen: set[str] | None = None
     ) -> list[str]:
         """Return all ComplexType short names transitively reachable from type_name.
 
         Returns in dependency order so constants can be emitted without
-        forward-reference issues.
+        forward-reference issues.  Mergeable abstract types and their
+        concrete descendants are included so the emitter can produce the
+        merged struct constant.
         """
         if _seen is None:
             _seen = set()
@@ -261,6 +334,12 @@ class MDEMetadata:
             short = strip_prefix(unwrap_collection(raw))
             if short in self.complex_types and short not in _seen:
                 _seen.add(short)
+                # If abstract and mergeable, pull in descendants too
+                if short in self.abstract_types and self.can_merge_abstract(short):
+                    for desc in self.concrete_descendants(short):
+                        if desc not in _seen:
+                            _seen.add(desc)
+                            result.extend(self.referenced_complex_types(desc, _seen))
                 result.extend(self.referenced_complex_types(short, _seen))
                 result.append(short)
         return result
@@ -292,6 +371,8 @@ class SchemaCodeGen:
 
         if short in self.meta.complex_types:
             if short in self.meta.abstract_types:
+                if self.meta.can_merge_abstract(short):
+                    return f"{to_const(short)}_TYPE"
                 return "pa.string()"
             return f"{to_const(short)}_TYPE"
 
@@ -315,8 +396,21 @@ class SchemaCodeGen:
         const = f"{to_const(ct_name)}_TYPE"
         lines = [f"{const}: pa.StructType = pa.struct("]
         lines += ["    ["]
-        for prop in self.meta.props_for(ct_name):
-            lines.append(self._field_line(prop, indent=8))
+
+        if ct_name in self.meta.abstract_types and self.meta.can_merge_abstract(
+            ct_name
+        ):
+            # Merged abstract struct: union of base + descendant fields, all nullable
+            for prop in self.meta.merged_abstract_props(ct_name):
+                name = prop.get("Name", "")
+                odata_t = prop.get("Type", "Edm.String")
+                pad = " " * 8
+                type_expr = self._type_expr(odata_t)
+                lines.append(f'{pad}pa.field("{name}", {type_expr}),')
+        else:
+            for prop in self.meta.props_for(ct_name):
+                lines.append(self._field_line(prop, indent=8))
+
         lines += ["    ]", ")"]
         return "\n".join(lines)
 
@@ -357,11 +451,17 @@ class SchemaCodeGen:
     # -- __init__.py -----------------------------------------------------------
 
     def _exports_for(self, type_name: str) -> list[str]:
-        """_SCHEMA first, then non-abstract _TYPE deps in topological order."""
+        """_SCHEMA first, then non-abstract _TYPE deps in topological order.
+
+        Mergeable abstract types are also exported since they produce a
+        concrete struct constant.
+        """
         exports: list[str] = [f"{to_const(type_name)}_SCHEMA"]
         seen: set[str] = {exports[0]}
         for ct_name in self.meta.referenced_complex_types(type_name):
-            if ct_name not in self.meta.abstract_types:
+            if ct_name not in self.meta.abstract_types or self.meta.can_merge_abstract(
+                ct_name
+            ):
                 const = f"{to_const(ct_name)}_TYPE"
                 if const not in seen:
                     seen.add(const)
