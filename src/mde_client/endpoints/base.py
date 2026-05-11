@@ -382,7 +382,31 @@ class BaseEndpoint:
                     **request_kwargs,
                 )
 
-            response.raise_for_status()
+            try:
+                response.raise_for_status()
+            except httpx.HTTPStatusError as e:
+                if e.response is not None and e.response.status_code == 403:
+                    # For 403 errors, we want to inform the user about the permissions they require that is returned in the response body
+                    # Rather than just raising a generic HTTP error.
+                    error_body = e.response.json()
+                    if "error" in error_body and "message" in error_body["error"]:
+                        raise PermissionError(
+                            str(
+                                "Insufficient permissions to access this endpoint. Check the message bellow for required permissions.\n"
+                                f"Code: {error_body['error']['code']}\n"
+                                f"Message:\n{error_body['error']['message']}"
+                            )
+                        )
+
+                raise httpx.HTTPStatusError(
+                    str(
+                        f"Request failed for URL: {response.url}\n"
+                        f"Status code: {response.status_code}\n"
+                        f"Response body: {response.text}"
+                    ),
+                    request=e.request,
+                    response=e.response,
+                ) from None
             body: dict = response.json()
             container.extend(body.get("value", []))
 
