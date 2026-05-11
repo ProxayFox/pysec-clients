@@ -9,6 +9,8 @@ This module defines:
 
 Endpoint methods return lazy `BaseResults` subclasses and do not issue HTTP
 requests until a terminal materialization method is called.
+
+**Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/machine
 """
 
 from __future__ import annotations

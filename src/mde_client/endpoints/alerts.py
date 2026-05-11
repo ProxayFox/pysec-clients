@@ -11,8 +11,12 @@ requests until a terminal materialization method is called. Create/update
 operations are declared but currently marked as not implemented.
 
 Note: Needs further Testing and implementation of POST methods for alert creation and updates.
-"""
 
+**Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/alerts
+"""
+from __future__ import annotations
+
+import logging
 from datetime import datetime
 from typing import Literal, Any
 
@@ -26,6 +30,7 @@ from ..schemas import (
     USER_SCHEMA,
 )
 
+log = logging.getLogger(__name__)
 
 STATUS_TYPES = Literal["Unknown", "New", "InProgress", "Resolved"]
 SEVERITY_TYPES = Literal["UnSpecified", "Informational", "Low", "Medium", "High"]
