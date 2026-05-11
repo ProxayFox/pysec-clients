@@ -236,6 +236,40 @@ def _expected_pa_type(
     return pa.string()  # fallback (unknown / entity ref)
 
 
+def _is_mergeable_abstract(short: str, meta: _ParsedMetadata) -> bool:
+    """True when an abstract ComplexType's concrete descendants can be merged.
+
+    Mirrors the logic in ``MDEMetadata.can_merge_abstract`` — descendants are
+    compatible when every shared field name maps to the same Arrow-level type
+    (enums are normalized to ``Edm.String``).
+    """
+    descendants = [
+        child
+        for child, parent in meta.base_types.items()
+        if parent == short
+        and child in meta.complex_types
+        and child not in meta.abstract_types
+    ]
+    if not descendants:
+        return False
+
+    def _normalize(odata_t: str) -> str:
+        if odata_t.startswith("Collection("):
+            return f"Collection({_normalize(odata_t[len('Collection(') : -1])})"
+        s = odata_t.removeprefix(_MDE_API_PREFIX)
+        return "Edm.String" if s in meta.enum_types else odata_t
+
+    field_types: dict[str, str] = {}
+    for desc in descendants:
+        for prop in meta.props_for(desc):
+            name = prop.get("Name", "")
+            norm = _normalize(prop.get("Type", ""))
+            if name in field_types and field_types[name] != norm:
+                return False
+            field_types[name] = norm
+    return True
+
+
 # ── 1. Module integrity ───────────────────────────────────────────────────────
 
 
@@ -440,7 +474,9 @@ class TestFieldTypes:
             if short not in mde_xml.complex_types:
                 continue
             if short in mde_xml.abstract_types:
-                continue  # abstract → pa.string(), not a struct
+                # Mergeable abstract types produce structs; non-mergeable → pa.string()
+                if not _is_mergeable_abstract(short, mde_xml):
+                    continue
 
             field_name = prop.get("Name", "")
             idx = schema.get_field_index(field_name)
@@ -486,4 +522,55 @@ class TestStructTypeConstants:
         assert not missing, (
             f"{const_name}: fields present in XML ComplexType {complex_name!r} "
             f"but missing from struct: {missing}"
+        )
+
+
+# ── 6. Merged abstract struct coverage ────────────────────────────────────────
+
+
+class TestMergedAbstractStructs:
+    """Mergeable abstract ComplexTypes must produce structs covering all descendants."""
+
+    def test_auth_params_base_is_struct_not_string(self) -> None:
+        """Regression: scanAuthenticationParams must be a struct, not pa.string()."""
+        schema: pa.Schema = _load_const("DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA")
+        idx = schema.get_field_index("scanAuthenticationParams")
+        assert idx != -1, "scanAuthenticationParams field missing from schema"
+        assert pa.types.is_struct(schema.field(idx).type), (
+            f"scanAuthenticationParams should be a struct, got {schema.field(idx).type}"
+        )
+
+    def test_merged_struct_contains_all_descendant_fields(
+        self, mde_xml: _ParsedMetadata
+    ) -> None:
+        """AUTH_PARAMS_BASE_TYPE must include fields from all concrete descendants."""
+        struct_type: pa.StructType = _load_const("AUTH_PARAMS_BASE_TYPE")
+        struct_field_names = {
+            struct_type.field(i).name for i in range(struct_type.num_fields)
+        }
+
+        # Collect expected field names from base + all concrete descendants
+        expected: set[str] = set()
+        for prop in mde_xml.props_for("AuthParamsBase"):
+            expected.add(prop.get("Name", ""))
+        for child, parent in mde_xml.base_types.items():
+            if parent == "AuthParamsBase" and child not in mde_xml.abstract_types:
+                for prop in mde_xml.props_for(child):
+                    expected.add(prop.get("Name", ""))
+
+        missing = expected - struct_field_names
+        assert not missing, (
+            f"AUTH_PARAMS_BASE_TYPE missing descendant fields: {missing}"
+        )
+
+    def test_merged_struct_fields_are_all_nullable(self) -> None:
+        """Every field in a merged abstract struct must be nullable."""
+        struct_type: pa.StructType = _load_const("AUTH_PARAMS_BASE_TYPE")
+        non_nullable = [
+            struct_type.field(i).name
+            for i in range(struct_type.num_fields)
+            if not struct_type.field(i).nullable
+        ]
+        assert not non_nullable, (
+            f"AUTH_PARAMS_BASE_TYPE has non-nullable fields in merged struct: {non_nullable}"
         )
