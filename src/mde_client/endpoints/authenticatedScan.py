@@ -117,6 +117,7 @@ class AuthenticatedDefinitionsAlterQuery(BaseQuery):
     The specific fields and validation logic will depend on the requirements of the update operations once they are defined.
     """
 
+    id: str | None = None
     scanType: SCAN_TYPE | None = None
     scanName: str | None = None
     isActive: bool | None = None
@@ -157,9 +158,58 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
     def get_all(
         self, query: AuthenticatedDefinitionsQuery | None = None
     ) -> AuthenticatedDefinitionsResults:
-        """Get all authenticated scan definitions."""
+        """Get all authenticated scan definitions.
+        
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-scan-definitions
+        """
         params = query.to_odata_filters if query else {}
         return AuthenticatedDefinitionsResults(self, params)
+
+    def add(
+        self, query: AuthenticatedDefinitionsAlterQuery
+    ) -> AuthenticatedDefinitionsResults:
+        """Add a new authenticated scan definition.
+        
+        **Docs:** 
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-add-a-new-scan
+        """
+        # return AuthenticatedDefinitionsResults(self, {})
+        raise NotImplementedError(
+            "Add operation for authenticated scan definitions is not yet implemented."
+        )
+
+    def update(
+        self, query: AuthenticatedDefinitionsAlterQuery
+    ) -> AuthenticatedDefinitionsResults:
+        """Update an existing authenticated scan definition.
+        
+        **Docs:** 
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-update-a-scan
+        """
+        # if not query.id:
+        # raise ValueError("ID is required for updating an authenticated scan definition.")
+        # path = f"{self._PATH}/{query.id}"
+
+        # return AuthenticatedDefinitionsResults(self, {}, path=path)
+        raise NotImplementedError(
+            "Update operation for authenticated scan definitions is not yet implemented."
+        )
+
+    def delete(self, ids: str | list[str]) -> AuthenticatedDefinitionsAlterQuery:
+        """Delete existing authenticated scan definition.
+        
+        **Docs:** 
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-delete-scans
+        """
+        # ids = [ids] if isinstance(ids, str) else ids
+        # path = f"{self._PATH}/BatchDelete"
+        # return AuthenticatedDefinitionsAlterQuery()
+        raise NotImplementedError(
+            "Delete operation for authenticated scan definitions is not yet implemented."
+        )
 
 
 class DeviceAuthenticatedAgentsEndpoint(BaseEndpoint):
@@ -168,6 +218,25 @@ class DeviceAuthenticatedAgentsEndpoint(BaseEndpoint):
     def get_all(
         self, query: DeviceAuthenticatedAgentsQuery | None = None
     ) -> DeviceAuthenticatedAgentsQueryResults:
-        """Get all device authenticated scan agents."""
+        """Get all device authenticated scan agents.
+        
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-scan-agents
+        """
         params = query.to_odata_filters if query else {}
         return DeviceAuthenticatedAgentsQueryResults(self, params)
+    
+    def get(self, id: str) -> DeviceAuthenticatedAgentsQueryResults:
+        """Get a single device authenticated scan agent by ID.
+        
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-agent-details
+        """
+        path = f"{self._PATH}/{id}"
+        return DeviceAuthenticatedAgentsQueryResults(self, {}, path=path, single=True)
+
+    def history(self, id: str) -> DeviceAuthenticatedAgentsQueryResults:
+        """Get scan history by definition/s
+        
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-scan-history-by-definition
+        """
+        path = f"{self._PATH}/GetScanHistoryByScanDefinitionId"
+        return DeviceAuthenticatedAgentsQueryResults(self, {}, path=path)
