@@ -1377,6 +1377,7 @@ dependencies = [
     { name = "aiohttp" },
     { name = "http-to-arrow" },
     { name = "msal" },
+    { name = "orjson" },
     { name = "requests" },
 ]
 
@@ -1393,6 +1394,7 @@ requires-dist = [
     { name = "aiohttp", specifier = ">=3.13.5" },
     { name = "http-to-arrow", git = "https://github.com/ProxayFox/proxay-pylibs.git?subdirectory=src%2Fhttp_to_arrow" },
     { name = "msal", specifier = ">=1.36.0" },
+    { name = "orjson", specifier = ">=3.10.18" },
     { name = "polars", marker = "extra == 'polars'", specifier = ">=1.40.1" },
     { name = "pyarrow", marker = "extra == 'arrow'", specifier = ">=24.0.0" },
     { name = "requests", specifier = ">=2.33.1" },

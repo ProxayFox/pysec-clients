@@ -15,6 +15,7 @@ dependencies = [
     "aiohttp>=3.13.5",
     "http-to-arrow",
     "msal>=1.36.0",
+    "orjson>=3.10.18",
     "requests>=2.33.1",
 ]
 
