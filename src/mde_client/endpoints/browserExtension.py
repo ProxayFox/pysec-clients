@@ -1,6 +1,19 @@
-"""The Export browser extensions endpoint sits on the Machines endpoint so this module will be a thin shim,
-that forwards to the correct path and returns the correct schema.
-The actual logic is handled in the MachinesEndpoint and related results classes.
+"""Microsoft Defender for Endpoint browser-extension inventory endpoint.
+
+This module defines:
+- `BrowserExtensionsPermissionsInfoQuery`: OData query model for filtering
+  browser extension permission records.
+- `BrowserExtensionResults` and `BrowserExtensionsResults`: lazy result
+  wrappers mapped to the browser-extension Arrow schemas.
+- `BrowserExtensionEndpoint`: a thin shim that forwards requests to the
+  browser-extension paths on the Machines API and returns correctly-typed
+  result wrappers. Core HTTP and pagination logic is inherited from
+  `MachinesEndpoint` / `BaseEndpoint`.
+
+Endpoint methods return lazy `BaseResults` subclasses and defer HTTP requests
+until a terminal materialization method is called.
+
+**Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/export-browser-extensions-assessment
 """
 
 from __future__ import annotations

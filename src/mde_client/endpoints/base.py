@@ -1,3 +1,20 @@
+"""Shared base primitives for all MDE endpoint modules.
+
+This module defines:
+- `BaseQuery`: Pydantic model providing common OData query parameters
+  (``page_size``, ``top``, ``skip``) and an ``to_odata_filters`` helper that
+  serialises field values into an OData ``$filter`` string.
+- `BasePayload`: thin Pydantic model base for POST/PATCH request bodies.
+- `BaseResults`: lazy result container that defers HTTP requests until a
+  terminal materialization method (``to_json``, ``to_arrow``, ``to_polars``,
+  ``refresh``) is invoked.
+- `BaseEndpoint`: base class for all endpoint classes, owning the shared
+  ``httpx.Client`` and ``MSALAuth`` instances and housing the ``_request``
+  helper that injects bearer tokens per-request.
+
+**Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/apis-intro
+"""
+
 from __future__ import annotations
 
 import httpx

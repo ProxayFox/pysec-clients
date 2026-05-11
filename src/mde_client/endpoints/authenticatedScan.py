@@ -1,3 +1,22 @@
+"""Microsoft Defender for Endpoint authenticated-scan endpoint models and client surface.
+
+This module defines:
+- `DeviceAuthenticatedAgentsQuery` and `AuthenticatedDefinitionsQuery` request models.
+- `AuthenticatedScanHistoryQuery` for history pagination.
+- Payload models for creating, updating, and deleting scan definitions
+  (``AuthenticatedDefinitionsAlterPayload``, ``ScannerAgentRefPayload``, etc.).
+- `*Results` wrappers mapped to Arrow schemas for scan agents, definitions,
+  and history records.
+- `DeviceAuthenticatedAgentsEndpoint` and `AuthenticatedDefinitionsEndpoint`
+  with methods for retrieving agents, listing/creating/updating/deleting scan
+  definitions, and querying scan history by definition or session ID.
+
+Endpoint methods return lazy `BaseResults` subclasses and defer HTTP requests
+until a terminal materialization method is called.
+
+**Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-authenticated-scan-agent
+"""
+
 from __future__ import annotations
 
 import logging

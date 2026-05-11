@@ -1,3 +1,20 @@
+"""Endpoint package for the Microsoft Defender for Endpoint client.
+
+This package provides lazy endpoint classes and result wrappers for each
+Defender API surface area:
+
+- `alerts` — alert retrieval and related resource lookups.
+- `machines` — machine inventory, logon users, software, vulnerabilities,
+  recommendations, and lookup helpers.
+- `authenticatedScan` — authenticated scan agents, definitions, and history.
+- `browserExtension` — browser extension inventory by machine.
+- `base` — shared `BaseQuery`, `BasePayload`, `BaseResults`, and
+  `BaseEndpoint` primitives consumed by every endpoint module.
+
+All public endpoint classes are importlib-lazy-loaded so that importing
+the package does not pull in every schema dependency up front.
+"""
+
 from __future__ import annotations
 
 import importlib
