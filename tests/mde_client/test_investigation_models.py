@@ -5,10 +5,8 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from mde_client.models.investigation_models import (
-    INVESTIGATION_STATE,
-    InvestigationStartPayload,
-)
+from mde_client.models.enums import INVESTIGATION_STATE
+from mde_client.models.action_payloads import StartInvestigationPayload
 
 
 class TestInvestigationState:
@@ -32,20 +30,20 @@ class TestInvestigationState:
         assert "Disabled" in INVESTIGATION_STATE.__args__
 
 
-class TestInvestigationStartPayload:
+class TestStartInvestigationPayload:
     def test_comment_required(self) -> None:
         with pytest.raises(ValidationError):
-            InvestigationStartPayload.model_validate({})
+            StartInvestigationPayload.model_validate({})
 
     def test_comment_only(self) -> None:
-        p = InvestigationStartPayload.model_validate({"Comment": "test"})
+        p = StartInvestigationPayload.model_validate({"Comment": "test"})
         assert p.Comment == "test"
         assert p.ExternalId is None
         assert p.RequestSource is None
         assert p.Title is None
 
     def test_all_fields(self) -> None:
-        p = InvestigationStartPayload.model_validate(
+        p = StartInvestigationPayload.model_validate(
             {
                 "Comment": "investigate this",
                 "ExternalId": "ext-123",
@@ -59,14 +57,14 @@ class TestInvestigationStartPayload:
         assert p.Title == "My Investigation"
 
     def test_no_machine_id_field(self) -> None:
-        assert "machineId" not in InvestigationStartPayload.model_fields
+        assert "machineId" not in StartInvestigationPayload.model_fields
 
     def test_optional_despite_nullable_false(self) -> None:
         """RequestSource is Nullable=false in XML but has OptionalParameter."""
-        p = InvestigationStartPayload.model_validate({"Comment": "test"})
+        p = StartInvestigationPayload.model_validate({"Comment": "test"})
         assert p.RequestSource is None
 
     def test_serialization_excludes_none(self) -> None:
-        p = InvestigationStartPayload(Comment="test")
+        p = StartInvestigationPayload(Comment="test")
         dumped = p.model_dump(exclude_none=True)
         assert dumped == {"Comment": "test"}
