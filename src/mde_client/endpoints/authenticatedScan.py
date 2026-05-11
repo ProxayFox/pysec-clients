@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 
 from .base import BaseQuery, BaseEndpoint, BaseResults
 from ..schemas import (
+    AUTH_SCAN_HISTORY_CONTRACT_SCHEMA,
     DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
     DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA,
 )
@@ -92,6 +93,44 @@ class ScannerAgentRef(BaseModel):
     machineId: str | None = None
 
 
+class AuthenticatedScanHistoryQuery(BaseModel):
+    """OData query parameters for authenticated scan history actions."""
+
+    model_config = {"extra": "forbid"}
+
+    top: int | None = Field(default=None, ge=1, le=10000)
+    skip: int | None = Field(default=None, ge=0)
+
+    @property
+    def to_odata_filters(self) -> dict[str, str]:
+        params: dict[str, str] = {}
+        if self.top is not None:
+            params["$top"] = str(self.top)
+        if self.skip is not None:
+            params["$skip"] = str(self.skip)
+        return params
+
+
+class ScanHistoryByDefinitionRequest(BaseModel):
+    """Request body for scan history by definition."""
+
+    model_config = {"extra": "forbid"}
+
+    ScanDefinitionIds: list[str]
+
+
+class ScanHistoryBySessionRequest(BaseModel):
+    """Request body for scan history by session."""
+
+    model_config = {"extra": "forbid"}
+
+    SessionIds: list[str]
+
+
+def _as_id_list(ids: str | list[str]) -> list[str]:
+    return [ids] if isinstance(ids, str) else ids
+
+
 class AuthenticatedDefinitionsQuery(BaseQuery):
     """Query parameters for the /api/DeviceAuthenticatedScanDefinitions endpoint.
 
@@ -148,6 +187,10 @@ class AuthenticatedDefinitionsResults(BaseResults):
     SCHEMA = DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA
 
 
+class AuthenticatedScanHistoryResults(BaseResults):
+    SCHEMA = AUTH_SCAN_HISTORY_CONTRACT_SCHEMA
+
+
 class DeviceAuthenticatedAgentsQueryResults(BaseResults):
     SCHEMA = DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA
 
@@ -159,18 +202,60 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         self, query: AuthenticatedDefinitionsQuery | None = None
     ) -> AuthenticatedDefinitionsResults:
         """Get all authenticated scan definitions.
-        
+
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-scan-definitions
         """
         params = query.to_odata_filters if query else {}
         return AuthenticatedDefinitionsResults(self, params)
 
+    def history(
+        self,
+        ids: str | list[str],
+        query: AuthenticatedScanHistoryQuery | None = None,
+    ) -> AuthenticatedScanHistoryResults:
+        """Get scan history by definition IDs.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-scan-history-by-definition
+        """
+        params = query.to_odata_filters if query else {}
+        payload = ScanHistoryByDefinitionRequest(
+            ScanDefinitionIds=_as_id_list(ids)
+        ).model_dump()
+        path = f"{self._PATH}/GetScanHistoryByScanDefinitionId"
+        return AuthenticatedScanHistoryResults(
+            self,
+            params,
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload},
+        )
+
+    def history_by_session(
+        self,
+        ids: str | list[str],
+        query: AuthenticatedScanHistoryQuery | None = None,
+    ) -> AuthenticatedScanHistoryResults:
+        """Get scan history by session IDs.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-scan-history-by-session
+        """
+        params = query.to_odata_filters if query else {}
+        payload = ScanHistoryBySessionRequest(SessionIds=_as_id_list(ids)).model_dump()
+        path = f"{self._PATH}/GetScanHistoryBySessionId"
+        return AuthenticatedScanHistoryResults(
+            self,
+            params,
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload},
+        )
+
     def add(
         self, query: AuthenticatedDefinitionsAlterQuery
     ) -> AuthenticatedDefinitionsResults:
         """Add a new authenticated scan definition.
-        
-        **Docs:** 
+
+        **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-add-a-new-scan
         """
@@ -183,8 +268,8 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         self, query: AuthenticatedDefinitionsAlterQuery
     ) -> AuthenticatedDefinitionsResults:
         """Update an existing authenticated scan definition.
-        
-        **Docs:** 
+
+        **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-update-a-scan
         """
@@ -199,8 +284,8 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
 
     def delete(self, ids: str | list[str]) -> AuthenticatedDefinitionsAlterQuery:
         """Delete existing authenticated scan definition.
-        
-        **Docs:** 
+
+        **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-delete-scans
         """
@@ -219,24 +304,27 @@ class DeviceAuthenticatedAgentsEndpoint(BaseEndpoint):
         self, query: DeviceAuthenticatedAgentsQuery | None = None
     ) -> DeviceAuthenticatedAgentsQueryResults:
         """Get all device authenticated scan agents.
-        
+
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-scan-agents
         """
         params = query.to_odata_filters if query else {}
         return DeviceAuthenticatedAgentsQueryResults(self, params)
-    
+
     def get(self, id: str) -> DeviceAuthenticatedAgentsQueryResults:
         """Get a single device authenticated scan agent by ID.
-        
+
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-agent-details
         """
         path = f"{self._PATH}/{id}"
         return DeviceAuthenticatedAgentsQueryResults(self, {}, path=path, single=True)
 
-    def history(self, id: str) -> DeviceAuthenticatedAgentsQueryResults:
-        """Get scan history by definition/s
-        
-        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-scan-history-by-definition
-        """
-        path = f"{self._PATH}/GetScanHistoryByScanDefinitionId"
-        return DeviceAuthenticatedAgentsQueryResults(self, {}, path=path)
+    def history(
+        self,
+        ids: str | list[str],
+        query: AuthenticatedScanHistoryQuery | None = None,
+    ) -> AuthenticatedScanHistoryResults:
+        """Compatibility shim for the definitions-bound scan history action."""
+        return AuthenticatedDefinitionsEndpoint(self._http, self._auth).history(
+            ids,
+            query,
+        )

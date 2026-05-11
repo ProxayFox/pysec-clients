@@ -23,6 +23,10 @@ if TYPE_CHECKING:
     from .asset_non_cpe_software import ASSET_NON_CPE_SOFTWARE_SCHEMA
     from .asset_software import ASSET_SOFTWARE_SCHEMA
     from .asset_vulnerability import ASSET_VULNERABILITY_SCHEMA
+    from .auth_scan_history_contract import (
+        AUTH_SCAN_HISTORY_CONTRACT_SCHEMA,
+        SCANNED_TARGET_RESULT_CONTRACT_TYPE,
+    )
     from .baseline_configuration import BASELINE_CONFIGURATION_SCHEMA
     from .baseline_exception import (
         BASELINE_EXCEPTION_SCHEMA,
@@ -127,6 +131,8 @@ _NAME_TO_MODULE: dict[str, str] = {
     "ASSET_NON_CPE_SOFTWARE_SCHEMA": "asset_non_cpe_software",
     "ASSET_SOFTWARE_SCHEMA": "asset_software",
     "ASSET_VULNERABILITY_SCHEMA": "asset_vulnerability",
+    "AUTH_SCAN_HISTORY_CONTRACT_SCHEMA": "auth_scan_history_contract",
+    "SCANNED_TARGET_RESULT_CONTRACT_TYPE": "auth_scan_history_contract",
     "BASELINE_CONFIGURATION_SCHEMA": "baseline_configuration",
     "BASELINE_EXCEPTION_SCHEMA": "baseline_exception",
     "BASELINE_CONFIGURATION_DTO_TYPE": "baseline_exception",
@@ -230,6 +236,7 @@ __all__ = [
     "ASSET_SOFTWARE_SCHEMA",
     "ASSET_VULNERABILITY_SCHEMA",
     "AUTH_PARAMS_BASE_TYPE",
+    "AUTH_SCAN_HISTORY_CONTRACT_SCHEMA",
     "BASELINE_CONFIGURATION_DTO_TYPE",
     "BASELINE_CONFIGURATION_SCHEMA",
     "BASELINE_EXCEPTION_DEVICE_DTO_TYPE",
@@ -286,6 +293,7 @@ __all__ = [
     "RECOMMENDATION_SCHEMA",
     "RELATED_FILE_INFO_TYPE",
     "REMEDIATION_TASK_SCHEMA",
+    "SCANNED_TARGET_RESULT_CONTRACT_TYPE",
     "SCAN_STATE_TYPE",
     "SOFTWARE_SCHEMA",
     "STORAGE_ACCOUNT_PROPERTIES_TYPE",
