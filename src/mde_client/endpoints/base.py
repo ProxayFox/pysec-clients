@@ -23,6 +23,7 @@ import pyarrow as pa
 import polars as pl
 from datetime import datetime
 from typing import Any
+from collections.abc import Iterator
 from pydantic import BaseModel, ConfigDict, Field
 from http_to_arrow import ArrowRecordContainer
 
@@ -242,23 +243,16 @@ class BaseResults:
 
     def to_dicts(self) -> list[dict]:
         """Materialize results into a list of dicts."""
-        return self._ensure_fetched().to_table().to_pylist()
+        # Polars is faster at converting from Arrow to dicts than pyarrow.to_pylist, so we use Polars as an intermediary here.
+        return self._ensure_fetched().to_polars.to_dicts()
 
     def to_arrow(self) -> pa.Table:
         """Materialize results into a PyArrow Table."""
-        try:
-            import pyarrow  # noqa: F401
-        except ImportError:
-            raise ImportError("Install with: uv add mde-client[arrow]") from None
-        return self._ensure_fetched().to_table()
+        return self._ensure_fetched().to_arrow
 
     def to_polars(self) -> pl.DataFrame:
         """Materialize results into a Polars DataFrame."""
-        try:
-            import polars  # noqa: F401
-        except ImportError:
-            raise ImportError("Install with: uv add mde-client[polars]") from None
-        return self._ensure_fetched().to_polars_frame()
+        return self._ensure_fetched().to_polars
 
     def refresh(self) -> BaseResults:
         """Clear any cached results, forcing the next materialization to re-query the API."""
@@ -278,6 +272,12 @@ class BaseEndpoint:
     @staticmethod
     def _id_list(ids: str | list[str]) -> list[str]:
         return [ids] if isinstance(ids, str) else ids
+
+    @staticmethod
+    def _chunks[T](lst: list[T], n: int) -> Iterator[list[T]]:
+        """Yield successive n-sized chunks from lst."""
+        for i in range(0, len(lst), n):
+            yield lst[i : i + n]
 
     async def _arequest(self, method: str, path: str, **kwargs) -> httpx.Response:
         """Make an authenticated async request, refreshing the token as needed."""

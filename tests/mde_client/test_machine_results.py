@@ -6,8 +6,8 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import httpx
+import polars as pl
 import pyarrow as pa
-import pytest
 from http_to_arrow import ArrowRecordContainer
 
 from mde_client.endpoints.machines import (
@@ -229,41 +229,23 @@ class TestToJsonBaseInstall:
 
 
 # ------------------------------------------------------------------
-# 6. Import guards on to_arrow / to_polars
+# 6. Terminal materialization helpers
 # ------------------------------------------------------------------
 
 
-class TestImportGuards:
-    def test_to_arrow_import_guard(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        """to_arrow() must raise ImportError with install instructions when
-        pyarrow is not available."""
-        import builtins
-
-        real_import = builtins.__import__
-
-        def _fake_import(name: str, *args: Any, **kwargs: Any):
-            if name == "pyarrow":
-                raise ImportError("fake missing pyarrow")
-            return real_import(name, *args, **kwargs)
-
+class TestTerminalFormats:
+    def test_to_arrow_returns_table(self) -> None:
+        """to_arrow() should materialize records into a pyarrow Table."""
         results = _make_results([[{"id": "1", "name": "a"}]])
-        monkeypatch.setattr(builtins, "__import__", _fake_import)
-        with pytest.raises(ImportError, match="arrow"):
-            results.to_arrow()
+        table = results.to_arrow()
 
-    def test_to_polars_import_guard(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        """to_polars() must raise ImportError with install instructions when
-        polars is not available."""
-        import builtins
+        assert isinstance(table, pa.Table)
+        assert table.to_pylist() == [{"id": "1", "name": "a"}]
 
-        real_import = builtins.__import__
-
-        def _fake_import(name: str, *args: Any, **kwargs: Any):
-            if name == "polars":
-                raise ImportError("fake missing polars")
-            return real_import(name, *args, **kwargs)
-
+    def test_to_polars_returns_dataframe(self) -> None:
+        """to_polars() should materialize records into a polars DataFrame."""
         results = _make_results([[{"id": "1", "name": "a"}]])
-        monkeypatch.setattr(builtins, "__import__", _fake_import)
-        with pytest.raises(ImportError, match="polars"):
-            results.to_polars()
+        frame = results.to_polars()
+
+        assert isinstance(frame, pl.DataFrame)
+        assert frame.to_dicts() == [{"id": "1", "name": "a"}]

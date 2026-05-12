@@ -77,18 +77,20 @@ class TestAlertWrites:
         assert result._request_kwargs == {"json": payload.model_dump(exclude_none=True)}
 
     def test_batch_update_uses_json_body(self) -> None:
+        endpoint = _FakeAlertsEndpoint({})
         payload = BatchUpdateAlertPayload(
             alertIds=["alert-1"],
             status="InProgress",
             comment="Taking ownership",
         )
 
-        result = _make_endpoint().batchUpdate(payload)
+        result = endpoint.batchUpdate(payload)
 
-        assert isinstance(result, AlertsResults)
-        assert result._path == "/api/alerts/batchUpdate"
-        assert result._params == {}
-        assert result._request_kwargs == {"json": payload.model_dump(exclude_none=True)}
+        assert result is True
+        assert len(endpoint.calls) == 1
+        assert endpoint.calls[0][0] == "POST"
+        assert endpoint.calls[0][1] == "/api/alerts/batchUpdate"
+        assert endpoint.calls[0][2]["json"] == payload.model_dump(exclude_none=True)
 
     def test_create_alert_by_reference_materializes_once(self) -> None:
         endpoint = _FakeAlertsEndpoint(_alert_body("alert-1"))
@@ -113,18 +115,17 @@ class TestAlertWrites:
         assert endpoint.calls[0][1] == "/api/alerts/CreateAlertByReference"
         assert endpoint.calls[0][2]["json"] == payload.model_dump(exclude_none=True)
 
-    def test_batch_update_materializes_once(self) -> None:
-        endpoint = _FakeAlertsEndpoint(_alert_body("alert-2"))
+    def test_batch_update_returns_true_and_posts_once(self) -> None:
+        endpoint = _FakeAlertsEndpoint({})
         payload = BatchUpdateAlertPayload(
             alertIds=["alert-2"],
             status="Resolved",
             comment="Closed after triage",
         )
 
-        results = endpoint.batchUpdate(payload)
+        result = endpoint.batchUpdate(payload)
 
-        assert results.to_dicts()[0]["id"] == "alert-2"
-        _ = results.to_polars()
+        assert result is True
 
         assert len(endpoint.calls) == 1
         assert endpoint.calls[0][0] == "POST"

@@ -21,13 +21,15 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from .base import BaseEndpoint, BaseQuery, BaseResults
+from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
 from ..schemas import (
     ALERT_SCHEMA,
     IP_SCHEMA,
     USER_SCHEMA,
 )
 from ..models.enums import (
+    ALERT_CLASSIFICATION,
+    ALERT_DETERMINATION,
     ALERT_SEVERITY,
     ALERT_STATUS,
     IOA_CATEGORY,
@@ -93,6 +95,17 @@ class AlertCreateQuery(BaseQuery):
             raise ValueError(
                 "Category cannot be 'Unknown'. Please choose a valid category."
             )
+
+
+class UpdateAlertPayload(BasePayload):
+    """Payload for updating a single alert using one alert ID."""
+
+    alertId: str
+    status: ALERT_STATUS | None = None
+    assignedTo: str | None = None
+    classification: ALERT_CLASSIFICATION | None = None
+    determination: ALERT_DETERMINATION | None = None
+    comment: str | None = None
 
 
 class AlertsResults(BaseResults):
@@ -216,24 +229,36 @@ class AlertsEndpoint(BaseEndpoint):
             request_kwargs={"json": payload.model_dump(exclude_none=True)},
         )
 
-    def batchUpdate(self, payload: BatchUpdateAlertPayload) -> AlertsResults:
+    def batchUpdate(self, payload: BatchUpdateAlertPayload) -> bool:
         """Batch update alerts
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/batch-update-alerts
+                - If successful, this method returns 200 OK, with an empty response body.
         """
         path = f"{self._PATH}/batchUpdate"
+        result = self._request("POST", path, json=payload.model_dump(exclude_none=True))
+        match result.status_code:
+            case 200:
+                return True
+            case _:
+                try:
+                    result.raise_for_status()
+                except Exception as e:
+                    raise RuntimeError(f"Failed to batch update alerts: {e}") from e
+                return False
+
+    def update(self, payload: UpdateAlertPayload) -> AlertsResults:
+        """Update alerts (alias for batch update)
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/update-alert
+        """
+        path = f"{self._PATH}/{payload.alertId}"
+        pl = payload.model_dump(exclude_none=True).pop("alertId")
         return AlertsResults(
             self,
             {},
             path=path,
             single=True,
-            method="POST",
-            request_kwargs={"json": payload.model_dump(exclude_none=True)},
+            method="PATCH",
+            request_kwargs={"json": pl},
         )
-
-    def update(self, payload: BatchUpdateAlertPayload) -> AlertsResults:
-        """Update alerts (alias for batch update)
-
-        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/update-alert
-        """
-        return self.batchUpdate(payload)
