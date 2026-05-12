@@ -207,8 +207,14 @@ class AlertsEndpoint(BaseEndpoint):
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/create-alert-by-reference
         """
         path = f"{self._PATH}/CreateAlertByReference"
-        params = payload.model_dump()
-        return AlertsResults(self, params, path=path, single=True, method="POST")
+        return AlertsResults(
+            self,
+            {},
+            path=path,
+            single=True,
+            method="POST",
+            request_kwargs={"json": payload.model_dump(exclude_none=True)},
+        )
 
     def batchUpdate(self, payload: BatchUpdateAlertPayload) -> AlertsResults:
         """Batch update alerts
@@ -216,8 +222,14 @@ class AlertsEndpoint(BaseEndpoint):
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/batch-update-alerts
         """
         path = f"{self._PATH}/batchUpdate"
-        params = payload.model_dump()
-        return AlertsResults(self, params, path=path, single=True, method="POST")
+        return AlertsResults(
+            self,
+            {},
+            path=path,
+            single=True,
+            method="POST",
+            request_kwargs={"json": payload.model_dump(exclude_none=True)},
+        )
 
     def update(self, payload: BatchUpdateAlertPayload) -> AlertsResults:
         """Update alerts (alias for batch update)

@@ -148,12 +148,14 @@ class BaseResults:
 
     def _ensure_fetched(self) -> ArrowRecordContainer:
         """Fetch results from the API if they haven't been fetched already, and return a populated container."""
-        if self._container is None:
-            self._container = ArrowRecordContainer(
-                schema=self.SCHEMA,
-                unknown_field_policy="drop",
-                coercion_policy="coerce",
-            )
+        if self._container is not None:
+            return self._container
+
+        self._container = ArrowRecordContainer(
+            schema=self.SCHEMA,
+            unknown_field_policy="drop",
+            coercion_policy="coerce",
+        )
 
         if self._single:
             response = self._endpoint._request(
