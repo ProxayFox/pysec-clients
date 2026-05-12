@@ -6,12 +6,12 @@ from .base import BaseEndpoint, BaseResults, BaseQuery
 from ..schemas import (
     SOFTWARE_SCHEMA,
     PUBLIC_DISTRIBUTION_DTO_SCHEMA,
-    PUBLIC_VULNERABILITY_DTO_SCHEMA,
     PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
 )
 
 if TYPE_CHECKING:
     from .machines import MachineReferencesResults
+    from .vulnerabilities import VulnerabilityDTOResults
 
 
 class SoftwareQuery(BaseQuery):
@@ -32,15 +32,6 @@ class DistributionDTOResults(BaseResults):
     """Results from the /api/Software/{id}/distributions endpoint."""
 
     SCHEMA = PUBLIC_DISTRIBUTION_DTO_SCHEMA
-
-
-class VulnerabilityDTOResults(BaseResults):
-    """Results from the /api/Software/{id}/vulnerabilities endpoint.
-
-    TODO: Move this to the vulnerability.py endpoint once we start working on that.
-    """
-
-    SCHEMA = PUBLIC_VULNERABILITY_DTO_SCHEMA
 
 
 class ProductDTOResults(BaseResults):

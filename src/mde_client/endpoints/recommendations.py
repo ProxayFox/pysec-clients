@@ -1,13 +1,18 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from .base import BaseEndpoint, BaseQuery, BaseResults
 from .machines import MachineReferencesResults
 from ..schemas import (
     RECOMMENDATION_SCHEMA,
     PUBLIC_PRODUCT_DTO_SCHEMA,
-    PUBLIC_VULNERABILITY_DTO_SCHEMA,
 )
 from ..models.enums import PUBLIC_RECOMMENDATION_EXCEPTION_STATUS
+
+
+if TYPE_CHECKING:
+    from .vulnerabilities import VulnerabilityDTOResults
 
 
 class RecommendationQuery(BaseQuery):
@@ -43,12 +48,6 @@ class ProductDTOResults(BaseResults):
     """
 
     SCHEMA = PUBLIC_PRODUCT_DTO_SCHEMA
-
-
-class VulnerabilityDTOResults(BaseResults):
-    """Results from the /api/recommendations/{id}/vulnerabilities endpoint."""
-
-    SCHEMA = PUBLIC_VULNERABILITY_DTO_SCHEMA
 
 
 class RecommendationsEndpoint(BaseEndpoint):

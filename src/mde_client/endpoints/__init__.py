@@ -52,7 +52,11 @@ if TYPE_CHECKING:
     )
     from .software import SoftwareEndpoint, SoftwareResults, DistributionDTOResults
     from .users import UserEndpoint, UserResults
-
+    from .vulnerabilities import (
+        VulnerabilityEndpoint,
+        VulnerabilityResults,
+        VulnerabilityDTOResults,
+    )
 
 _NAME_TO_MODULE = {
     "AlertsEndpoint": "alerts",
@@ -96,6 +100,9 @@ _NAME_TO_MODULE = {
     "DistributionDTOResults": "software",
     "UserEndpoint": "user",
     "UserResults": "user",
+    "VulnerabilityEndpoint": "vulnerabilities",
+    "VulnerabilityResults": "vulnerabilities",
+    "VulnerabilityDTOResults": "vulnerabilities",
 }
 
 
@@ -176,4 +183,8 @@ __all__ = [
     # User
     "UserEndpoint",
     "UserResults",
+    # Vulnerabilities
+    "VulnerabilityEndpoint",
+    "VulnerabilityResults",
+    "VulnerabilityDTOResults",
 ]

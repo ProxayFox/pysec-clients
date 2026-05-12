@@ -24,7 +24,6 @@ from .alerts import AlertsResults
 from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import (
     MACHINE_SCHEMA,
-    PUBLIC_VULNERABILITY_DTO_SCHEMA,
     PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
     PUBLIC_ASSET_DTO_SCHEMA,
     ASSET_BASELINE_ASSESSMENT_SCHEMA,
@@ -59,6 +58,7 @@ if TYPE_CHECKING:
     from .recommendations import RecommendationResults
     from .software import SoftwareResults
     from .users import UserResults
+    from .vulnerabilities import VulnerabilityDTOResults
 
 log = logging.getLogger(__name__)
 
@@ -109,15 +109,6 @@ class MachineResults(BaseResults):
     """Results from the /api/machines endpoint."""
 
     SCHEMA = MACHINE_SCHEMA
-
-
-class VulnerabilityDTOResults(BaseResults):
-    """Results from the /api/machines/{id}/vulnerabilities endpoint.
-
-    TODO: Move to vulnerabilities.py once the endpoint is setup
-    """
-
-    SCHEMA = PUBLIC_VULNERABILITY_DTO_SCHEMA
 
 
 class ProductDTOResults(BaseResults):

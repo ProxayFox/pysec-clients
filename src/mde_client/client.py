@@ -27,6 +27,7 @@ if TYPE_CHECKING:
         BaselineConfigurationEndpoint,
         SoftwareEndpoint,
         UserEndpoint,
+        VulnerabilityEndpoint,
     )
 
 
@@ -207,6 +208,12 @@ class MDEClient:
         from .endpoints import UserEndpoint
 
         return UserEndpoint(self._http, self._auth)
+
+    @property
+    def vulnerabilities(self) -> VulnerabilityEndpoint:
+        from .endpoints import VulnerabilityEndpoint
+
+        return VulnerabilityEndpoint(self._http, self._auth)
 
     # ------------------------------------------------------------------
     # Lifecycle
