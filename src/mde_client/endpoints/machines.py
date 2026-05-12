@@ -27,8 +27,8 @@ from ..schemas import (
     USER_SCHEMA,
     SOFTWARE_SCHEMA,
     VULNERABILITY_SCHEMA,
-    RECOMMENDATION_SCHEMA,
     PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
+    PUBLIC_ASSET_DTO_SCHEMA,
 )
 from ..models.enums import (
     DEVICE_VALUE,
@@ -57,6 +57,7 @@ if TYPE_CHECKING:
     from .deviceAvHealth import DeviceAVHealthResults
     from .investigations import InvestigationResults
     from .machineActions import MachineActionsResults
+    from .recommendations import RecommendationResults
 
 log = logging.getLogger(__name__)
 
@@ -89,6 +90,12 @@ class MachinesQuery(BaseQuery):
     osPlatform: str | list[str] | None = None
     riskScore: RISK_SCORE | list[RISK_SCORE] | None = None
     rbacGroupId: str | list[str] | None = None
+
+
+class MachineReferencesResults(BaseResults):
+    """Results from the /api/recommendations/{id}/machinereferences endpoint."""
+
+    SCHEMA = PUBLIC_ASSET_DTO_SCHEMA
 
 
 class MachineResults(BaseResults):
@@ -124,17 +131,11 @@ class VulnerabilityResults(BaseResults):
     SCHEMA = VULNERABILITY_SCHEMA
 
 
-class RecommendationResults(BaseResults):
-    """Results from the /api/machines/{id}/recommendations endpoint.
+class ProductDTOResults(BaseResults):
+    """Results from the /api/machines/{id}/getmissingkbs endpoint.
 
-    TODO: Move to recommendations.py once the endpoint is setup
+    TODO: Move this schema into software.py once we're working on the software endpoint.
     """
-
-    SCHEMA = RECOMMENDATION_SCHEMA
-
-
-class PublicProductFixResults(BaseResults):
-    """Results from the /api/machines/{id}/getmissingkbs endpoint."""
 
     SCHEMA = PUBLIC_PRODUCT_FIX_DTO_SCHEMA
 
@@ -211,16 +212,18 @@ class MachinesEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-security-recommendations
         """
+        from .recommendations import RecommendationResults
+
         path = f"{self._PATH}/{id}/recommendations"
         return RecommendationResults(self, {}, path=path)
 
-    def getmissingkbs(self, id: str) -> PublicProductFixResults:
+    def getmissingkbs(self, id: str) -> ProductDTOResults:
         """Get missing KBs by device ID
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-missing-kbs-machine
         """
         path = f"{self._PATH}/{id}/getmissingkbs"
-        return PublicProductFixResults(self, {}, path=path)
+        return ProductDTOResults(self, {}, path=path)
 
     def findbyip(self, ip: str, timestamp: datetime) -> MachineResults:
         """Find devices by internal IP

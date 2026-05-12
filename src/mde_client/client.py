@@ -1,24 +1,28 @@
 import msal
 import httpx
+from typing import TYPE_CHECKING
 
 from .auth import MSALAuth
-from .endpoints import (
-    AlertsEndpoint,
-    AuthenticatedDefinitionsEndpoint,
-    DeviceAuthenticatedAgentsEndpoint,
-    BaseEndpoint,
-    BrowserExtensionEndpoint,
-    CertificateInventoryEndpoint,
-    DeviceAVHealthEndpoint,
-    DomainEndpoint,
-    FileEndpoint,
-    IndicatorsEndpoint,
-    InvestigationsEndpoint,
-    IPEndpoint,
-    LibraryFilesEndpoint,
-    MachineActionsEndpoint,
-    MachinesEndpoint,
-)
+
+if TYPE_CHECKING:
+    from .endpoints import (
+        AlertsEndpoint,
+        AuthenticatedDefinitionsEndpoint,
+        DeviceAuthenticatedAgentsEndpoint,
+        BaseEndpoint,
+        BrowserExtensionEndpoint,
+        CertificateInventoryEndpoint,
+        DeviceAVHealthEndpoint,
+        DomainEndpoint,
+        FileEndpoint,
+        IndicatorsEndpoint,
+        InvestigationsEndpoint,
+        IPEndpoint,
+        LibraryFilesEndpoint,
+        MachineActionsEndpoint,
+        MachinesEndpoint,
+        RecommendationsEndpoint,
+    )
 
 
 class MDEClient:
@@ -75,63 +79,99 @@ class MDEClient:
 
     @property
     def alerts(self) -> AlertsEndpoint:
+        from .endpoints import AlertsEndpoint
+
         return AlertsEndpoint(self._http, self._auth)
 
     @property
     def authenticated_definitions(self) -> AuthenticatedDefinitionsEndpoint:
+        from .endpoints import AuthenticatedDefinitionsEndpoint
+
         return AuthenticatedDefinitionsEndpoint(self._http, self._auth)
 
     @property
     def authenticated_agents(self) -> DeviceAuthenticatedAgentsEndpoint:
+        from .endpoints import DeviceAuthenticatedAgentsEndpoint
+
         return DeviceAuthenticatedAgentsEndpoint(self._http, self._auth)
 
     @property
     def misc(self) -> BaseEndpoint:
+        from .endpoints import BaseEndpoint
+
         return BaseEndpoint(self._http, self._auth)
 
     @property
     def browser_extension(self) -> BrowserExtensionEndpoint:
+        from .endpoints import BrowserExtensionEndpoint
+
         return BrowserExtensionEndpoint(self._http, self._auth)
 
     @property
     def certificate_inventory(self) -> CertificateInventoryEndpoint:
+        from .endpoints import CertificateInventoryEndpoint
+
         return CertificateInventoryEndpoint(self._http, self._auth)
 
     @property
     def device_av_health(self) -> DeviceAVHealthEndpoint:
+        from .endpoints import DeviceAVHealthEndpoint
+
         return DeviceAVHealthEndpoint(self._http, self._auth)
 
     @property
     def domain(self) -> DomainEndpoint:
+        from .endpoints import DomainEndpoint
+
         return DomainEndpoint(self._http, self._auth)
 
     @property
     def files(self) -> FileEndpoint:
+        from .endpoints import FileEndpoint
+
         return FileEndpoint(self._http, self._auth)
 
     @property
     def indicators(self) -> IndicatorsEndpoint:
+        from .endpoints import IndicatorsEndpoint
+
         return IndicatorsEndpoint(self._http, self._auth)
 
     @property
     def investigations(self) -> InvestigationsEndpoint:
+        from .endpoints import InvestigationsEndpoint
+
         return InvestigationsEndpoint(self._http, self._auth)
 
     @property
     def ips(self) -> IPEndpoint:
+        from .endpoints import IPEndpoint
+
         return IPEndpoint(self._http, self._auth)
 
     @property
     def library(self) -> LibraryFilesEndpoint:
+        from .endpoints import LibraryFilesEndpoint
+
         return LibraryFilesEndpoint(self._http, self._auth)
 
     @property
     def machine_actions(self) -> MachineActionsEndpoint:
+        from .endpoints import MachineActionsEndpoint
+
         return MachineActionsEndpoint(self._http, self._auth)
 
     @property
     def machines(self) -> MachinesEndpoint:
+        from .endpoints import MachinesEndpoint
+
         return MachinesEndpoint(self._http, self._auth)
+
+    @property
+    def recommendations(self) -> RecommendationsEndpoint:
+        from .endpoints import RecommendationsEndpoint
+
+        return RecommendationsEndpoint(self._http, self._auth)
 
     # ------------------------------------------------------------------
     # Lifecycle

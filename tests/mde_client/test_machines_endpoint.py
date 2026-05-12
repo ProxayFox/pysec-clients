@@ -20,10 +20,9 @@ from mde_client.endpoints.machines import (
     MachineResults,
     MachinesEndpoint,
     MachinesQuery,
-    PublicProductFixResults,
-    RecommendationResults,
     SoftwareResults,
     VulnerabilityResults,
+    ProductDTOResults,
 )
 
 
@@ -111,8 +110,7 @@ class TestSubResources:
             ("alerts", "alerts", AlertsResults),
             ("software", "software", SoftwareResults),
             ("vulnerabilities", "vulnerabilities", VulnerabilityResults),
-            ("recommendations", "recommendations", RecommendationResults),
-            ("getmissingkbs", "getmissingkbs", PublicProductFixResults),
+            ("getmissingkbs", "getmissingkbs", ProductDTOResults),
         ],
     )
     def test_path_and_type(self, method: str, suffix: str, result_type: type) -> None:
