@@ -21,6 +21,7 @@ import importlib
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from .advancedqueries import AdvancedHuntingQueriesEndpoint
     from .alerts import AlertsEndpoint, AlertsResults
     from .authenticatedScan import (
         AuthenticatedDefinitionsEndpoint,
@@ -60,6 +61,7 @@ if TYPE_CHECKING:
     )
 
 _NAME_TO_MODULE = {
+    "AdvancedHuntingQueriesEndpoint": "advancedqueries",
     "AlertsEndpoint": "alerts",
     "AlertsResults": "alerts",
     "AuthenticatedDefinitionsEndpoint": "authenticatedScan",
@@ -124,6 +126,8 @@ def __getattr__(name: str) -> object:
 
 
 __all__ = [
+    # Advanced Hunting Queries
+    "AdvancedHuntingQueriesEndpoint",
     # Alerts
     "AlertsEndpoint",
     "AlertsResults",

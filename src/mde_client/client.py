@@ -6,6 +6,7 @@ from .auth import MSALAuth
 
 if TYPE_CHECKING:
     from .endpoints import (
+        AdvancedHuntingQueriesEndpoint,
         AlertsEndpoint,
         AuthenticatedDefinitionsEndpoint,
         DeviceAuthenticatedAgentsEndpoint,
@@ -82,6 +83,12 @@ class MDEClient:
     # ------------------------------------------------------------------
     # Endpoints
     # ------------------------------------------------------------------
+
+    @property
+    def advanced_queries(self) -> AdvancedHuntingQueriesEndpoint:
+        from .endpoints import AdvancedHuntingQueriesEndpoint
+
+        return AdvancedHuntingQueriesEndpoint(self._http, self._auth)
 
     @property
     def alerts(self) -> AlertsEndpoint:

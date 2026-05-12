@@ -21,6 +21,7 @@ import httpx
 import asyncio
 import pyarrow as pa
 import polars as pl
+import orjson
 from datetime import datetime
 from typing import Any
 from collections.abc import Iterator
@@ -246,6 +247,18 @@ class BaseResults:
         """Materialize results into a list of dicts."""
         # Polars is faster at converting from Arrow to dicts than pyarrow.to_pylist, so we use Polars as an intermediary here.
         return self._ensure_fetched().to_polars.to_dicts()
+
+    def to_json(self, indent: bool = False) -> str | bytes:
+        """Materialize results into a JSON string.
+
+        Returns a str if indent=False, bytes if indent=True (since orjson returns bytes). You can decode the bytes to get a str if needed.
+        """
+        if indent:
+            return orjson.dumps(
+                self._ensure_fetched().to_polars.to_dicts(), option=orjson.OPT_INDENT_2
+            ).decode()
+        else:
+            return orjson.dumps(self._ensure_fetched().to_polars.to_dicts())
 
     def to_arrow(self) -> pa.Table:
         """Materialize results into a PyArrow Table."""
