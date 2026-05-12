@@ -17,15 +17,24 @@ class ScoreEndpoint(BaseEndpoint):
     _PATH = "/api/exposureScore"
 
     def get(self) -> ScoreResults:
-        """Get the current configuration score."""
+        """Retrieves the organizational exposure score.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-exposure-score
+        """
         return ScoreResults(self, {})
 
     def byMachineGroups(self) -> ScoreResults:
-        """Get the current configuration score by machine groups."""
+        """Retrieves the exposure score for each machine group.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-group-exposure-score
+        """
         path = f"{self._PATH}/ByMachineGroups"
         return ScoreResults(self, {}, path=path)
 
     def configurationScore(self) -> ScoreResults:
-        """Alias for get()."""
+        """Retrieves Microsoft Secure Score for Devices.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-device-secure-score
+        """
         path = "/api/configurationScore"
         return ScoreResults(self, {}, path=path)
