@@ -14,6 +14,7 @@ from .endpoints import (
     FileEndpoint,
     IndicatorsEndpoint,
     InvestigationsEndpoint,
+    IPEndpoint,
     MachinesEndpoint,
 )
 
@@ -113,6 +114,10 @@ class MDEClient:
     @property
     def investigations(self) -> InvestigationsEndpoint:
         return InvestigationsEndpoint(self._http, self._auth)
+
+    @property
+    def ips(self) -> IPEndpoint:
+        return IPEndpoint(self._http, self._auth)
 
     @property
     def machines(self) -> MachinesEndpoint:

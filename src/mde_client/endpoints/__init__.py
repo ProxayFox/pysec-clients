@@ -34,6 +34,7 @@ if TYPE_CHECKING:
     from .files import FileEndpoint, FileResults
     from .indicators import IndicatorsEndpoint, IndicatorsResults
     from .investigations import InvestigationsEndpoint
+    from .ips import IPEndpoint, IPResults
     from .machines import MachinesEndpoint, MachineResults
 
 
@@ -56,6 +57,8 @@ _NAME_TO_MODULE = {
     "IndicatorsEndpoint": "indicators",
     "IndicatorsResults": "indicators",
     "InvestigationsEndpoint": "investigations",
+    "IPEndpoint": "ips",
+    "IPResults": "ips",
     "MachinesEndpoint": "machines",
     "MachineResults": "machines",
 }
@@ -105,6 +108,9 @@ __all__ = [
     "IndicatorsResults",
     # Investigations
     "InvestigationsEndpoint",
+    # IPs
+    "IPEndpoint",
+    "IPResults",
     # Machines
     "MachinesEndpoint",
     "MachineResults",
