@@ -40,7 +40,7 @@ if TYPE_CHECKING:
     from .files import FileResults
     from .machines import MachineResults
     from .ips import IPResults
-    from .user import UserResults
+    from .users import UserResults
 
 log = logging.getLogger(__name__)
 

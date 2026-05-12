@@ -58,7 +58,7 @@ if TYPE_CHECKING:
     from .machineActions import MachineActionsResults
     from .recommendations import RecommendationResults
     from .software import SoftwareResults
-    from .user import UserResults
+    from .users import UserResults
 
 log = logging.getLogger(__name__)
 

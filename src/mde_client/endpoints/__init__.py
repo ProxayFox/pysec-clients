@@ -51,7 +51,7 @@ if TYPE_CHECKING:
         BaselineConfigurationResults,
     )
     from .software import SoftwareEndpoint, SoftwareResults, DistributionDTOResults
-    from .user import UserEndpoint, UserResults
+    from .users import UserEndpoint, UserResults
 
 
 _NAME_TO_MODULE = {
