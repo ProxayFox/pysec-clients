@@ -24,7 +24,6 @@ from typing import TYPE_CHECKING, Any
 from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
 from ..schemas import (
     ALERT_SCHEMA,
-    IP_SCHEMA,
     USER_SCHEMA,
 )
 from ..models.enums import (
@@ -43,6 +42,7 @@ if TYPE_CHECKING:
     from .domain import DomainResults
     from .files import FileResults
     from .machines import MachineResults
+    from .ips import IPResults
 
 log = logging.getLogger(__name__)
 
@@ -114,15 +114,6 @@ class AlertsResults(BaseResults):
     SCHEMA = ALERT_SCHEMA
 
 
-class IPResults(BaseResults):
-    """Results from the /api/alerts/{id}/ips endpoint.
-
-    TODO: Move to ips.py once the endpoint is setup
-    """
-
-    SCHEMA = IP_SCHEMA
-
-
 class UserResults(BaseResults):
     """Results from the /api/alerts/{id}/user endpoint.
 
@@ -191,6 +182,8 @@ class AlertsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-ip-info
         """
+        from .ips import IPResults
+
         path = f"{self._PATH}/{id}/ips"
         return IPResults(self, {}, path=path)
 
