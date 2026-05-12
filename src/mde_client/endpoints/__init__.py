@@ -39,6 +39,7 @@ if TYPE_CHECKING:
     from .machineActions import MachineActionsEndpoint, MachineActionsResults
     from .machines import MachinesEndpoint, MachineResults, MachineReferencesResults
     from .recommendations import RecommendationsEndpoint, RecommendationResults
+    from .remediations import RemediationEndpoint, RemediationResults
 
 
 _NAME_TO_MODULE = {
@@ -71,6 +72,8 @@ _NAME_TO_MODULE = {
     "MachineReferencesResults": "machines",
     "RecommendationsEndpoint": "recommendations",
     "RecommendationResults": "recommendations",
+    "RemediationEndpoint": "remediations",
+    "RemediationResults": "remediations",
 }
 
 
@@ -134,4 +137,7 @@ __all__ = [
     # Recommendations
     "RecommendationsEndpoint",
     "RecommendationResults",
+    # Remediations
+    "RemediationEndpoint",
+    "RemediationResults",
 ]

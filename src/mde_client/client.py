@@ -22,6 +22,7 @@ if TYPE_CHECKING:
         MachineActionsEndpoint,
         MachinesEndpoint,
         RecommendationsEndpoint,
+        RemediationEndpoint,
     )
 
 
@@ -172,6 +173,12 @@ class MDEClient:
         from .endpoints import RecommendationsEndpoint
 
         return RecommendationsEndpoint(self._http, self._auth)
+
+    @property
+    def remediations(self) -> RemediationEndpoint:
+        from .endpoints import RemediationEndpoint
+
+        return RemediationEndpoint(self._http, self._auth)
 
     # ------------------------------------------------------------------
     # Lifecycle
