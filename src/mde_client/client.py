@@ -5,11 +5,14 @@ from .auth import MSALAuth
 from .endpoints import (
     AlertsEndpoint,
     AuthenticatedDefinitionsEndpoint,
+    DeviceAuthenticatedAgentsEndpoint,
     BaseEndpoint,
     BrowserExtensionEndpoint,
     CertificateInventoryEndpoint,
     DeviceAVHealthEndpoint,
     DomainEndpoint,
+    FileEndpoint,
+    IndicatorsEndpoint,
     InvestigationsEndpoint,
     MachinesEndpoint,
 )
@@ -72,8 +75,12 @@ class MDEClient:
         return AlertsEndpoint(self._http, self._auth)
 
     @property
-    def authenticated_scan(self) -> AuthenticatedDefinitionsEndpoint:
+    def authenticated_definitions(self) -> AuthenticatedDefinitionsEndpoint:
         return AuthenticatedDefinitionsEndpoint(self._http, self._auth)
+
+    @property
+    def authenticated_agents(self) -> DeviceAuthenticatedAgentsEndpoint:
+        return DeviceAuthenticatedAgentsEndpoint(self._http, self._auth)
 
     @property
     def misc(self) -> BaseEndpoint:
@@ -94,6 +101,14 @@ class MDEClient:
     @property
     def domain(self) -> DomainEndpoint:
         return DomainEndpoint(self._http, self._auth)
+
+    @property
+    def files(self) -> FileEndpoint:
+        return FileEndpoint(self._http, self._auth)
+
+    @property
+    def indicators(self) -> IndicatorsEndpoint:
+        return IndicatorsEndpoint(self._http, self._auth)
 
     @property
     def investigations(self) -> InvestigationsEndpoint:

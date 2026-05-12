@@ -32,6 +32,7 @@ if TYPE_CHECKING:
     from .deviceAvHealth import DeviceAVHealthEndpoint
     from .domain import DomainEndpoint, DomainResults
     from .files import FileEndpoint, FileResults
+    from .indicators import IndicatorsEndpoint, IndicatorsResults
     from .investigations import InvestigationsEndpoint
     from .machines import MachinesEndpoint, MachineResults
 
@@ -52,6 +53,8 @@ _NAME_TO_MODULE = {
     "DomainResults": "domain",
     "FileEndpoint": "files",
     "FileResults": "files",
+    "IndicatorsEndpoint": "indicators",
+    "IndicatorsResults": "indicators",
     "InvestigationsEndpoint": "investigations",
     "MachinesEndpoint": "machines",
     "MachineResults": "machines",
@@ -97,6 +100,9 @@ __all__ = [
     # Files
     "FileEndpoint",
     "FileResults",
+    # Indicators
+    "IndicatorsEndpoint",
+    "IndicatorsResults",
     # Investigations
     "InvestigationsEndpoint",
     # Machines
