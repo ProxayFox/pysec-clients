@@ -24,7 +24,6 @@ from .alerts import AlertsResults
 from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import (
     MACHINE_SCHEMA,
-    USER_SCHEMA,
     PUBLIC_VULNERABILITY_DTO_SCHEMA,
     PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
     PUBLIC_ASSET_DTO_SCHEMA,
@@ -59,6 +58,7 @@ if TYPE_CHECKING:
     from .machineActions import MachineActionsResults
     from .recommendations import RecommendationResults
     from .software import SoftwareResults
+    from .user import UserResults
 
 log = logging.getLogger(__name__)
 
@@ -109,15 +109,6 @@ class MachineResults(BaseResults):
     """Results from the /api/machines endpoint."""
 
     SCHEMA = MACHINE_SCHEMA
-
-
-class LogonUserResults(BaseResults):
-    """Results from the /api/machines/{id}/logonusers endpoint.
-
-    TODO: Move to users.py once the endpoint is setup
-    """
-
-    SCHEMA = USER_SCHEMA
 
 
 class VulnerabilityDTOResults(BaseResults):
@@ -171,13 +162,13 @@ class MachinesEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}"
         return MachineResults(self, {}, path=path, single=True)
 
-    def logonusers(self, id: str) -> LogonUserResults:
+    def logonusers(self, id: str) -> UserResults:
         """Get machine logon users for a machine
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-log-on-users
         """
         path = f"{self._PATH}/{id}/logonusers"
-        return LogonUserResults(self, {}, path=path)
+        return UserResults(self, {}, path=path)
 
     def alerts(self, id: str) -> AlertsResults:
         """Get machine related alerts

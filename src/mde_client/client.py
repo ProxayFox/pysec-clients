@@ -26,6 +26,7 @@ if TYPE_CHECKING:
         ScoreEndpoint,
         BaselineConfigurationEndpoint,
         SoftwareEndpoint,
+        UserEndpoint,
     )
 
 
@@ -200,6 +201,12 @@ class MDEClient:
         from .endpoints import SoftwareEndpoint
 
         return SoftwareEndpoint(self._http, self._auth)
+
+    @property
+    def user(self) -> UserEndpoint:
+        from .endpoints import UserEndpoint
+
+        return UserEndpoint(self._http, self._auth)
 
     # ------------------------------------------------------------------
     # Lifecycle

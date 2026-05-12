@@ -22,10 +22,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
-from ..schemas import (
-    ALERT_SCHEMA,
-    USER_SCHEMA,
-)
+from ..schemas import ALERT_SCHEMA
 from ..models.enums import (
     ALERT_CLASSIFICATION,
     ALERT_DETERMINATION,
@@ -43,6 +40,7 @@ if TYPE_CHECKING:
     from .files import FileResults
     from .machines import MachineResults
     from .ips import IPResults
+    from .user import UserResults
 
 log = logging.getLogger(__name__)
 
@@ -112,15 +110,6 @@ class AlertsResults(BaseResults):
     """Results from the /api/alerts endpoint."""
 
     SCHEMA = ALERT_SCHEMA
-
-
-class UserResults(BaseResults):
-    """Results from the /api/alerts/{id}/user endpoint.
-
-    TODO: Move to users.py once the endpoint is setup
-    """
-
-    SCHEMA = USER_SCHEMA
 
 
 class AlertsEndpoint(BaseEndpoint):
