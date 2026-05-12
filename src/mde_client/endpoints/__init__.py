@@ -21,31 +21,40 @@ import importlib
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .alerts import AlertsEndpoint
+    from .alerts import AlertsEndpoint, AlertsResults
     from .authenticatedScan import (
         AuthenticatedDefinitionsEndpoint,
         DeviceAuthenticatedAgentsEndpoint,
     )
-    from .base import BaseEndpoint
+    from .base import BaseEndpoint, BaseResults, BaseQuery, BasePayload
     from .browserExtension import BrowserExtensionEndpoint
     from .certificateInventory import CertificateInventoryEndpoint
     from .deviceAvHealth import DeviceAVHealthEndpoint
-    from .domain import DomainEndpoint
+    from .domain import DomainEndpoint, DomainResults
+    from .files import FileEndpoint, FileResults
     from .investigations import InvestigationsEndpoint
-    from .machines import MachinesEndpoint
+    from .machines import MachinesEndpoint, MachineResults
 
 
 _NAME_TO_MODULE = {
     "AlertsEndpoint": "alerts",
+    "AlertsResults": "alerts",
     "AuthenticatedDefinitionsEndpoint": "authenticatedScan",
     "DeviceAuthenticatedAgentsEndpoint": "authenticatedScan",
     "BaseEndpoint": "base",
+    "BaseResults": "base",
+    "BaseQuery": "base",
+    "BasePayload": "base",
     "BrowserExtensionEndpoint": "browserExtension",
     "CertificateInventoryEndpoint": "certificateInventory",
     "DeviceAVHealthEndpoint": "deviceAvHealth",
     "DomainEndpoint": "domain",
+    "DomainResults": "domain",
+    "FileEndpoint": "files",
+    "FileResults": "files",
     "InvestigationsEndpoint": "investigations",
     "MachinesEndpoint": "machines",
+    "MachineResults": "machines",
 }
 
 
@@ -67,11 +76,15 @@ def __getattr__(name: str) -> object:
 __all__ = [
     # Alerts
     "AlertsEndpoint",
+    "AlertsResults",
     # Authenticated Scan
     "AuthenticatedDefinitionsEndpoint",
     "DeviceAuthenticatedAgentsEndpoint",
     # Base Endpoint
     "BaseEndpoint",
+    "BaseResults",
+    "BaseQuery",
+    "BasePayload",
     # Browser Extension
     "BrowserExtensionEndpoint",
     # Certificate Inventory
@@ -80,8 +93,13 @@ __all__ = [
     "DeviceAVHealthEndpoint",
     # Domain
     "DomainEndpoint",
+    "DomainResults",
+    # Files
+    "FileEndpoint",
+    "FileResults",
     # Investigations
     "InvestigationsEndpoint",
     # Machines
     "MachinesEndpoint",
+    "MachineResults",
 ]

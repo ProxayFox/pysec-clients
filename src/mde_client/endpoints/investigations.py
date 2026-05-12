@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from .base import BaseQuery, BaseEndpoint, BaseResults
-from .machines import MachinesEndpoint
+from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import INVESTIGATION_SCHEMA
 from ..models.enums import INVESTIGATION_STATE
 from ..models.action_payloads import StartInvestigationPayload
@@ -66,6 +65,8 @@ class InvestigationsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
         """
+        from .machines import MachinesEndpoint
+
         return MachinesEndpoint(self._http, self._auth)._startInvestigation(
             deviceId, payload
         )

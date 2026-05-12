@@ -19,15 +19,12 @@ from __future__ import annotations
 
 import logging
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from .base import BaseQuery, BaseEndpoint, BaseResults
+from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import (
     ALERT_SCHEMA,
-    DOMAIN_SCHEMA,
-    FILE_SCHEMA,
     IP_SCHEMA,
-    MACHINE_SCHEMA,
     USER_SCHEMA,
 )
 from ..models.enums import (
@@ -39,6 +36,11 @@ from ..models.action_payloads import (
     CreateAlertByReferencePayload,
     BatchUpdateAlertPayload,
 )
+
+if TYPE_CHECKING:
+    from .domain import DomainResults
+    from .files import FileResults
+    from .machines import MachineResults
 
 log = logging.getLogger(__name__)
 
@@ -99,32 +101,20 @@ class AlertsResults(BaseResults):
     SCHEMA = ALERT_SCHEMA
 
 
-class DomainResults(BaseResults):
-    """Results from the /api/alerts/{id}/domains endpoint."""
-
-    SCHEMA = DOMAIN_SCHEMA
-
-
-class FileResults(BaseResults):
-    """Results from the /api/alerts/{id}/files endpoint."""
-
-    SCHEMA = FILE_SCHEMA
-
-
 class IPResults(BaseResults):
-    """Results from the /api/alerts/{id}/ips endpoint."""
+    """Results from the /api/alerts/{id}/ips endpoint.
+
+    TODO: Move to ips.py once the endpoint is setup
+    """
 
     SCHEMA = IP_SCHEMA
 
 
-class MachineResults(BaseResults):
-    """Results from the /api/alerts/{id}/machines endpoint."""
-
-    SCHEMA = MACHINE_SCHEMA
-
-
 class UserResults(BaseResults):
-    """Results from the /api/alerts/{id}/user endpoint."""
+    """Results from the /api/alerts/{id}/user endpoint.
+
+    TODO: Move to users.py once the endpoint is setup
+    """
 
     SCHEMA = USER_SCHEMA
 
@@ -168,6 +158,8 @@ class AlertsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-domain-info
         """
+        from .domain import DomainResults
+
         path = f"{self._PATH}/{id}/domains"
         return DomainResults(self, {}, path=path)
 
@@ -176,6 +168,8 @@ class AlertsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-files-info
         """
+        from .files import FileResults
+
         path = f"{self._PATH}/{id}/files"
         return FileResults(self, {}, path=path)
 
@@ -192,6 +186,8 @@ class AlertsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-machine-info
         """
+        from .machines import MachineResults
+
         path = f"{self._PATH}/{id}/machines"
         return MachineResults(self, {}, path=path)
 

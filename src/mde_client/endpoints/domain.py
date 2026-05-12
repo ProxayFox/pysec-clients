@@ -1,20 +1,19 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
 
 from .base import BaseEndpoint, BaseResults
-from ..schemas import IN_ORG_DOMAIN_STATS_SCHEMA, MACHINE_SCHEMA, ALERT_SCHEMA
+from ..schemas import DOMAIN_SCHEMA, IN_ORG_DOMAIN_STATS_SCHEMA
+
+if TYPE_CHECKING:
+    from .alerts import AlertsResults
+    from .machines import MachineResults
 
 
-class DomainAlertsResults(BaseResults):
-    """Results for the /api/alerts/{id}/domains endpoint."""
+class DomainResults(BaseResults):
+    """Results for the /api/domains endpoint."""
 
-    SCHEMA = ALERT_SCHEMA
-
-
-class DomainMachinesResults(BaseResults):
-    """Results for the /api/alerts/{id}/domains/{domain}/machines endpoint."""
-
-    SCHEMA = MACHINE_SCHEMA
+    SCHEMA = DOMAIN_SCHEMA
 
 
 class DomainStatsResults(BaseResults):
@@ -28,21 +27,25 @@ class DomainEndpoint(BaseEndpoint):
 
     _PATH = "/api/domains"
 
-    def alerts(self, domain: str) -> DomainAlertsResults:
+    def alerts(self, domain: str) -> AlertsResults:
         """Get the alerts associated with a domain.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-domain-related-alerts
         """
-        path = f"{self._PATH}/{domain}/alerts"
-        return DomainAlertsResults(self, {}, path=path)
+        from .alerts import AlertsResults
 
-    def machines(self, domain: str) -> DomainMachinesResults:
+        path = f"{self._PATH}/{domain}/alerts"
+        return AlertsResults(self, {}, path=path)
+
+    def machines(self, domain: str) -> MachineResults:
         """Get the machines associated with a domain.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-domain-related-machines
         """
+        from .machines import MachineResults
+
         path = f"{self._PATH}/{domain}/machines"
-        return DomainMachinesResults(self, {}, path=path)
+        return MachineResults(self, {}, path=path)
 
     def stats(self, domain: str) -> DomainStatsResults:
         """Get the in-organization stats for a domain.

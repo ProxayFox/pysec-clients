@@ -22,7 +22,7 @@ from __future__ import annotations
 import logging
 
 
-from .base import BaseQuery, BaseEndpoint, BaseResults, BasePayload
+from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
 from ..schemas import (
     AUTH_SCAN_HISTORY_CONTRACT_SCHEMA,
     DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,

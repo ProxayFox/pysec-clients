@@ -15,7 +15,7 @@ import httpx
 import pytest
 
 from mde_client.endpoints.machines import (
-    AlertResults,
+    AlertsResults,
     LogonUserResults,
     MachineResults,
     MachinesEndpoint,
@@ -108,7 +108,7 @@ class TestSubResources:
         ("method", "suffix", "result_type"),
         [
             ("logonusers", "logonusers", LogonUserResults),
-            ("alerts", "alerts", AlertResults),
+            ("alerts", "alerts", AlertsResults),
             ("software", "software", SoftwareResults),
             ("vulnerabilities", "vulnerabilities", VulnerabilityResults),
             ("recommendations", "recommendations", RecommendationResults),

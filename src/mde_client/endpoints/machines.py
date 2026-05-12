@@ -20,11 +20,11 @@ import logging
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
-from .base import BaseQuery, BaseEndpoint, BaseResults
+from .alerts import AlertsResults
+from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import (
     MACHINE_SCHEMA,
     USER_SCHEMA,
-    ALERT_SCHEMA,
     SOFTWARE_SCHEMA,
     VULNERABILITY_SCHEMA,
     RECOMMENDATION_SCHEMA,
@@ -42,9 +42,9 @@ from ..models.action_payloads import StartInvestigationPayload
 
 if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionResults
-    from .investigations import InvestigationResults
-    from .deviceAvHealth import DeviceAVHealthResults
     from .certificateInventory import CertificateInventoryResults
+    from .deviceAvHealth import DeviceAVHealthResults
+    from .investigations import InvestigationResults
 
 log = logging.getLogger(__name__)
 
@@ -86,31 +86,37 @@ class MachineResults(BaseResults):
 
 
 class LogonUserResults(BaseResults):
-    """Results from the /api/machines/{id}/logonusers endpoint."""
+    """Results from the /api/machines/{id}/logonusers endpoint.
+
+    TODO: Move to users.py once the endpoint is setup
+    """
 
     SCHEMA = USER_SCHEMA
 
 
-class AlertResults(BaseResults):
-    """Results from the /api/machines/{id}/alerts endpoint."""
-
-    SCHEMA = ALERT_SCHEMA
-
-
 class SoftwareResults(BaseResults):
-    """Results from the /api/machines/{id}/software endpoint."""
+    """Results from the /api/machines/{id}/software endpoint.
+
+    TODO: Move to software.py once the endpoint is setup
+    """
 
     SCHEMA = SOFTWARE_SCHEMA
 
 
 class VulnerabilityResults(BaseResults):
-    """Results from the /api/machines/{id}/vulnerabilities endpoint."""
+    """Results from the /api/machines/{id}/vulnerabilities endpoint.
+
+    TODO: Move to vulnerabilities.py once the endpoint is setup
+    """
 
     SCHEMA = VULNERABILITY_SCHEMA
 
 
 class RecommendationResults(BaseResults):
-    """Results from the /api/machines/{id}/recommendations endpoint."""
+    """Results from the /api/machines/{id}/recommendations endpoint.
+
+    TODO: Move to recommendations.py once the endpoint is setup
+    """
 
     SCHEMA = RECOMMENDATION_SCHEMA
 
@@ -162,13 +168,15 @@ class MachinesEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}/logonusers"
         return LogonUserResults(self, {}, path=path)
 
-    def alerts(self, id: str) -> AlertResults:
+    def alerts(self, id: str) -> AlertsResults:
         """Get machine related alerts
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-related-alerts
         """
+        from .alerts import AlertsResults
+
         path = f"{self._PATH}/{id}/alerts"
-        return AlertResults(self, {}, path=path)
+        return AlertsResults(self, {}, path=path)
 
     def software(self, id: str) -> SoftwareResults:
         """Get installed software
@@ -308,6 +316,8 @@ class MachinesEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/initiate-autoir-investigation
         """
+        from .investigations import InvestigationResults
+
         path = f"{self._PATH}/{id}/startInvestigation"
         return InvestigationResults(
             self,

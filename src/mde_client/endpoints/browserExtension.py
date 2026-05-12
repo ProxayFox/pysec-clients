@@ -20,8 +20,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from .base import BaseQuery, BaseEndpoint, BaseResults
-from .machines import MachinesEndpoint
+from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import ASSET_BROWSER_EXTENSION_SCHEMA, BROWSER_EXTENSIONS_SCHEMA
 
 
@@ -61,6 +60,8 @@ class BrowserExtensionEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions#1-export-browser-extensions-assessment-json-response
         """
+        from .machines import MachinesEndpoint
+
         return MachinesEndpoint(
             self._http, self._auth
         )._browserExtensionsInventoryByMachine()
@@ -74,6 +75,8 @@ class BrowserExtensionEndpoint(BaseEndpoint):
 
         TODO: Need to Implement file download and parsing logic to handle this endpoint
         """
+        from .machines import MachinesEndpoint
+
         return MachinesEndpoint(
             self._http, self._auth
         )._browserextensionsinventoryExport()

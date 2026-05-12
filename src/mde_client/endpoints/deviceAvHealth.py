@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 import logging
+import orjson
 from typing import Any
 
-import orjson
-
-from .base import BaseQuery, BaseEndpoint, BaseResults
+from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import DEVICE_AV_INFO_SCHEMA
 from ..viaFiles import RecordTransform
-from .machines import MachinesEndpoint
 
 log = logging.getLogger(__name__)
 
@@ -196,4 +194,6 @@ class DeviceAVHealthEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api
             - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api#2-export-health-reporting-via-files
         """
+        from .machines import MachinesEndpoint
+
         return MachinesEndpoint(self._http, self._auth)._infoGatheringExport()

@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import logging
 
-from .base import BaseQuery, BaseEndpoint, BaseResults
+from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import ASSET_CERTIFICATE_ASSESSMENT_SCHEMA
-from .machines import MachinesEndpoint
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +30,8 @@ class CertificateInventoryEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment#1-export-certificate-assessment-json-response
         """
+        from .machines import MachinesEndpoint
+
         return MachinesEndpoint(
             self._http, self._auth
         )._certificateAssessmentByMachine()
@@ -42,4 +43,6 @@ class CertificateInventoryEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment#2-export-certificate-assessment-via-files
         """
+        from .machines import MachinesEndpoint
+
         return MachinesEndpoint(self._http, self._auth)._certificateAssessmentExport()
