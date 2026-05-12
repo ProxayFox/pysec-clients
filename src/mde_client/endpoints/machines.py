@@ -24,7 +24,6 @@ from .alerts import AlertsResults
 from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import (
     MACHINE_SCHEMA,
-    PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
     PUBLIC_ASSET_DTO_SCHEMA,
     ASSET_BASELINE_ASSESSMENT_SCHEMA,
 )
@@ -55,6 +54,7 @@ if TYPE_CHECKING:
     from .deviceAvHealth import DeviceAVHealthResults
     from .investigations import InvestigationResults
     from .machineActions import MachineActionsResults
+    from .misc import ProductDTOResults
     from .recommendations import RecommendationResults
     from .software import SoftwareResults
     from .users import UserResults
@@ -109,15 +109,6 @@ class MachineResults(BaseResults):
     """Results from the /api/machines endpoint."""
 
     SCHEMA = MACHINE_SCHEMA
-
-
-class ProductDTOResults(BaseResults):
-    """Results from the /api/machines/{id}/getmissingkbs endpoint.
-
-    TODO: Move this schema into software.py once we're working on the software endpoint.
-    """
-
-    SCHEMA = PUBLIC_PRODUCT_FIX_DTO_SCHEMA
 
 
 class MachinesEndpoint(BaseEndpoint):
@@ -204,6 +195,8 @@ class MachinesEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-missing-kbs-machine
         """
+        from .misc import ProductDTOResults
+
         path = f"{self._PATH}/{id}/getmissingkbs"
         return ProductDTOResults(self, {}, path=path)
 

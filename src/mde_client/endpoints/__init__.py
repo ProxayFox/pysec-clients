@@ -43,6 +43,7 @@ if TYPE_CHECKING:
         MachineReferencesResults,
         AssetBaselineAssessmentResults,
     )
+    from .misc import ProductDTOResults
     from .recommendations import RecommendationsEndpoint, RecommendationResults
     from .remediations import RemediationEndpoint, RemediationResults
     from .score import ScoreEndpoint, ScoreResults
@@ -87,6 +88,7 @@ _NAME_TO_MODULE = {
     "MachineResults": "machines",
     "MachineReferencesResults": "machines",
     "AssetBaselineAssessmentResults": "machines",
+    "ProductDTOResults": "misc",
     "RecommendationsEndpoint": "recommendations",
     "RecommendationResults": "recommendations",
     "RemediationEndpoint": "remediations",
@@ -164,6 +166,8 @@ __all__ = [
     "MachineResults",
     "MachineReferencesResults",
     "AssetBaselineAssessmentResults",
+    # Misc
+    "ProductDTOResults",
     # Recommendations
     "RecommendationsEndpoint",
     "RecommendationResults",

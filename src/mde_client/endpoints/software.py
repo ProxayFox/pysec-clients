@@ -6,12 +6,12 @@ from .base import BaseEndpoint, BaseResults, BaseQuery
 from ..schemas import (
     SOFTWARE_SCHEMA,
     PUBLIC_DISTRIBUTION_DTO_SCHEMA,
-    PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
 )
 
 if TYPE_CHECKING:
     from .machines import MachineReferencesResults
     from .vulnerabilities import VulnerabilityDTOResults
+    from .misc import ProductDTOResults
 
 
 class SoftwareQuery(BaseQuery):
@@ -32,12 +32,6 @@ class DistributionDTOResults(BaseResults):
     """Results from the /api/Software/{id}/distributions endpoint."""
 
     SCHEMA = PUBLIC_DISTRIBUTION_DTO_SCHEMA
-
-
-class ProductDTOResults(BaseResults):
-    """Results from the /api/Software/{id}/getmissingkbs endpoint."""
-
-    SCHEMA = PUBLIC_PRODUCT_FIX_DTO_SCHEMA
 
 
 class SoftwareEndpoint(BaseEndpoint):
@@ -72,5 +66,7 @@ class SoftwareEndpoint(BaseEndpoint):
 
     def getmissingkbs(self, id: str) -> ProductDTOResults:
         """Get missing KBs for a specific software inventory record."""
+        from .misc import ProductDTOResults
+
         path = f"{self._PATH}/{id}/getmissingkbs"
         return ProductDTOResults(self, {}, path=path)
