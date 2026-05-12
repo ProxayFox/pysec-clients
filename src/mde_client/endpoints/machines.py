@@ -29,6 +29,7 @@ from ..schemas import (
     VULNERABILITY_SCHEMA,
     PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
     PUBLIC_ASSET_DTO_SCHEMA,
+    ASSET_BASELINE_ASSESSMENT_SCHEMA,
 )
 from ..models.enums import (
     DEVICE_VALUE,
@@ -90,6 +91,12 @@ class MachinesQuery(BaseQuery):
     osPlatform: str | list[str] | None = None
     riskScore: RISK_SCORE | list[RISK_SCORE] | None = None
     rbacGroupId: str | list[str] | None = None
+
+
+class AssetBaselineAssessmentResults(BaseResults):
+    """Results from the /api/machines/{id}/BaselineComplianceAssessmentByMachine endpoint."""
+
+    SCHEMA = ASSET_BASELINE_ASSESSMENT_SCHEMA
 
 
 class MachineReferencesResults(BaseResults):
@@ -521,6 +528,33 @@ class MachinesEndpoint(BaseEndpoint):
             method="POST",
             request_kwargs={"json": payload.model_dump()},
         )
+
+    # === Security Baseline related endpoints ===
+    def _baselineComplianceAssessmentByMachine(self) -> AssetBaselineAssessmentResults:
+        """Get the security baseline compliance assessment for a machine.
+
+        Returns all security baselines assessments for all devices, on a per-device basis.\n
+        It returns a table with a separate entry for every unique combination of DeviceId, ProfileId, ConfigurationId.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/export-security-baseline-assessment
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/export-security-baseline-assessment#1-export-security-baselines-assessment-json-response
+        """
+        path = f"{self._PATH}/baselineComplianceAssessmentByMachine"
+        return AssetBaselineAssessmentResults(self, {}, path=path)
+
+    def _baselineComplianceAssessmentExport(self) -> AssetBaselineAssessmentResults:
+        """Get the security baseline compliance assessment for a machine as a file.
+
+        Returns all security baselines assessments for all devices, on a per-device basis.\n
+        It returns a table with a separate entry for every unique combination of DeviceId, ProfileId, ConfigurationId.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/export-security-baseline-assessment
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/export-security-baseline-assessment#2-export-security-baselines-assessment-via-files
+        """
+        path = f"{self._PATH}/BaselineComplianceAssessmentExport"
+        return AssetBaselineAssessmentResults(self, {}, path=path, files=True)
 
 
 class MachineNotFoundError(Exception):

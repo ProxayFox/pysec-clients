@@ -37,10 +37,19 @@ if TYPE_CHECKING:
     from .ips import IPEndpoint, IPResults
     from .library import LibraryFilesEndpoint, LibraryFilesResults
     from .machineActions import MachineActionsEndpoint, MachineActionsResults
-    from .machines import MachinesEndpoint, MachineResults, MachineReferencesResults
+    from .machines import (
+        MachinesEndpoint,
+        MachineResults,
+        MachineReferencesResults,
+        AssetBaselineAssessmentResults,
+    )
     from .recommendations import RecommendationsEndpoint, RecommendationResults
     from .remediations import RemediationEndpoint, RemediationResults
     from .score import ScoreEndpoint, ScoreResults
+    from .securityBaseline import (
+        BaselineConfigurationEndpoint,
+        BaselineConfigurationResults,
+    )
 
 
 _NAME_TO_MODULE = {
@@ -71,12 +80,15 @@ _NAME_TO_MODULE = {
     "MachinesEndpoint": "machines",
     "MachineResults": "machines",
     "MachineReferencesResults": "machines",
+    "AssetBaselineAssessmentResults": "machines",
     "RecommendationsEndpoint": "recommendations",
     "RecommendationResults": "recommendations",
     "RemediationEndpoint": "remediations",
     "RemediationResults": "remediations",
     "ScoreEndpoint": "score",
     "ScoreResults": "score",
+    "BaselineConfigurationEndpoint": "securityBaseline",
+    "BaselineConfigurationResults": "securityBaseline",
 }
 
 
@@ -137,6 +149,7 @@ __all__ = [
     "MachinesEndpoint",
     "MachineResults",
     "MachineReferencesResults",
+    "AssetBaselineAssessmentResults",
     # Recommendations
     "RecommendationsEndpoint",
     "RecommendationResults",
@@ -146,4 +159,7 @@ __all__ = [
     # Score
     "ScoreEndpoint",
     "ScoreResults",
+    # Security Baseline
+    "BaselineConfigurationEndpoint",
+    "BaselineConfigurationResults",
 ]
