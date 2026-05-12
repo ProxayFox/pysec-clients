@@ -38,13 +38,25 @@ from ..models.enums import (
     RISK_SCORE,
 )
 
-from ..models.action_payloads import StartInvestigationPayload
+from ..models.action_payloads import (
+    StartInvestigationPayload,
+    CollectInvestigationPackagePayload,
+    IsolatePayload,
+    UnisolatePayload,
+    RestrictCodeExecutionPayload,
+    RunLiveResponsePayload,
+    StopAndQuarantineFilePayload,
+    UnrestrictCodeExecutionPayload,
+    RunAntiVirusScanPayload,
+    OffBoardPayload,
+)
 
 if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionResults
     from .certificateInventory import CertificateInventoryResults
     from .deviceAvHealth import DeviceAVHealthResults
     from .investigations import InvestigationResults
+    from .machineActions import MachineActionsResults
 
 log = logging.getLogger(__name__)
 
@@ -310,7 +322,7 @@ class MachinesEndpoint(BaseEndpoint):
 
     # === Investigations related endpoints ===
     def _startInvestigation(
-        self, id: str, payload: StartInvestigationPayload | None = None
+        self, id: str, payload: StartInvestigationPayload
     ) -> InvestigationResults:
         """Start Investigation
 
@@ -324,7 +336,187 @@ class MachinesEndpoint(BaseEndpoint):
             {},
             path=path,
             method="POST",
-            request_kwargs={"json": payload.model_dump() if payload else {}},
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    # === Machine Action related endpoints ===
+    def _collectInvestigationPackage(
+        self, id: str, payload: CollectInvestigationPackagePayload
+    ) -> MachineActionsResults:
+        """Collect investigation package for a machine
+
+        If successful, this method returns 201 - Created response code and Machine Action in the response body. If a collection is already running, this returns 400 Bad Request.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/collect-investigation-package
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/collectInvestigationPackage"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def _isolate(self, id: str, payload: IsolatePayload) -> MachineActionsResults:
+        """Isolate a machine
+
+        If successful, this method returns 201 - Created response code and Machine Action in the response body.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/isolate-machine
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/isolate"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def _unisolate(self, id: str, payload: UnisolatePayload) -> MachineActionsResults:
+        """Unisolate a machine
+
+        If successful, this method returns 201 - Created response code and Machine Action in the response body.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/unisolate-machine
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/unisolate"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def _restrictCodeExecution(
+        self, id: str, payload: RestrictCodeExecutionPayload
+    ) -> MachineActionsResults:
+        """Restrict code execution on a machine
+
+        If successful, this method returns 201 - Created response code and Machine Action in the response body.\n
+        If you send multiple API calls to restrict app execution for the same device, it returns "pending machine action" or HTTP 400 with the message "Action is already in progress".
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/restrict-code-execution
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/restrictCodeExecution"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def _unrestrictCodeExecution(
+        self, id: str, payload: UnrestrictCodeExecutionPayload
+    ) -> MachineActionsResults:
+        """Unrestrict code execution on a machine
+
+        If successful, this method returns 201 - Created response code and Machine Action in the response body.\n
+        If you send multiple API calls to remove app restrictions for the same device, it returns "pending machine action" or HTTP 400 with the message "Action is already in progress".
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/unrestrict-code-execution
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/unrestrictCodeExecution"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def _runAntiVirusScan(
+        self, id: str, payload: RunAntiVirusScanPayload
+    ) -> MachineActionsResults:
+        """Run antivirus scan on a machine
+
+        If successful, this method returns 201, Created response code and MachineAction object in the response body.\n
+        If you send multiple API calls to run an antivirus scan for the same device, it returns "pending machine action" or HTTP 400 with the message "Action is already in progress".
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/run-av-scan
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/runAntiVirusScan"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def _runLiveResponse(
+        self, id: str, payload: RunLiveResponsePayload
+    ) -> MachineActionsResults:
+        """Run live response on a machine
+
+        If successful, this method returns 201, Created response code and MachineAction object in the response body.\n
+        If you send multiple API calls to run live response for the same device, it returns "pending machine action" or HTTP 400 with the message "Action is already in progress".
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/run-live-response
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/runliveresponse"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def _offBoard(self, id: str, payload: OffBoardPayload) -> MachineActionsResults:
+        """Offboard a machine
+
+        If successful, this method returns 200 - Created response code and Machine Action in the response body.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/offboard-machine-api
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/offboard"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def _stopAndQuarantineFile(
+        self, id: str, payload: StopAndQuarantineFilePayload
+    ) -> MachineActionsResults:
+        """Stop and quarantine a file on a machine
+
+        If successful, this method returns 201, Created response code and MachineAction object in the response body.\n
+        If you send multiple API calls to stop and quarantine the same file for the same device, it returns "pending machine action" or HTTP 400 with the message "Action is already in progress".
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/stop-and-quarantine-file
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/StopAndQuarantineFile"
+        return MachineActionsResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
         )
 
 

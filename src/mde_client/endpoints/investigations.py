@@ -59,7 +59,7 @@ class InvestigationsEndpoint(BaseEndpoint):
         return InvestigationResults(self, {}, path=path, single=True)
 
     def startInvestigation(
-        self, deviceId: str, payload: StartInvestigationPayload | None = None
+        self, deviceId: str, payload: StartInvestigationPayload
     ) -> InvestigationResults:
         """Start an investigation.
 
