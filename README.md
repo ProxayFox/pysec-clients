@@ -1,20 +1,24 @@
 # pysec-clients
 
-Monorepo of Python API clients for security vendors.
+Python API clients for security vendors, developed as a single `uv` workspace.
 
-Each vendor package lives under `src/` as its own installable workspace member, with shared tooling and quality checks at the repository root.
+The repository currently ships one package, [`mde-client`](src/mde_client/), a Microsoft Defender for Endpoint client built around lazy endpoint results, Arrow and Polars materialization helpers, and dependency injection for HTTP and auth testability.
 
 ## Packages
 
-| Package | Vendor | Notes |
-| ------- | ------ | ----- |
-| [mde-client](src/mde_client/) | Microsoft Defender for Endpoint | OAuth client credentials auth, lazy endpoint results, PyArrow/Polars output helpers |
+| Package | Vendor | Summary |
+| ------- | ------ | ------- |
+| [`mde-client`](src/mde_client/) | Microsoft Defender for Endpoint | Client-credentials auth, lazy endpoint wrappers, file-export helpers, Arrow and Polars outputs |
+
+Package-specific setup, examples, and API notes live in [`src/mde_client/README.md`](src/mde_client/README.md).
 
 ## Requirements
 
 - Python >= 3.14
-- [uv](https://docs.astral.sh/uv/) for environment and dependency management
+- [`uv`](https://docs.astral.sh/uv/) for environment and dependency management
 - [`just`](https://just.systems/) for common development tasks
+
+Use `uv` for dependency operations throughout the workspace. Do not use `pip` or `poetry` here.
 
 ## Quick Start
 
@@ -26,71 +30,60 @@ just hooks-install
 just quality
 ```
 
-Use `uv` for dependency operations throughout the workspace. Do not use `pip` or `poetry` here.
+`just quality` is the default repository gate. It runs linting, formatting, type-checking, and the test suite with integration tests skipped.
+
+## Development Workflow
+
+The root [`justfile`](justfile) is the source of truth for local commands.
+
+| Task | Command |
+| ---- | ------- |
+| Bootstrap the workspace | `uv sync --all-packages --all-groups` |
+| Lint | `just lint` |
+| Format | `just format` |
+| Type-check | `just typecheck` |
+| Run focused tests | `just test tests/mde_client/...` |
+| Default quality gate | `just quality` |
+| Include integration tests | `just quality-full` |
+| Install pre-commit hook | `just hooks-install` |
+| Run the hook manually | `just hooks-run` |
+
+The repository ships a `.pre-commit-config.yaml` that runs `just quality` before each commit. Because the quality gate can auto-fix lint and formatting issues, the hook may rewrite files and abort the commit once; review the changes, re-stage them, and commit again.
 
 ## Project Layout
 
 ```text
 pysec-clients/
- pyproject.toml      # uv workspace configuration and shared dependency groups
- justfile            # lint, format, typecheck, test, docs tasks
- src/
-  mde_client/       # Microsoft Defender for Endpoint package
- test/               # repository-level tests
+    pyproject.toml         # uv workspace configuration and shared dependency groups
+    justfile               # lint, format, typecheck, test, and docs tasks
+    scripts/               # repo utilities such as schema generation helpers
+    src/
+        mde_client/          # Microsoft Defender for Endpoint client package
+    tests/
+        mde_client/          # package-focused pytest suite
 ```
 
-Vendor packages follow the same high-level pattern:
+Each client package follows the same broad shape:
 
 - `client.py` exposes the top-level client and lifecycle management.
 - `auth.py` encapsulates vendor authentication.
-- `endpoints/` contains endpoint clients and query/result types.
-- `schemas/` holds table schemas or response-shaping helpers when needed.
+- `endpoints/` contains endpoint clients, query models, and lazy result wrappers.
+- `schemas/` holds Arrow schemas and response-shaping helpers.
 
-For package-specific API usage, authentication requirements, and examples, start with the vendor README. The current implementation is documented in [src/mde_client/README.md](src/mde_client/README.md).
+## Documentation
 
-## Development Workflow
+This repository is currently README-first.
 
-All common tasks are exposed through `just`:
+- Start here for workspace setup and development commands.
+- Use [`src/mde_client/README.md`](src/mde_client/README.md) for package usage, authentication, and examples.
+- `just docs-build` and `just docs-serve` exist in [`justfile`](justfile), but the repository does not currently include an `mkdocs.yml`, so those tasks are not runnable from the checked-in state yet.
 
-```bash
-just lint          # uv run ruff check .
-just lint-fix      # uv run ruff check --fix .
-just format        # uv run ruff format .
-just format-check  # uv run ruff format --check .
-just test          # uv run pytest -q
-just test-all      # uv run pytest --runslow -q
-just typecheck     # uv run ty check --project . && uvx pyright --threads
-just quality       # lint, format-check/format, typecheck, test
-just hooks-install # install pre-commit hook that runs `just quality`
-just hooks-run     # run the hook manually against all files
-```
+## Adding Another Client
 
-### Pre-commit Hook
-
-The repository ships a `.pre-commit-config.yaml` that runs `just quality` before every commit.
-Install it once with `just hooks-install`.
-
-Because the quality gate auto-fixes lint and formatting issues, the hook may rewrite files and abort the commit.
-When that happens, review the changes, re-stage the updated files, and commit again.
-
-The hook can be bypassed with `git commit --no-verify`, but this is discouraged.
-
-Documentation tasks also exist in `justfile`:
-
-```bash
-just docs-build    # uv run --group docs mkdocs build --strict
-just docs-serve    # uv run --group docs mkdocs serve
-just docs-validate # uv run --group docs mkdocs build --strict
-```
-
-Those docs commands currently require a checked-in `mkdocs.yml`. They are part of the intended workflow, but they are not runnable from this repository state until that configuration file is added.
-
-## Adding A New Vendor Client
-
-1. Create `src/<vendor_client>/` with its own `pyproject.toml`.
-2. Follow the same package shape as `src/mde_client/`.
-3. Register the workspace member in the root `pyproject.toml` under `[tool.uv.sources]`.
-4. Add or extend tests under `test/` for the new package surface.
+1. Create `src/<vendor_client>/` as a workspace member with its own `pyproject.toml`.
+2. Follow the same `Client -> Auth -> Endpoint -> Results -> Schema` shape used by [`src/mde_client/`](src/mde_client/).
+3. Register the workspace member in the root [`pyproject.toml`](pyproject.toml).
+4. Add or extend tests under [`tests/`](tests/).
 5. Document package-specific setup and examples in that package's README.
 
 ## License

@@ -2,7 +2,15 @@
 
 Python client for the [Microsoft Defender for Endpoint](https://learn.microsoft.com/en-us/defender-endpoint/) API.
 
-The current package surface focuses on the machines endpoint and returns lazy result handles that can be materialized as JSON, PyArrow tables, or Polars DataFrames.
+`mde-client` is organized around a single top-level `MDEClient` with lazy endpoint wrappers. Endpoint calls return result handles that fetch on first materialization, cache the payload, and can be rendered as Python dictionaries, JSON, PyArrow tables, or Polars DataFrames.
+
+## Highlights
+
+- Client-credentials authentication through MSAL.
+- Lazy endpoint results with shared materialization methods.
+- Coverage across machine inventory, alerts, investigations, authenticated scans, advanced hunting, assessments, remediation, and machine actions.
+- Built-in support for Defender file-export endpoints through `ViaFiles`.
+- Constructor injection for `httpx.Client` and `msal.TokenCache` to keep tests and custom transports straightforward.
 
 ## Install
 
@@ -10,23 +18,29 @@ The current package surface focuses on the machines endpoint and returns lazy re
 uv add mde-client
 ```
 
-Optional extras for terminal conversions:
+The package also defines optional extras when you want to declare dataframe support explicitly in your environment:
 
 ```bash
-uv add mde-client[arrow]
-uv add mde-client[arrow,polars]
+uv add "mde-client[arrow]"
+uv add "mde-client[arrow,polars]"
 ```
 
-Use the base install if you only need JSON output. Add extras when you want `to_arrow()` or `to_polars()`.
+If you are developing inside this monorepo, use the root workflow instead:
 
-## Prerequisites
+```bash
+uv sync --all-packages --all-groups
+```
+
+## Authentication Prerequisites
 
 You need an Azure AD app registration that can use the OAuth 2.0 client-credentials flow against Microsoft Defender for Endpoint.
 
 - Tenant ID
 - Client ID
 - Client secret
-- Defender application permissions for your tenant's app registration
+- Defender application permissions granted to the app registration
+
+`MDEClient` uses [MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-python) and the Defender default scope under the hood.
 
 ## Quick Start
 
@@ -40,151 +54,99 @@ try:
         client_id="YOUR_CLIENT_ID",
         client_secret="YOUR_CLIENT_SECRET",
     ) as client:
-        results = client.machines.get_all(
+        machines = client.machines.get_all(
             MachinesQuery(healthStatus="Active", page_size=500)
-        )
+        ).to_dicts()
 
-        machines = results.to_json()
         print(f"Fetched {len(machines)} machines")
 
-        machine = client.machines.get("machine-guid").to_json()[0]
+        machine = client.machines.get("machine-guid").to_dicts()[0]
         print(machine["computerDnsName"])
 
-        logon_users = client.machines.logonusers("machine-guid").to_json()
+        logon_users = client.machines.logonusers("machine-guid").to_dicts()
         print(logon_users[:3])
 except AuthenticationError as exc:
     print(f"Authentication failed: {exc}")
 ```
 
-## Authentication
+## Public Imports
 
-`MDEClient` authenticates with [MSAL](https://github.com/AzureAD/microsoft-authentication-library-for-python) using the client-credentials flow and the Defender default scope.
+The top-level package exports:
 
-An optional token cache can be injected for persistent storage:
+- `MDEClient`
+- `AuthenticationError`
+- `ViaFiles`
+- `ViaFilesConfig`
+- `EmptyExportBlobError`
 
-```python
-import msal
+## Result Model
 
-cache = msal.SerializableTokenCache()
-
-client = MDEClient(
-    tenant_id="YOUR_TENANT_ID",
-    client_id="YOUR_CLIENT_ID",
-    client_secret="YOUR_CLIENT_SECRET",
-    token_cache=cache,
-)
-```
-
-`MDEClient` also accepts an injected `httpx.Client` for testing, custom transports, timeouts, or proxy configuration.
-
-## Package Shape
-
-```text
-mde_client/
-  __init__.py       # public API: MDEClient, AuthenticationError
-  client.py         # top-level client and context-manager lifecycle
-  auth.py           # MSAL token acquisition and caching
-  endpoints/
-    base.py         # shared query/result behavior
-    machines.py     # machines endpoint, query model, lazy result types
-  schemas/
-    machines.py     # PyArrow schemas for machine and logon-user results
-```
-
-## Execution Model
-
-Collection reads and single-machine reads currently use the same lazy result wrapper.
+Most endpoint methods return a lazy results wrapper rather than an eager list or model.
 
 ```python
 results = client.machines.get_all(MachinesQuery(healthStatus="Active"))
 
-# No HTTP request is made until a terminal method runs.
-rows = results.to_json()
+# No request is made until a terminal method runs.
+rows = results.to_dicts()
+payload = results.to_json()
 table = results.to_arrow()
 frame = results.to_polars()
 
-# Re-fetch the underlying API response.
-fresh_rows = results.refresh().to_json()
+# Drop the cached payload and fetch again on the next terminal call.
+fresh_rows = results.refresh().to_dicts()
 ```
 
-Current behavior to account for:
+Behavior to account for:
 
-- `get_all()` returns a `MachineResults` handle and auto-paginates unless `top` or `skip` is supplied.
-- `get()` also returns a `MachineResults` handle, but it is configured for a single machine lookup.
-- Terminal methods reuse the cached response until `refresh()` is called.
-- `to_json()` returns `list[dict]`.
-- `to_arrow()` returns a `pyarrow.Table`.
-- `to_polars()` returns a Polars DataFrame.
+- Collection and single-item lookups use the same wrapper style.
+- Pagination is automatic for list endpoints unless you set `$top` or `$skip` through a query model.
+- Materialization methods reuse cached data until `refresh()` is called.
+- `to_dicts()` is the simplest Python-native representation for downstream code.
+- Write helpers return either lazy result wrappers or `bool`, depending on whether the underlying API returns an entity payload or an empty success response.
 
-## Supported Endpoints
+## Endpoint Surface
 
-### `client.machines`
+`MDEClient` exposes endpoint properties for the current Defender surface. The most commonly used groups are:
 
-| Method | Returns | Notes |
-| ------ | ------- | ----- |
-| `get_all(query=None)` | `MachineResults` | Lists machines and follows `@odata.nextLink` pagination unless `top` or `skip` is set |
-| `get(id)` | `MachineResults` | Fetches one machine by ID and materializes as a single-row result |
-| `logonusers(id)` | `LogonUserResults` | Fetches machine logon users |
+| Property | What it covers |
+| -------- | -------------- |
+| `machines` | Machine inventory, machine lookups, related users and alerts, installed software, vulnerabilities, recommendations, machine-scoped actions, and several assessment exports |
+| `alerts` | Alert listing, alert relationships, create-by-reference flows, and batch updates |
+| `authenticated_definitions` / `authenticated_agents` | Authenticated scan definitions, scanner agents, and scan history workflows |
+| `advanced_queries` | Advanced hunting query execution |
+| `software`, `vulnerabilities`, `recommendations`, `remediations`, `score`, `baseline_configurations` | Exposure, remediation, score, and baseline-related datasets |
+| `browser_extension`, `certificate_inventory`, `device_av_health` | Assessment inventory and export-backed datasets |
+| `files`, `domain`, `ips`, `user`, `investigations`, `indicators`, `library`, `machine_actions` | Related entity lookups, response actions, indicator management, and live response library operations |
 
-### Not Yet Implemented
+The full property list is defined on `MDEClient`, but the important pattern is consistent: endpoint methods return a results wrapper or a small success value, and the wrapper APIs stay uniform across endpoint families.
 
-These methods are present on `client.machines` but currently raise `NotImplementedError`:
+## Query Models
 
-- `alerts(id)`
-- `software(id)`
-- `vulnerabilities(id)`
-- `recommendations(id)`
-- `tags(id)`
-- `getmissingkbs(id)`
+Query models inherit from a shared base that supports:
 
-## Query Parameters
+- `page_size` mapped to `pageSize`
+- `top` mapped to `$top`
+- `skip` mapped to `$skip`
+- OData-style `$filter` construction from non-null model fields
 
-`MachinesQuery` combines common pagination controls with endpoint-specific filters.
+Defender-specific query fields intentionally preserve upstream API names such as `healthStatus`, `machineTags`, and `lastSeen` instead of normalizing everything to snake_case.
 
-### Pagination Controls
+## File Exports And `ViaFiles`
 
-| Field | Type | Notes |
-| ----- | ---- | ----- |
-| `page_size` | `int` | Sent as `pageSize`; must be between 1 and 10000 |
-| `top` | `int \| None` | Sent as `$top`; disables automatic pagination |
-| `skip` | `int \| None` | Sent as `$skip`; disables automatic pagination |
+Some Defender endpoints return `exportFiles` SAS URLs instead of embedding the final dataset in the initial API response. For those endpoints, the result wrappers use `ViaFiles` internally to:
 
-### Machine Filters
+- download blobs concurrently
+- stream gzip or plain NDJSON responses
+- parse records incrementally
+- append them into an `ArrowRecordContainer`
 
-These fields map directly to the Defender machines API filter field names, so they intentionally use camelCase.
+Most callers do not need to use `ViaFiles` directly because export-backed endpoint wrappers already handle it. Use `ViaFiles` yourself when you already have export URLs and want to stream them into your own Arrow container with custom tuning through `ViaFilesConfig`.
 
-| Field | Type |
-| ----- | ---- |
-| `computerDnsName` | `str \| None` |
-| `id` | `str \| list[str] \| None` |
-| `version` | `str \| None` |
-| `deviceValue` | `Literal["None", "Informational", "Low", "Medium", "High"] \| None` |
-| `aadDeviceId` | `str \| list[str] \| None` |
-| `machineTags` | `str \| list[str] \| None` |
-| `lastSeen` | `datetime \| None` |
-| `exposureLevel` | `Literal["None", "Informational", "Low", "Medium", "High"] \| None` |
-| `onboardingStatus` | `Literal["Onboarded", "CanBeOnboarded", "Unsupported", "InsufficientInfo"] \| None` |
-| `lastIpAddress` | `str \| None` |
-| `healthStatus` | `Literal["Active", "Inactive", "ImpairedCommunication", "NoSensorData", "NoSensorDataImpairedCommunication", "Unknown"] \| None` |
-| `osPlatform` | `str \| None` |
-| `riskScore` | `Literal["None", "Informational", "Low", "Medium", "High"] \| None` |
-| `rbacGroupId` | `str \| None` |
+`EmptyExportBlobError` is the internal signal used when a blob returns `200 OK` but contains no records. The public downloader retries and then skips confirmed-empty blobs.
 
-## Output Schemas
+## Customization And Testing
 
-Machine and logon-user collections are shaped into Arrow-backed containers using the schemas in [schemas/machines.py](schemas/machines.py). Unknown fields are dropped and compatible values are coerced into the declared schema during materialization.
-
-## Errors And Troubleshooting
-
-- `AuthenticationError` is raised when MSAL cannot acquire a token.
-- API request failures bubble up through `httpx.Response.raise_for_status()`, which raises `httpx.HTTPStatusError`.
-- `to_arrow()` raises `ImportError` with install guidance if Arrow support is unavailable.
-- `to_polars()` raises `ImportError` with install guidance if Polars support is unavailable.
-- Placeholder machine sub-resource methods currently raise `NotImplementedError` by design.
-
-## Testability
-
-The client is built for dependency injection. You can provide your own `httpx.Client` and `msal.TokenCache` when testing:
+`MDEClient` accepts both a custom `httpx.Client` and an optional MSAL token cache:
 
 ```python
 import httpx
@@ -198,6 +160,15 @@ client = MDEClient(
     token_cache=msal.TokenCache(),
 )
 ```
+
+This makes it straightforward to test request construction, inject custom transports, or persist tokens outside the default in-memory cache.
+
+## Errors And Operational Notes
+
+- `AuthenticationError` is raised when MSAL cannot acquire a token.
+- HTTP failures bubble up through `httpx` status handling.
+- Export-file downloads retry transient failures and raise a runtime error if a blob cannot be fetched successfully; confirmed-empty blobs are skipped after retry logging.
+- The client is a context manager; use `with MDEClient(...) as client:` when possible so the underlying HTTP session is closed promptly.
 
 ## License
 
