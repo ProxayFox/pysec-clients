@@ -1,0 +1,64 @@
+site_name: pysec-clients
+site_description: Documentation for pysec-clients and its package surfaces.
+repo_name: ProxayFox/pysec-clients
+repo_url: https://github.com/ProxayFox/pysec-clients
+docs_dir: docs
+theme:
+  name: material
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+nav:
+  - Home: index.md
+  - MDE Client:
+      - Overview: mde_client/index.md
+      - Tutorials:
+          - Get started: mde_client/tutorials/get-started.md
+      - How-to guides:
+          - Index: mde_client/how-to/index.md
+          - Authenticate with client credentials: mde_client/how-to/authenticate-with-client-credentials.md
+          - List and filter machines: mde_client/how-to/list-and-filter-machines.md
+          - Get related data for one machine: mde_client/how-to/get-machine-related-data.md
+          - Run an advanced hunting query: mde_client/how-to/run-advanced-hunting.md
+          - Work with result formats: mde_client/how-to/work-with-result-formats.md
+          - Use export-backed endpoints: mde_client/how-to/use-export-backed-endpoints.md
+          - Inject a custom HTTP client or token cache: mde_client/how-to/inject-http-client-and-token-cache.md
+      - Reference:
+          - Index: mde_client/reference/index.md
+          - MDEClient: mde_client/reference/mde-client.md
+          - Authentication: mde_client/reference/authentication.md
+          - Results wrappers: mde_client/reference/results.md
+          - Query models: mde_client/reference/queries.md
+          - ViaFiles: mde_client/reference/via-files.md
+          - Endpoints:
+              - Index: mde_client/reference/endpoints/index.md
+              - advanced_queries: mde_client/reference/endpoints/advanced-queries.md
+              - alerts: mde_client/reference/endpoints/alerts.md
+              - authenticated_definitions: mde_client/reference/endpoints/authenticated-definitions.md
+              - authenticated_agents: mde_client/reference/endpoints/authenticated-agents.md
+              - browser_extension: mde_client/reference/endpoints/browser-extension.md
+              - certificate_inventory: mde_client/reference/endpoints/certificate-inventory.md
+              - device_av_health: mde_client/reference/endpoints/device-av-health.md
+              - domain: mde_client/reference/endpoints/domain.md
+              - files: mde_client/reference/endpoints/files.md
+              - indicators: mde_client/reference/endpoints/indicators.md
+              - investigations: mde_client/reference/endpoints/investigations.md
+              - ips: mde_client/reference/endpoints/ips.md
+              - library: mde_client/reference/endpoints/library.md
+              - machine_actions: mde_client/reference/endpoints/machine-actions.md
+              - machines: mde_client/reference/endpoints/machines.md
+              - recommendations: mde_client/reference/endpoints/recommendations.md
+              - remediations: mde_client/reference/endpoints/remediations.md
+              - score: mde_client/reference/endpoints/score.md
+              - baseline_configurations: mde_client/reference/endpoints/baseline-configurations.md
+              - software: mde_client/reference/endpoints/software.md
+              - user: mde_client/reference/endpoints/user.md
+              - vulnerabilities: mde_client/reference/endpoints/vulnerabilities.md
+      - Explanation:
+          - Index: mde_client/explanation/index.md
+          - Lazy results and caching: mde_client/explanation/lazy-results.md
+          - Why query models keep Defender field names: mde_client/explanation/query-models.md
+          - How export-backed endpoints work: mde_client/explanation/export-backed-endpoints.md
+          - Why the client supports dependency injection: mde_client/explanation/dependency-injection.md

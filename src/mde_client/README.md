@@ -12,6 +12,14 @@ Python client for the [Microsoft Defender for Endpoint](https://learn.microsoft.
 - Built-in support for Defender file-export endpoints through `ViaFiles`.
 - Constructor injection for `httpx.Client` and `msal.TokenCache` to keep tests and custom transports straightforward.
 
+## Documentation
+
+Use this README for the package overview and quick start.
+
+- For the structured docs set, start at [../../docs/mde_client/index.md](../../docs/mde_client/index.md).
+- For a first-success walkthrough, use [../../docs/mde_client/tutorials/get-started.md](../../docs/mde_client/tutorials/get-started.md).
+- For API lookup, use [../../docs/mde_client/reference/index.md](../../docs/mde_client/reference/index.md).
+
 ## Install
 
 ```bash

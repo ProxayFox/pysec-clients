@@ -72,10 +72,11 @@ Each client package follows the same broad shape:
 
 ## Documentation
 
-This repository is currently README-first.
+This repository is currently README-first, with structured package documentation starting under [`docs/mde_client/`](docs/mde_client/index.md).
 
 - Start here for workspace setup and development commands.
-- Use [`src/mde_client/README.md`](src/mde_client/README.md) for package usage, authentication, and examples.
+- Use [`src/mde_client/README.md`](src/mde_client/README.md) for the package summary and quick-start example.
+- Use [`docs/mde_client/index.md`](docs/mde_client/index.md) for tutorials, how-to guides, reference pages, and explanation pages for `mde-client`.
 - `just docs-build` and `just docs-serve` exist in [`justfile`](justfile), but the repository does not currently include an `mkdocs.yml`, so those tasks are not runnable from the checked-in state yet.
 
 ## Adding Another Client
