@@ -25,6 +25,7 @@ if TYPE_CHECKING:
         RemediationEndpoint,
         ScoreEndpoint,
         BaselineConfigurationEndpoint,
+        SoftwareEndpoint,
     )
 
 
@@ -193,6 +194,12 @@ class MDEClient:
         from .endpoints import BaselineConfigurationEndpoint
 
         return BaselineConfigurationEndpoint(self._http, self._auth)
+
+    @property
+    def software(self) -> SoftwareEndpoint:
+        from .endpoints import SoftwareEndpoint
+
+        return SoftwareEndpoint(self._http, self._auth)
 
     # ------------------------------------------------------------------
     # Lifecycle

@@ -25,8 +25,7 @@ from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import (
     MACHINE_SCHEMA,
     USER_SCHEMA,
-    SOFTWARE_SCHEMA,
-    VULNERABILITY_SCHEMA,
+    PUBLIC_VULNERABILITY_DTO_SCHEMA,
     PUBLIC_PRODUCT_FIX_DTO_SCHEMA,
     PUBLIC_ASSET_DTO_SCHEMA,
     ASSET_BASELINE_ASSESSMENT_SCHEMA,
@@ -59,6 +58,7 @@ if TYPE_CHECKING:
     from .investigations import InvestigationResults
     from .machineActions import MachineActionsResults
     from .recommendations import RecommendationResults
+    from .software import SoftwareResults
 
 log = logging.getLogger(__name__)
 
@@ -120,22 +120,13 @@ class LogonUserResults(BaseResults):
     SCHEMA = USER_SCHEMA
 
 
-class SoftwareResults(BaseResults):
-    """Results from the /api/machines/{id}/software endpoint.
-
-    TODO: Move to software.py once the endpoint is setup
-    """
-
-    SCHEMA = SOFTWARE_SCHEMA
-
-
-class VulnerabilityResults(BaseResults):
+class VulnerabilityDTOResults(BaseResults):
     """Results from the /api/machines/{id}/vulnerabilities endpoint.
 
     TODO: Move to vulnerabilities.py once the endpoint is setup
     """
 
-    SCHEMA = VULNERABILITY_SCHEMA
+    SCHEMA = PUBLIC_VULNERABILITY_DTO_SCHEMA
 
 
 class ProductDTOResults(BaseResults):
@@ -203,16 +194,18 @@ class MachinesEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-installed-software
         """
+        from .software import SoftwareResults
+
         path = f"{self._PATH}/{id}/software"
         return SoftwareResults(self, {}, path=path)
 
-    def vulnerabilities(self, id: str) -> VulnerabilityResults:
+    def vulnerabilities(self, id: str) -> VulnerabilityDTOResults:
         """Get discovered vulnerabilities for a machine.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-discovered-vulnerabilities
         """
         path = f"{self._PATH}/{id}/vulnerabilities"
-        return VulnerabilityResults(self, {}, path=path)
+        return VulnerabilityDTOResults(self, {}, path=path)
 
     def recommendations(self, id: str) -> RecommendationResults:
         """Get security recommendations for a machine.

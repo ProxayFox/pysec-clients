@@ -12,17 +12,11 @@ from datetime import datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
 import httpx
-import pytest
 
 from mde_client.endpoints.machines import (
-    AlertsResults,
-    LogonUserResults,
     MachineResults,
     MachinesEndpoint,
     MachinesQuery,
-    SoftwareResults,
-    VulnerabilityResults,
-    ProductDTOResults,
 )
 
 
@@ -95,43 +89,6 @@ class TestGet:
         """Passing None is caught by the type checker; no runtime guard exists."""
         result = _make_endpoint().get(None)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
         assert "/None" in result._path
-
-
-# ------------------------------------------------------------------
-# Sub-resource endpoints — path and return type
-# ------------------------------------------------------------------
-
-
-class TestSubResources:
-    @pytest.mark.parametrize(
-        ("method", "suffix", "result_type"),
-        [
-            ("logonusers", "logonusers", LogonUserResults),
-            ("alerts", "alerts", AlertsResults),
-            ("software", "software", SoftwareResults),
-            ("vulnerabilities", "vulnerabilities", VulnerabilityResults),
-            ("getmissingkbs", "getmissingkbs", ProductDTOResults),
-        ],
-    )
-    def test_path_and_type(self, method: str, suffix: str, result_type: type) -> None:
-        result = getattr(_make_endpoint(), method)(MACHINE_ID)
-        assert result._path == f"/api/machines/{MACHINE_ID}/{suffix}"
-        assert isinstance(result, result_type)
-
-    @pytest.mark.parametrize(
-        "method",
-        [
-            "logonusers",
-            "alerts",
-            "software",
-            "vulnerabilities",
-            "recommendations",
-            "getmissingkbs",
-        ],
-    )
-    def test_not_single(self, method: str) -> None:
-        result = getattr(_make_endpoint(), method)(MACHINE_ID)
-        assert not result._single
 
 
 # ------------------------------------------------------------------

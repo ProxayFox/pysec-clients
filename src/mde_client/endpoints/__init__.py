@@ -50,6 +50,7 @@ if TYPE_CHECKING:
         BaselineConfigurationEndpoint,
         BaselineConfigurationResults,
     )
+    from .software import SoftwareEndpoint, SoftwareResults, DistributionDTOResults
 
 
 _NAME_TO_MODULE = {
@@ -89,6 +90,9 @@ _NAME_TO_MODULE = {
     "ScoreResults": "score",
     "BaselineConfigurationEndpoint": "securityBaseline",
     "BaselineConfigurationResults": "securityBaseline",
+    "SoftwareEndpoint": "software",
+    "SoftwareResults": "software",
+    "DistributionDTOResults": "software",
 }
 
 
@@ -162,4 +166,8 @@ __all__ = [
     # Security Baseline
     "BaselineConfigurationEndpoint",
     "BaselineConfigurationResults",
+    # Software
+    "SoftwareEndpoint",
+    "SoftwareResults",
+    "DistributionDTOResults",
 ]
