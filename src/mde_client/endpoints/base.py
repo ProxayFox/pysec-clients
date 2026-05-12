@@ -112,7 +112,8 @@ class BaseResults:
     a terminal method is called (e.g. ``to_dicts``, ``to_arrow``, ``to_polars``, ``refresh``).
     """
 
-    SCHEMA: pa.Schema
+    # Subclasses should override this with a Pydantic schema for the expected record shape, if desired.
+    SCHEMA: pa.Schema | None
 
     def __init__(
         self,

@@ -3,14 +3,11 @@ from __future__ import annotations
 import pyarrow as pa
 from datetime import datetime
 from httpx import HTTPStatusError
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from .base import BaseEndpoint, BaseResults, BaseQuery, BasePayload
 from ..schemas import INDICATOR_SCHEMA
 from ..models.enums import TI_INDICATOR_TYPE, TI_INDICATOR_ACTION, SEVERITY
-
-if TYPE_CHECKING:
-    pass
 
 
 class IndicatorsQuery(BaseQuery):
@@ -59,7 +56,7 @@ class ImportIndicatorResults(BaseResults):
     TODO: Fix the mde_contract.py script to generate this schema properly instead of using the same schema as for single indicator submission.
     """
 
-    SCHEMA: pa.Schema = pa.schema(
+    SCHEMA = pa.schema(
         [
             pa.field("id", pa.string()),
             pa.field("indicator", pa.string()),
