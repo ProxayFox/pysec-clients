@@ -23,6 +23,7 @@ if TYPE_CHECKING:
         MachinesEndpoint,
         RecommendationsEndpoint,
         RemediationEndpoint,
+        ScoreEndpoint,
     )
 
 
@@ -179,6 +180,12 @@ class MDEClient:
         from .endpoints import RemediationEndpoint
 
         return RemediationEndpoint(self._http, self._auth)
+
+    @property
+    def score(self) -> ScoreEndpoint:
+        from .endpoints import ScoreEndpoint
+
+        return ScoreEndpoint(self._http, self._auth)
 
     # ------------------------------------------------------------------
     # Lifecycle
