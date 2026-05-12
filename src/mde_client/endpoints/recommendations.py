@@ -3,16 +3,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .base import BaseEndpoint, BaseQuery, BaseResults
-from .machines import MachineReferencesResults
+
 from ..schemas import (
     RECOMMENDATION_SCHEMA,
-    PUBLIC_PRODUCT_DTO_SCHEMA,
 )
 from ..models.enums import PUBLIC_RECOMMENDATION_EXCEPTION_STATUS
 
 
 if TYPE_CHECKING:
     from .vulnerabilities import VulnerabilityDTOResults
+    from .machines import MachineReferencesResults
+    from .misc import ProductDTOResults
 
 
 class RecommendationQuery(BaseQuery):
@@ -39,15 +40,6 @@ class RecommendationResults(BaseResults):
     """Results from the /api/recommendations endpoint."""
 
     SCHEMA = RECOMMENDATION_SCHEMA
-
-
-class ProductDTOResults(BaseResults):
-    """Results from the /api/recommendations/{id}/software endpoint.
-
-    TODO: Move this schema into software.py once we're working on the software endpoint.
-    """
-
-    SCHEMA = PUBLIC_PRODUCT_DTO_SCHEMA
 
 
 class RecommendationsEndpoint(BaseEndpoint):
@@ -78,6 +70,8 @@ class RecommendationsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/list-recommendation-software
         """
+        from .misc import ProductDTOResults
+
         path = f"{self._PATH}/{id}/software"
         return ProductDTOResults(self, {}, path=path)
 
@@ -86,6 +80,8 @@ class RecommendationsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/list-recommendation-machine-references
         """
+        from .machines import MachineReferencesResults
+
         path = f"{self._PATH}/{id}/machinereferences"
         return MachineReferencesResults(self, {}, path=path)
 
