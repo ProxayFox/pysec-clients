@@ -53,7 +53,12 @@ if TYPE_CHECKING:
         BaselineConfigurationResults,
         AssetConfigurationResults,
     )
-    from .software import SoftwareEndpoint, SoftwareResults, DistributionDTOResults
+    from .software import (
+        SoftwareEndpoint,
+        SoftwareResults,
+        DistributionDTOResults,
+        AssetSoftwareResults,
+    )
     from .users import UserEndpoint, UserResults
     from .vulnerabilities import (
         VulnerabilityEndpoint,
@@ -104,6 +109,7 @@ _NAME_TO_MODULE = {
     "SoftwareEndpoint": "software",
     "SoftwareResults": "software",
     "DistributionDTOResults": "software",
+    "AssetSoftwareResults": "software",
     "UserEndpoint": "user",
     "UserResults": "user",
     "VulnerabilityEndpoint": "vulnerabilities",
@@ -191,6 +197,7 @@ __all__ = [
     "SoftwareEndpoint",
     "SoftwareResults",
     "DistributionDTOResults",
+    "AssetSoftwareResults",
     # User
     "UserEndpoint",
     "UserResults",

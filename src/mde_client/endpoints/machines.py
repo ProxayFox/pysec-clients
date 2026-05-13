@@ -57,7 +57,7 @@ if TYPE_CHECKING:
     from .misc import ProductDTOResults
     from .recommendations import RecommendationResults
     from .securityBaseline import AssetConfigurationResults
-    from .software import SoftwareResults
+    from .software import SoftwareResults, AssetSoftwareResults
     from .users import UserResults
     from .vulnerabilities import VulnerabilityDTOResults
 
@@ -554,6 +554,29 @@ class MachinesEndpoint(BaseEndpoint):
 
         path = f"{self._PATH}/SecureConfigurationsAssessmentExport"
         return AssetConfigurationResults(self, {}, path=path, files=True)
+
+    # === Software Related endpoints ===
+    def _softwareInventoryByMachine(
+        self, page_size: int = 50000, since: datetime | None = None
+    ) -> AssetSoftwareResults:
+        """Get software inventory records for a specific machine.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-software-inventory-by-machine
+        """
+        from .software import AssetSoftwareResults
+
+        path = f"{self._PATH}/SoftwareInventoryByMachine"
+        return AssetSoftwareResults(self, {}, path=path)
+
+    def _softwareInventoryExport(self) -> AssetSoftwareResults:
+        """Get software inventory records for a specific machine as a file.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-software-inventory-by-machine#2-export-software-inventory-by-machine-via-files
+        """
+        from .software import AssetSoftwareResults
+
+        path = f"{self._PATH}/SoftwareInventoryExport"
+        return AssetSoftwareResults(self, {}, path=path, files=True)
 
 
 class MachineNotFoundError(Exception):

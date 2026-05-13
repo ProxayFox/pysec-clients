@@ -6,6 +6,7 @@ from .base import BaseEndpoint, BaseResults, BaseQuery
 from ..schemas import (
     SOFTWARE_SCHEMA,
     PUBLIC_DISTRIBUTION_DTO_SCHEMA,
+    ASSET_SOFTWARE_SCHEMA,
 )
 
 if TYPE_CHECKING:
@@ -26,6 +27,12 @@ class SoftwareResults(BaseResults):
     """Results from the /api/Software endpoint."""
 
     SCHEMA = SOFTWARE_SCHEMA
+
+
+class AssetSoftwareResults(BaseResults):
+    """Results from the /api/Software/inventoryByMachine endpoint."""
+
+    SCHEMA = ASSET_SOFTWARE_SCHEMA
 
 
 class DistributionDTOResults(BaseResults):
@@ -88,3 +95,27 @@ class SoftwareEndpoint(BaseEndpoint):
 
         path = f"{self._PATH}/{id}/getmissingkbs"
         return ProductDTOResults(self, {}, path=path)
+
+    def inventoryByMachine(self, page_size: int = 50000) -> AssetSoftwareResults:
+        """Responds with all the data of installed software that has a Common Platform Enumeration(CPE), per device.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory#1-export-software-inventory-assessment-json-response
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(self._http, self._auth)._softwareInventoryByMachine(
+            page_size=page_size
+        )
+
+    def inventoryByMachineFiles(self) -> AssetSoftwareResults:
+        """Responds with all the data of installed software that has a Common Platform Enumeration(CPE), per device.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory#1-export-software-inventory-assessment-json-response
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(self._http, self._auth)._softwareInventoryExport()
