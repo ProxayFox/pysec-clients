@@ -991,11 +991,15 @@ wheels = [
 
 [[package]]
 name = "http-to-arrow"
-version = "0.1.0"
-source = { git = "https://github.com/ProxayFox/proxay-pylibs.git?subdirectory=src%2Fhttp_to_arrow#821f235f6d2c544d91cce3334e3b46657621fca4" }
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "polars" },
     { name = "pyarrow" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0b/8d/cf8b1437a81a74960520ac813c51f83faab2f65ca05070afb9fa848de1d8/http_to_arrow-0.1.2.tar.gz", hash = "sha256:2b9392417160fe49405b512e84fc3cb58315d1d4ba8b9d96b6d751a6edb537c5", size = 7151, upload-time = "2026-05-13T04:16:52.839Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/39/9e/74e2293f5444d981f34a131e6d5dae905848d65b8332d17b7044f94136eb/http_to_arrow-0.1.2-py3-none-any.whl", hash = "sha256:98b2c198dc83db45aee9e318dafe0d734d9d858da607be607596895ad9594708", size = 8101, upload-time = "2026-05-13T04:16:51.689Z" },
 ]
 
 [[package]]
@@ -1046,11 +1050,11 @@ wheels = [
 
 [[package]]
 name = "idna"
-version = "3.14"
+version = "3.15"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/05/b1/efac073e0c297ecf2fb33c346989a529d4e19164f1759102dee5953ee17e/idna-3.14.tar.gz", hash = "sha256:466d810d7a2cc1022bea9b037c39728d51ae7dad40d480fc9b7d7ecf98ba8ee3", size = 198272, upload-time = "2026-05-10T20:32:15.935Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/82/77/7b3966d0b9d1d31a36ddf1746926a11dface89a83409bf1483f0237aa758/idna-3.15.tar.gz", hash = "sha256:ca962446ea538f7092a95e057da437618e886f4d349216d2b1e294abfdb65fdc", size = 199245, upload-time = "2026-05-12T22:45:57.011Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6c/3c/3f62dee257eb3d6b2c1ef2a09d36d9793c7111156a73b5654d2c2305e5ce/idna-3.14-py3-none-any.whl", hash = "sha256:e677eaf072e290f7b725f9acf0b3a2bd55f9fd6f7c70abe5f0e34823d0accf69", size = 72184, upload-time = "2026-05-10T20:32:14.295Z" },
+    { url = "https://files.pythonhosted.org/packages/d2/23/408243171aa9aaba178d3e2559159c24c1171a641aa83b67bdd3394ead8e/idna-3.15-py3-none-any.whl", hash = "sha256:048adeaf8c2d788c40fee287673ccaa74c24ffd8dcf09ffa555a2fbb59f10ac8", size = 72340, upload-time = "2026-05-12T22:45:55.733Z" },
 ]
 
 [[package]]
@@ -1392,7 +1396,7 @@ polars = [
 [package.metadata]
 requires-dist = [
     { name = "aiohttp", specifier = ">=3.13.5" },
-    { name = "http-to-arrow", git = "https://github.com/ProxayFox/proxay-pylibs.git?subdirectory=src%2Fhttp_to_arrow" },
+    { name = "http-to-arrow", specifier = ">=0.1.2" },
     { name = "msal", specifier = ">=1.36.0" },
     { name = "orjson", specifier = ">=3.10.18" },
     { name = "polars", marker = "extra == 'polars'", specifier = ">=1.40.1" },
@@ -2346,15 +2350,15 @@ wheels = [
 
 [[package]]
 name = "python-discovery"
-version = "1.3.0"
+version = "1.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
     { name = "platformdirs" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ae/e0/cc5a8653e9a24f6cf84768f05064aa8ed5a83dcefd5e2a043db14a1c5f44/python_discovery-1.3.0.tar.gz", hash = "sha256:d098f1e86be5d45fe4d14bf1029294aabbd332f4321179dec85e76cddce834b0", size = 63925, upload-time = "2026-05-05T14:38:39.769Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/48/60/e88788207d81e46362cfbef0d4aaf4c0f49efc3c12d4c3fa3f542c34ebec/python_discovery-1.3.1.tar.gz", hash = "sha256:62f6db28064c9613e7ca76cb3f00c38c839a07c31c00dfe7ed0986493d2150a6", size = 68011, upload-time = "2026-05-12T20:53:36.336Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/d4/24d543ab8b8158b7f5a97113c831205f5c900c92c8762b1e7f44b7ea0405/python_discovery-1.3.0-py3-none-any.whl", hash = "sha256:441d9ced3dfce36e113beb35ca302c71c7ef06f3c0f9c227a0b9bb3bd49b9e9f", size = 33124, upload-time = "2026-05-05T14:38:38.539Z" },
+    { url = "https://files.pythonhosted.org/packages/b7/6f/a05a317a66fee0aad270011461f1a63a453ed12471249f172f7d2e2bc7b4/python_discovery-1.3.1-py3-none-any.whl", hash = "sha256:ed188687ebb3b82c01a17cd5ac62fc94d9f6487a7f1a0f9dfe89753fec91039c", size = 33185, upload-time = "2026-05-12T20:53:34.969Z" },
 ]
 
 [[package]]
@@ -2666,7 +2670,7 @@ wheels = [
 
 [[package]]
 name = "scalene"
-version = "2.2.1"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cloudpickle" },
@@ -2678,11 +2682,11 @@ dependencies = [
     { name = "pyyaml" },
     { name = "rich" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/66/fc/ed550649058e9ad4bc262039c2c146c92e4d5d0b9d305c7d33d709c151f5/scalene-2.2.1.tar.gz", hash = "sha256:642f809e34d84cae5712bbe8cca76450af81f2dc4c02762b714d1710160dd791", size = 9483401, upload-time = "2026-03-22T14:49:36.825Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/91/96/e2ea55e8d1d981fb2d0fe76c38c1d7ab7b91c2229176bbeed771b9da0f1f/scalene-2.3.0.tar.gz", hash = "sha256:57212ceeeeeef9891c344275592413f4b90fb407ecdec75b5b164f0eef2e6261", size = 9457857, upload-time = "2026-05-12T18:45:43.894Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/4b/38/6ee3bbd6eb983bf6f25427b4110b2f2d34359e78fbb02b79b4e9c11ca565/scalene-2.2.1-cp314-cp314-macosx_15_0_universal2.whl", hash = "sha256:7e13ceaaea670c385825b9b21b58596f86f4d0b6e2a0927eefa9dcbf1444380b", size = 1229918, upload-time = "2026-03-22T14:49:37.607Z" },
-    { url = "https://files.pythonhosted.org/packages/94/1a/0e7a49db2440c31e66479c93567cc4e4f0198dbe413699a2de9d2095a8e3/scalene-2.2.1-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:edb511df0097d3091b4967c70023698306e5fa2c75e9532216904b882e3bd02e", size = 1537041, upload-time = "2026-03-22T14:42:40.067Z" },
-    { url = "https://files.pythonhosted.org/packages/c8/13/a11f6b081c7235a66da71c5230adf5a7a87ef92a6cd98c659494ec20d22e/scalene-2.2.1-cp314-cp314-win_amd64.whl", hash = "sha256:8af3834504d3a4f4ebaa489bb9266563be818972c83a826337936b6809c145e7", size = 1165782, upload-time = "2026-03-22T14:45:13.804Z" },
+    { url = "https://files.pythonhosted.org/packages/64/59/53e513a6cd926e1b222491aa7105891f7b0b5f0fcfe713c8046769746358/scalene-2.3.0-cp314-cp314-macosx_15_0_universal2.whl", hash = "sha256:b8400014d4af47410f6ba5250e27f19f1addf0f534cef7013b1a7827170f5ea8", size = 1134328, upload-time = "2026-05-12T18:46:29.283Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/ad/99f345fb1030fb1eca7d9bc8bc77d52a642bb81dbd6efb7d599d490b2c9e/scalene-2.3.0-cp314-cp314-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:2c6acc3bb76e32dfbfc7a0fe75986cde8eb8e98cee2515aea541631d440bc465", size = 1495627, upload-time = "2026-05-12T18:46:01.128Z" },
+    { url = "https://files.pythonhosted.org/packages/1d/35/2c8ba0472df79511e3a903100d95348c6d3113d2e2fdca89e2ca5141f265/scalene-2.3.0-cp314-cp314-win_amd64.whl", hash = "sha256:dec3398f6166bbe65494241506745ed088395c6298d31394461bf7061729edef", size = 1054162, upload-time = "2026-05-12T18:49:17.465Z" },
 ]
 
 [[package]]
@@ -2802,15 +2806,15 @@ wheels = [
 
 [[package]]
 name = "sse-starlette"
-version = "3.4.3"
+version = "3.4.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
     { name = "starlette" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/64/13/3cafb96bceb02949f265bbdf1cbcea2810271ae709e4aa35e980f90c07fd/sse_starlette-3.4.3.tar.gz", hash = "sha256:a7f6d87cf482cf38b911c31075811c7f8b4efbada8ac9d5199a8e239fed513c9", size = 35247, upload-time = "2026-05-11T17:23:41.987Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f7/2b/58abc2d1fd397e7dde08e947e05c884d8ef2f78d5e2588c17a12d42d6994/sse_starlette-3.4.4.tar.gz", hash = "sha256:07e0fa0460138baf25cdd5fb28683472c3995dc1642225191b3832d62526bcb0", size = 31819, upload-time = "2026-05-12T17:37:17.019Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fe/a4/c888212b19dd432110d4a78dbc5e6c1bc7476e5fff2f2df2ea9f298b0003/sse_starlette-3.4.3-py3-none-any.whl", hash = "sha256:bf8a90d76192062f01b55095593606bfc7edd0e3ad481339a6e16e7890bc9367", size = 16514, upload-time = "2026-05-11T17:23:40.352Z" },
+    { url = "https://files.pythonhosted.org/packages/dc/67/805710444ea8cc75fbf70b920ed431a560c4bf9c57f7d5a3117213189399/sse_starlette-3.4.4-py3-none-any.whl", hash = "sha256:3f4dd50d8aed2771a091f3a83000323fc3844541c16b4fe585ae2420cc6df973", size = 16514, upload-time = "2026-05-12T17:37:15.601Z" },
 ]
 
 [[package]]
@@ -3030,7 +3034,7 @@ wheels = [
 
 [[package]]
 name = "virtualenv"
-version = "21.3.1"
+version = "21.3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "distlib" },
@@ -3038,9 +3042,9 @@ dependencies = [
     { name = "platformdirs" },
     { name = "python-discovery" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ec/0d/915c02c94d207b85580eb09bffab54438a709e7288524094fe781da526c2/virtualenv-21.3.1.tar.gz", hash = "sha256:c2305bc1fddeec40699b8370d13f8d431b0701f00ce895061ce493aeded4426b", size = 7613791, upload-time = "2026-05-05T01:34:31.402Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/69/e1/665267cea4767debd19f584667a9197c2098b5e7f67a502da9f3a086ab37/virtualenv-21.3.2.tar.gz", hash = "sha256:3ecda97894a6fc1c53106356f488690e5c86278c1f693f3fc0805ac85a513686", size = 7613810, upload-time = "2026-05-12T14:44:18.01Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b1/4f/f71e641e504111a5a74e3a20bc52d01bd86788b22699dd3fee1c63253cf6/virtualenv-21.3.1-py3-none-any.whl", hash = "sha256:d1a71cf58f2f9228fff23a1f6ec15d39785c6b32e03658d104974247145edd35", size = 7594539, upload-time = "2026-05-05T01:34:28.98Z" },
+    { url = "https://files.pythonhosted.org/packages/20/5b/885f479093f6627669d39b57bc3d4e674da532e1a4b247d473a61d8d2118/virtualenv-21.3.2-py3-none-any.whl", hash = "sha256:c58ea748fa50bb2a4367da5ba3d30b02458ed40b4ea888faad94021f3309f764", size = 7594558, upload-time = "2026-05-12T14:44:15.193Z" },
 ]
 
 [[package]]

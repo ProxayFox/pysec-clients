@@ -13,7 +13,7 @@ authors = [
 ]
 dependencies = [
     "aiohttp>=3.13.5",
-    "http-to-arrow",
+    "http-to-arrow>=0.1.2",
     "msal>=1.36.0",
     "orjson>=3.10.18",
     "requests>=2.33.1",
@@ -25,6 +25,3 @@ polars = ["polars>=1.40.1"]
 
 [tool.setuptools]
 package-dir = { "mde_client" = "." }
-
-[tool.uv.sources]
-http-to-arrow = { git = "https://github.com/ProxayFox/proxay-pylibs.git", subdirectory = "src/http_to_arrow" }

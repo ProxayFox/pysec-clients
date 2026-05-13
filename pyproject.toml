@@ -8,7 +8,9 @@ authors = [
     { name = "Proxay", email = "28168887+ProxayFox@users.noreply.github.com" },
 ]
 requires-python = ">=3.14"
-dependencies = ["mde-client[arrow,polars]"]
+dependencies = [
+    "mde-client[arrow,polars]",
+]
 
 [dependency-groups]
 dev = [
