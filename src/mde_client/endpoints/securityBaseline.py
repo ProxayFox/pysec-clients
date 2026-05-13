@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from .base import BaseEndpoint, BaseResults
-from ..schemas import BASELINE_CONFIGURATION_SCHEMA
+from ..schemas import BASELINE_CONFIGURATION_SCHEMA, ASSET_CONFIGURATION_SCHEMA
 
 if TYPE_CHECKING:
     from .machines import AssetBaselineAssessmentResults
@@ -13,6 +13,12 @@ class BaselineConfigurationResults(BaseResults):
     """Results from the /api/baselineConfigurations endpoint."""
 
     SCHEMA = BASELINE_CONFIGURATION_SCHEMA
+
+
+class AssetConfigurationResults(BaseResults):
+    """Results from the /api/assetConfigurations endpoint."""
+
+    SCHEMA = ASSET_CONFIGURATION_SCHEMA
 
 
 class BaselineConfigurationEndpoint(BaseEndpoint):
@@ -65,3 +71,35 @@ class BaselineConfigurationEndpoint(BaseEndpoint):
         """
         path = "/api/baselineConfigurations"
         return BaselineConfigurationResults(self, {}, path=path)
+
+    def assessmentByMachine(self) -> AssetConfigurationResults:
+        """Get the secure configuration assessment for a machine.
+
+        This response contains the Secure Configuration Assessment on your exposed devices,
+        and returns an entry for every unique combination of DeviceId, ConfigurationId.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config#1-export-secure-configuration-assessment-json-response
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(
+            self._http, self._auth
+        )._secureConfigurationsAssessmentByMachine()
+
+    def assessmentByMachineFiles(self) -> AssetConfigurationResults:
+        """Get the secure configuration assessment for a machine as a file.
+
+        This response contains the Secure Configuration Assessment on your exposed devices,
+        and returns an entry for every unique combination of DeviceId, ConfigurationId.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config#2-export-secure-configuration-assessment-via-files
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(
+            self._http, self._auth
+        )._secureConfigurationsAssessmentExport()

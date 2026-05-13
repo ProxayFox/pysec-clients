@@ -51,6 +51,7 @@ if TYPE_CHECKING:
     from .securityBaseline import (
         BaselineConfigurationEndpoint,
         BaselineConfigurationResults,
+        AssetConfigurationResults,
     )
     from .software import SoftwareEndpoint, SoftwareResults, DistributionDTOResults
     from .users import UserEndpoint, UserResults
@@ -99,6 +100,7 @@ _NAME_TO_MODULE = {
     "ScoreResults": "score",
     "BaselineConfigurationEndpoint": "securityBaseline",
     "BaselineConfigurationResults": "securityBaseline",
+    "AssetConfigurationResults": "securityBaseline",
     "SoftwareEndpoint": "software",
     "SoftwareResults": "software",
     "DistributionDTOResults": "software",
@@ -184,6 +186,7 @@ __all__ = [
     # Security Baseline
     "BaselineConfigurationEndpoint",
     "BaselineConfigurationResults",
+    "AssetConfigurationResults",
     # Software
     "SoftwareEndpoint",
     "SoftwareResults",

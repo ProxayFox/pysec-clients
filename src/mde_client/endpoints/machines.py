@@ -56,6 +56,7 @@ if TYPE_CHECKING:
     from .machineActions import MachineActionsResults
     from .misc import ProductDTOResults
     from .recommendations import RecommendationResults
+    from .securityBaseline import AssetConfigurationResults
     from .software import SoftwareResults
     from .users import UserResults
     from .vulnerabilities import VulnerabilityDTOResults
@@ -523,6 +524,36 @@ class MachinesEndpoint(BaseEndpoint):
         """
         path = f"{self._PATH}/BaselineComplianceAssessmentExport"
         return AssetBaselineAssessmentResults(self, {}, path=path, files=True)
+
+    def _secureConfigurationsAssessmentByMachine(self) -> AssetConfigurationResults:
+        """Get the secure configuration assessment for a machine.
+
+        This response contains the Secure Configuration Assessment on your exposed devices,
+        and returns an entry for every unique combination of DeviceId, ConfigurationId.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config#1-export-secure-configuration-assessment-json-response
+        """
+        from .securityBaseline import AssetConfigurationResults
+
+        path = f"{self._PATH}/SecureConfigurationsAssessmentByMachine"
+        return AssetConfigurationResults(self, {}, path=path)
+
+    def _secureConfigurationsAssessmentExport(self) -> AssetConfigurationResults:
+        """Get the secure configuration assessment for a machine as a file.
+
+        This response contains the Secure Configuration Assessment on your exposed devices,
+        and returns an entry for every unique combination of DeviceId, ConfigurationId.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config#2-export-secure-configuration-assessment-via-files
+        """
+        from .securityBaseline import AssetConfigurationResults
+
+        path = f"{self._PATH}/SecureConfigurationsAssessmentExport"
+        return AssetConfigurationResults(self, {}, path=path, files=True)
 
 
 class MachineNotFoundError(Exception):

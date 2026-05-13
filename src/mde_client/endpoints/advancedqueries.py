@@ -75,5 +75,8 @@ class AdvancedHuntingQueriesEndpoint(BaseEndpoint):
     _PATH = "/api/advancedqueries/run"
 
     def run(self, query: str) -> AdvancedHuntingQueriesResults:
-        """Run an advanced hunting query."""
+        """Run an advanced hunting query.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/run-advanced-query-api
+        """
         return AdvancedHuntingQueriesResults(self, self._PATH, query)
