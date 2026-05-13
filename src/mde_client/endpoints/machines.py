@@ -64,7 +64,11 @@ if TYPE_CHECKING:
         AssetNonCPESoftwareResults,
     )
     from .users import UserResults
-    from .vulnerabilities import VulnerabilityDTOResults
+    from .vulnerabilities import (
+        VulnerabilityDTOResults,
+        AssetVulnerabilityResults,
+        DeltaAssetVulnerabilityResults,
+    )
 
 log = logging.getLogger(__name__)
 
@@ -657,6 +661,54 @@ class MachinesEndpoint(BaseEndpoint):
 
         path = f"{self._PATH}/SoftwareInventoryNonCpeExport"
         return AssetNonCPESoftwareResults(self, {}, path=path, files=True)
+
+    # === Vulnerabilities Related Endpoints ===
+    def _softwareVulnerabilitiesByMachine(
+        self, page_size: int = 50000
+    ) -> AssetVulnerabilityResults:
+        """Get vulnerabilities for a machine with software references.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities#1-export-software-vulnerabilities-assessment-json-response
+        """
+        from .vulnerabilities import AssetVulnerabilityResults
+
+        params = MachinesExportQuery(page_size=page_size).to_odata_filters
+        path = f"{self._PATH}/SoftwareVulnerabilitiesByMachine"
+        return AssetVulnerabilityResults(self, params, path=path)
+
+    def _softwareVulnerabilitiesExport(self) -> AssetVulnerabilityResults:
+        """Get vulnerabilities for a machine with software references.
+
+        Same Results as `softwareVulnerabilitiesByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities#2-export-software-vulnerabilities-assessment-via-files
+        """
+        from .vulnerabilities import AssetVulnerabilityResults
+
+        path = f"{self._PATH}/SoftwareVulnerabilitiesExport"
+        return AssetVulnerabilityResults(self, {}, path=path, files=True)
+
+    def _softwareVulnerabilityChangesByMachine(
+        self, page_size: int = 50000, since: datetime | int | str | None = None
+    ) -> DeltaAssetVulnerabilityResults:
+        """Get vulnerabilities for a machine with software references.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities#3-delta-export-software-vulnerabilities-assessment-json-response
+        """
+        from .vulnerabilities import DeltaAssetVulnerabilityResults
+
+        params = MachinesExportQuery(
+            page_size=page_size, sinceTime=since
+        ).to_odata_filters
+        path = f"{self._PATH}/SoftwareVulnerabilityChangesByMachine"
+        return DeltaAssetVulnerabilityResults(self, params, path=path)
 
 
 class MachineNotFoundError(Exception):

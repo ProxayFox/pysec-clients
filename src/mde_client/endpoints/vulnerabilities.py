@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 from .base import BaseEndpoint, BaseResults, BaseQuery
 from ..schemas import (
     VULNERABILITY_SCHEMA,
+    ASSET_VULNERABILITY_SCHEMA,
+    DELTA_ASSET_VULNERABILITY_SCHEMA,
     PUBLIC_ASSET_VULNERABILITY_DTO_SCHEMA,
     PUBLIC_VULNERABILITY_DTO_SCHEMA,
 )
@@ -43,6 +45,18 @@ class VulnerabilityResults(BaseResults):
     """Results from the /api/vulnerabilities endpoint."""
 
     SCHEMA = VULNERABILITY_SCHEMA
+
+
+class AssetVulnerabilityResults(BaseResults):
+    """Results from the /api/machines/SoftwareVulnerabilitiesByMachine endpoint."""
+
+    SCHEMA = ASSET_VULNERABILITY_SCHEMA
+
+
+class DeltaAssetVulnerabilityResults(BaseResults):
+    """Results from the /api/machines/SoftwareVulnerabilityChangesByMachine endpoint with delta query parameters."""
+
+    SCHEMA = DELTA_ASSET_VULNERABILITY_SCHEMA
 
 
 class VulnerabilitiesByMachineAndSoftwareResults(BaseResults):
@@ -99,3 +113,43 @@ class VulnerabilityEndpoint(BaseEndpoint):
         """
         path = f"{self._PATH}/machinesVulnerabilities"
         return VulnerabilitiesByMachineAndSoftwareResults(self, {}, path=path)
+
+    def softwareVulnerabilitiesByMachine(self) -> AssetVulnerabilityResults:
+        """Get vulnerabilities for a machine with software references.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities#1-export-software-vulnerabilities-assessment-json-response
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(
+            self._http, self._auth
+        )._softwareVulnerabilitiesByMachine()
+
+    def softwareVulnerabilitiesByMachineFiles(self) -> AssetVulnerabilityResults:
+        """Get vulnerabilities for a machine with software references.
+
+        Same Results as `softwareVulnerabilitiesByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities#2-export-software-vulnerabilities-assessment-via-files
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(self._http, self._auth)._softwareVulnerabilitiesExport()
+
+    def softwareVulnerabilityChangesByMachine(self) -> DeltaAssetVulnerabilityResults:
+        """Get vulnerabilities for a machine with software references.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-vulnerabilities#3-delta-export-software-vulnerabilities-assessment-json-response
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(
+            self._http, self._auth
+        )._softwareVulnerabilityChangesByMachine()

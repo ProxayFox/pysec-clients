@@ -65,6 +65,8 @@ if TYPE_CHECKING:
         VulnerabilityEndpoint,
         VulnerabilityResults,
         VulnerabilityDTOResults,
+        AssetVulnerabilityResults,
+        DeltaAssetVulnerabilityResults,
     )
 
 _NAME_TO_MODULE = {
@@ -117,6 +119,8 @@ _NAME_TO_MODULE = {
     "VulnerabilityEndpoint": "vulnerabilities",
     "VulnerabilityResults": "vulnerabilities",
     "VulnerabilityDTOResults": "vulnerabilities",
+    "AssetVulnerabilityResults": "vulnerabilities",
+    "DeltaAssetVulnerabilityResults": "vulnerabilities",
 }
 
 
@@ -208,4 +212,6 @@ __all__ = [
     "VulnerabilityEndpoint",
     "VulnerabilityResults",
     "VulnerabilityDTOResults",
+    "AssetVulnerabilityResults",
+    "DeltaAssetVulnerabilityResults",
 ]
