@@ -22,7 +22,7 @@ import asyncio
 import pyarrow as pa
 import polars as pl
 import orjson
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Any
 from collections.abc import Iterator
 from pydantic import BaseModel, ConfigDict, Field
@@ -47,6 +47,7 @@ class BaseQuery(BaseModel):
     page_size: int | None = Field(default=10000, ge=1, le=10000)
     top: int | None = Field(default=None, ge=1, le=10000)
     skip: int | None = Field(default=None, ge=0)
+    sinceTime: datetime | int | str | None = None
     # TODO: custom_query: str | list[str] | None = None
 
     @property
@@ -64,9 +65,32 @@ class BaseQuery(BaseModel):
             params["$top"] = str(self.top)
         if self.skip is not None:
             params["$skip"] = str(self.skip)
+        match self.sinceTime:
+            case int() as days:
+                dateTime = (
+                    datetime.now(tz=timezone.utc) - timedelta(days=days)
+                ).isoformat()
+            case datetime():
+                if self.sinceTime.tzinfo is None:
+                    dateTime = self.sinceTime.replace(tzinfo=timezone.utc).isoformat()
+                else:
+                    dateTime = self.sinceTime.astimezone(timezone.utc).isoformat()
+            case str() as s:
+                dateTime = s.replace("'", "''")
+            case None:
+                dateTime = None
+            case _:
+                raise TypeError(
+                    str(
+                        f"Unsupported type for 'sinceTime' field: {type(self.sinceTime)}, value: {self.sinceTime}"
+                        "\nRaise an issue if you need support for this type."
+                    )
+                )
+        if dateTime is not None:
+            params["sinceTime"] = dateTime
 
         for field, value in self.model_dump(
-            exclude={"page_size", "top", "skip"}
+            exclude={"page_size", "top", "skip", "sinceTime"}
         ).items():
             match value:
                 case str():
@@ -92,6 +116,36 @@ class BaseQuery(BaseModel):
             params["$filter"] = " and ".join(filter_list)
 
         return params
+
+    def to_datetime_format(
+        self, format: str = "%Y-%m-%d", regex: str | None = None
+    ) -> BaseQuery:
+        """Converts the sinceTime field to a string in the specified format, if it is not already a string."""
+        from re import match
+
+        match self.sinceTime:
+            case int() as days:
+                self.sinceTime = (
+                    datetime.now(tz=timezone.utc) - timedelta(days=days)
+                ).strftime(format)
+            case datetime():
+                if self.sinceTime.tzinfo is None:
+                    self.sinceTime = self.sinceTime.replace(
+                        tzinfo=timezone.utc
+                    ).strftime(format)
+                else:
+                    self.sinceTime = self.sinceTime.astimezone(timezone.utc).strftime(
+                        format
+                    )
+            case str() as s:
+                if regex is not None and not match(regex, s):
+                    raise ValueError(
+                        f"String value for 'sinceTime' must match regex: {regex}"
+                    )
+                self.sinceTime = s
+            case _:
+                pass
+        return self
 
 
 class BasePayload(BaseModel):
