@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import logging
 
+from pydantic import Field
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
@@ -57,7 +58,11 @@ if TYPE_CHECKING:
     from .misc import ProductDTOResults
     from .recommendations import RecommendationResults
     from .securityBaseline import AssetConfigurationResults
-    from .software import SoftwareResults, AssetSoftwareResults
+    from .software import (
+        SoftwareResults,
+        AssetSoftwareResults,
+        AssetNonCPESoftwareResults,
+    )
     from .users import UserResults
     from .vulnerabilities import VulnerabilityDTOResults
 
@@ -92,6 +97,15 @@ class MachinesQuery(BaseQuery):
     osPlatform: str | list[str] | None = None
     riskScore: RISK_SCORE | list[RISK_SCORE] | None = None
     rbacGroupId: str | list[str] | None = None
+
+
+class MachinesExportQuery(BaseQuery):
+    """Query parameters for machines export endpoints.
+
+    See `MachinesEndpoint._baselineComplianceAssessmentExport` for an example of usage.
+    """
+
+    page_size: int | None = Field(default=50_000, ge=1, le=200_000)
 
 
 class AssetBaselineAssessmentResults(BaseResults):
@@ -577,6 +591,48 @@ class MachinesEndpoint(BaseEndpoint):
 
         path = f"{self._PATH}/SoftwareInventoryExport"
         return AssetSoftwareResults(self, {}, path=path, files=True)
+
+    def _softwareInventoryNoProductCodeByMachine(
+        self, page_size: int = 50000, since: datetime | int | str | None = None
+    ) -> AssetNonCPESoftwareResults:
+        """Get software inventory records that do not have a product code for a specific machine.
+
+        Args:
+            page_size(int): Pagination size for the results. Default is 50k, Max is 200k.
+            since(datetime | int | str | None):
+                - datetime: The datetime object representing the that date and forward
+                - int: Number of days to look back from now (e.g. since=30 returns records seen in the last 30 days)
+                - str: Needs to look like "2024-01-01" - Year-Month-Day format, representing that date and forward
+                - None: No time-based filtering, return all records regardless of when they were seen.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-non-cpe-software-inventory
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-non-cpe-software-inventory#1-export-non-product-code-software-inventory-assessment-json-response
+        """
+        from .software import AssetNonCPESoftwareResults
+
+        params = (
+            MachinesExportQuery(page_size=page_size, sinceTime=since)
+            .to_datetime_format(regex=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
+            .to_odata_filters
+        )
+        path = f"{self._PATH}/SoftwareInventoryNoProductCodeByMachine"
+        return AssetNonCPESoftwareResults(self, params, path=path)
+
+    def _softwareInventoryNonCpeExport(self) -> AssetNonCPESoftwareResults:
+        """Get software inventory records that do not have a product code for a specific machine exported from files.
+
+        Same Results as `_softwareInventoryNoProductCodeByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-non-cpe-software-inventory
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-non-cpe-software-inventory#2-export-non-product-code-software-inventory-assessment-via-files
+        """
+        from .software import AssetNonCPESoftwareResults
+
+        path = f"{self._PATH}/SoftwareInventoryNonCpeExport"
+        return AssetNonCPESoftwareResults(self, {}, path=path, files=True)
 
 
 class MachineNotFoundError(Exception):

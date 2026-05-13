@@ -58,6 +58,7 @@ if TYPE_CHECKING:
         SoftwareResults,
         DistributionDTOResults,
         AssetSoftwareResults,
+        AssetNonCPESoftwareResults,
     )
     from .users import UserEndpoint, UserResults
     from .vulnerabilities import (
@@ -110,6 +111,7 @@ _NAME_TO_MODULE = {
     "SoftwareResults": "software",
     "DistributionDTOResults": "software",
     "AssetSoftwareResults": "software",
+    "AssetNonCPESoftwareResults": "software",
     "UserEndpoint": "user",
     "UserResults": "user",
     "VulnerabilityEndpoint": "vulnerabilities",
@@ -198,6 +200,7 @@ __all__ = [
     "SoftwareResults",
     "DistributionDTOResults",
     "AssetSoftwareResults",
+    "AssetNonCPESoftwareResults",
     # User
     "UserEndpoint",
     "UserResults",

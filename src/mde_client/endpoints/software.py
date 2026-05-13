@@ -7,9 +7,11 @@ from ..schemas import (
     SOFTWARE_SCHEMA,
     PUBLIC_DISTRIBUTION_DTO_SCHEMA,
     ASSET_SOFTWARE_SCHEMA,
+    ASSET_NON_CPE_SOFTWARE_SCHEMA,
 )
 
 if TYPE_CHECKING:
+    from datetime import datetime
     from .machines import MachineReferencesResults
     from .vulnerabilities import VulnerabilityDTOResults
     from .misc import ProductDTOResults
@@ -39,6 +41,12 @@ class DistributionDTOResults(BaseResults):
     """Results from the /api/Software/{id}/distributions endpoint."""
 
     SCHEMA = PUBLIC_DISTRIBUTION_DTO_SCHEMA
+
+
+class AssetNonCPESoftwareResults(BaseResults):
+    """Results from the /api/Software/inventoryNoProductCodeByMachine endpoint."""
+
+    SCHEMA = ASSET_NON_CPE_SOFTWARE_SCHEMA
 
 
 class SoftwareEndpoint(BaseEndpoint):
@@ -119,3 +127,34 @@ class SoftwareEndpoint(BaseEndpoint):
         from .machines import MachinesEndpoint
 
         return MachinesEndpoint(self._http, self._auth)._softwareInventoryExport()
+
+    def inventoryNoProductCodeByMachine(
+        self, page_size: int = 50000, since: datetime | int | str | None = None
+    ) -> AssetNonCPESoftwareResults:
+        """Responds with all the data of installed software that does not have a Common Platform Enumeration(CPE), per device.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory#1-export-software-inventory-assessment-json-response
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(
+            self._http, self._auth
+        )._softwareInventoryNoProductCodeByMachine(page_size=page_size, since=since)
+
+    def inventoryNoProductCodeByMachineFiles(
+        self, page_size: int = 50000, since: datetime | int | str | None = None
+    ) -> AssetNonCPESoftwareResults:
+        """Responds with all the data of installed software that does not have a Common Platform Enumeration(CPE), per device.
+
+        Same Results as `inventoryNoProductCodeByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory#2-export-software-inventory-assessment-via-files
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(self._http, self._auth)._softwareInventoryNonCpeExport()
