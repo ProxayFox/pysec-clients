@@ -190,6 +190,9 @@ class DeviceAVHealthEndpoint(BaseEndpoint):
     def get_all_files(self) -> DeviceAVHealthResults:
         """Get device AV health report as a file.
 
+        Same Results as `get_all` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api
             - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api#2-export-health-reporting-via-files

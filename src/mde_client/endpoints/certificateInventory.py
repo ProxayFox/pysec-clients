@@ -39,6 +39,9 @@ class CertificateInventoryEndpoint(BaseEndpoint):
     def get_all_files(self) -> CertificateInventoryResults:
         """Get the certificate inventory for a machine as a file.
 
+        Same Results as `get_all` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment#2-export-certificate-assessment-via-files

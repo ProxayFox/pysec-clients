@@ -120,6 +120,9 @@ class SoftwareEndpoint(BaseEndpoint):
     def inventoryByMachineFiles(self) -> AssetSoftwareResults:
         """Responds with all the data of installed software that has a Common Platform Enumeration(CPE), per device.
 
+        Same Results as `inventoryByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory#1-export-software-inventory-assessment-json-response

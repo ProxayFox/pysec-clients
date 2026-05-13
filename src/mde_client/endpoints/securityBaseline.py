@@ -43,8 +43,8 @@ class BaselineConfigurationEndpoint(BaseEndpoint):
     def get_all_files(self) -> AssetBaselineAssessmentResults:
         """Get the security baseline compliance assessment for a machine as a file.
 
-        Returns all security baselines assessments for all devices, on a per-device basis.\n
-        It returns a table with a separate entry for every unique combination of DeviceId, ProfileId, ConfigurationId.
+        Same Results as `get_all` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
 
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-security-baseline-assessment
@@ -91,8 +91,8 @@ class BaselineConfigurationEndpoint(BaseEndpoint):
     def assessmentByMachineFiles(self) -> AssetConfigurationResults:
         """Get the secure configuration assessment for a machine as a file.
 
-        This response contains the Secure Configuration Assessment on your exposed devices,
-        and returns an entry for every unique combination of DeviceId, ConfigurationId.
+        Same Results as `assessmentByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
 
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config

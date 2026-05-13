@@ -266,6 +266,9 @@ class MachinesEndpoint(BaseEndpoint):
     def _browserextensionsinventoryExport(self) -> BrowserExtensionResults:
         """Get browser extensions for a machine.
 
+        Same Results as `_browserExtensionsInventoryByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions#2-export-browser-extension-assessment-via-files
@@ -291,6 +294,9 @@ class MachinesEndpoint(BaseEndpoint):
     def _certificateAssessmentExport(self) -> CertificateInventoryResults:
         """Get the certificate inventory for a machine as a file.
 
+        Same Results as `_certificateAssessmentByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-certificate-inventory-assessment#2-export-certificate-assessment-via-files
@@ -303,6 +309,9 @@ class MachinesEndpoint(BaseEndpoint):
     # === Device AV Health related endpoints ===
     def _infoGatheringExport(self) -> DeviceAVHealthResults:
         """Get device AV health report as a file.
+
+        Same Results as `DeviceAVHealthEndpoint.get_all()` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
 
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api
@@ -529,8 +538,8 @@ class MachinesEndpoint(BaseEndpoint):
     def _baselineComplianceAssessmentExport(self) -> AssetBaselineAssessmentResults:
         """Get the security baseline compliance assessment for a machine as a file.
 
-        Returns all security baselines assessments for all devices, on a per-device basis.\n
-        It returns a table with a separate entry for every unique combination of DeviceId, ProfileId, ConfigurationId.
+        Same Results as `_baselineComplianceAssessmentByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
 
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/export-security-baseline-assessment
@@ -557,8 +566,8 @@ class MachinesEndpoint(BaseEndpoint):
     def _secureConfigurationsAssessmentExport(self) -> AssetConfigurationResults:
         """Get the secure configuration assessment for a machine as a file.
 
-        This response contains the Secure Configuration Assessment on your exposed devices,
-        and returns an entry for every unique combination of DeviceId, ConfigurationId.
+        Same Results as `_secureConfigurationsAssessmentByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
 
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-secure-config
@@ -571,21 +580,36 @@ class MachinesEndpoint(BaseEndpoint):
 
     # === Software Related endpoints ===
     def _softwareInventoryByMachine(
-        self, page_size: int = 50000, since: datetime | None = None
+        self, page_size: int = 50000, since: datetime | int | None = None
     ) -> AssetSoftwareResults:
         """Get software inventory records for a specific machine.
 
-        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-software-inventory-by-machine
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory#1-export-software-inventory-assessment-json-response
         """
         from .software import AssetSoftwareResults
 
+        if isinstance(since, int):
+            since = datetime.fromtimestamp(since, tz=timezone.utc)
+
+        params = (
+            MachinesExportQuery(page_size=page_size, sinceTime=since)
+            .to_datetime_format(regex=r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
+            .to_odata_filters
+        )
         path = f"{self._PATH}/SoftwareInventoryByMachine"
-        return AssetSoftwareResults(self, {}, path=path)
+        return AssetSoftwareResults(self, params, path=path)
 
     def _softwareInventoryExport(self) -> AssetSoftwareResults:
         """Get software inventory records for a specific machine as a file.
 
-        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-software-inventory-by-machine#2-export-software-inventory-by-machine-via-files
+        Same Results as `_softwareInventoryByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
+        **Docs:**
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory
+            - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-software-inventory#1-export-software-inventory-assessment-json-response
         """
         from .software import AssetSoftwareResults
 
