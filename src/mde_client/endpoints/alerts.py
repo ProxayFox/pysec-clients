@@ -183,7 +183,7 @@ class AlertsEndpoint(BaseEndpoint):
         """
         from .machines import MachineResults
 
-        path = f"{self._PATH}/{id}/machines"
+        path = f"{self._PATH}/{id}/machine"
         return MachineResults(self, {}, path=path)
 
     def user(self, id: str) -> UserResults:
