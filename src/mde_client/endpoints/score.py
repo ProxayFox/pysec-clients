@@ -21,7 +21,7 @@ class ScoreEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-exposure-score
         """
-        return ScoreResults(self, {})
+        return ScoreResults(self, {}, single=True)
 
     def byMachineGroups(self) -> ScoreResults:
         """Retrieves the exposure score for each machine group.

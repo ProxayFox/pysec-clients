@@ -26,5 +26,9 @@
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
-    "python.terminal.useEnvFile": true
+    "python.terminal.useEnvFile": true,
+    "markdownlint.config": {
+        "MD060": false,
+        "MD033": false
+    }
 }
