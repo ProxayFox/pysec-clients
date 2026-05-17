@@ -349,7 +349,9 @@ class BaseEndpoint:
 
     async def _arequest(self, method: str, path: str, **kwargs) -> httpx.Response:
         """Make an authenticated async request, refreshing the token as needed."""
-        async with httpx.AsyncClient(base_url=self._http.base_url) as client:
+        async with httpx.AsyncClient(
+            base_url=self._http.base_url, timeout=self._http.timeout
+        ) as client:
             return await client.request(
                 method,
                 path,
