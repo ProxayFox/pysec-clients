@@ -25,7 +25,7 @@ from ..schemas import ASSET_BROWSER_EXTENSION_SCHEMA, BROWSER_EXTENSIONS_SCHEMA
 
 
 class BrowserExtensionsPermissionsInfoQuery(BaseQuery):
-    """OData query parameters for the api/browserextensions/permissionsinfo endpoint."""
+    """OData query parameters for the api/browserExtensions/permissionsinfo endpoint."""
 
     id: str | None = None
     name: str | None = None
@@ -43,7 +43,7 @@ class BrowserExtensionResults(BaseResults):
 
 
 class BrowserExtensionsPermissionsInfoResults(BaseResults):
-    """Results from the /api/browserextensions/permissionsinfo endpoint."""
+    """Results from the /api/browserExtensions/permissionsinfo endpoint."""
 
     SCHEMA = BROWSER_EXTENSIONS_SCHEMA
 
@@ -51,7 +51,7 @@ class BrowserExtensionsPermissionsInfoResults(BaseResults):
 class BrowserExtensionEndpoint(BaseEndpoint):
     """Client for browser extension inventory endpoints."""
 
-    _PATH = "/api/browserextensions"
+    _PATH = "/api/browserExtensions"
 
     def get_all(self) -> BrowserExtensionResults:
         """Get All Browser Extensions for a machine.

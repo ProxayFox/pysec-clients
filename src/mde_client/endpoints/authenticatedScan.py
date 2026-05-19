@@ -144,6 +144,14 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
         params = query.to_odata_filters if query else {}
         return AuthenticatedDefinitionsResults(self, params)
 
+    def get(self, id: str) -> AuthenticatedDefinitionsResults:
+        """Get a single authenticated scan definition by ID.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-scan-definition-by-id
+        """
+        path = f"{self._PATH}/{id}"
+        return AuthenticatedDefinitionsResults(self, {}, path=path, single=True)
+
     def definition_history(
         self,
         ids: str | list[str],
@@ -227,9 +235,11 @@ class AuthenticatedDefinitionsEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition
             - https://learn.microsoft.com/en-us/defender-endpoint/api/add-a-new-scan-definition#example-request-to-delete-scans
         """
+        path = f"{self._PATH}/BatchDelete"
         return AuthenticatedDefinitionsResults(
             self,
             {},
+            path=path,
             method="POST",
             request_kwargs={"json": {"ScanDefinitionIds": self._id_list(ids)}},
         )

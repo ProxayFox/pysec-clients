@@ -48,13 +48,13 @@ class LibraryFilesUpdatePayload(BasePayload):
 
 
 class LibraryFilesResults(BaseResults):
-    """Results from the /api/libraryfiles endpoint."""
+    """Results from the /api/libraryFiles endpoint."""
 
     SCHEMA = LIBRARY_FILES_SCHEMA
 
 
 class LibraryFilesEndpoint(BaseEndpoint):
-    """Endpoint for /api/libraryfiles."""
+    """Endpoint for /api/libraryFiles."""
 
     _PATH = "/api/libraryfiles"
 

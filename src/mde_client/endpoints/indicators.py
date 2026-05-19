@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import pyarrow as pa
 from datetime import datetime
-from httpx import HTTPStatusError
+from httpx import HTTPStatusError, Response
 from typing import cast
 
 from .base import BaseEndpoint, BaseResults, BaseQuery, BasePayload
 from ..schemas import INDICATOR_SCHEMA
+from ..models.action_payloads import BatchUpdateIndicatorPayload
 from ..models.enums import TI_INDICATOR_TYPE, TI_INDICATOR_ACTION, SEVERITY
 
 
@@ -80,6 +81,14 @@ class IndicatorsEndpoint(BaseEndpoint):
         params = query.to_odata_filters if query else {}
         return IndicatorsResults(self, params)
 
+    def get(self, id: str) -> IndicatorsResults:
+        """Get a single indicator by ID.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-ti-indicator-by-id
+        """
+        path = f"{self._PATH}/{id}"
+        return IndicatorsResults(self, {}, path=path, single=True)
+
     def submit(self, payload: IndicatorsSubmitPayload) -> IndicatorsResults:
         """Submit a new indicator.
 
@@ -124,6 +133,18 @@ class IndicatorsEndpoint(BaseEndpoint):
             method="POST",
             path=path,
             request_kwargs={"json": trf_payload},
+        )
+
+    def batch_update(self, payload: BatchUpdateIndicatorPayload) -> Response:
+        """Batch update indicators.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/batch-update-ti-indicators
+        """
+        path = f"{self._PATH}/batchUpdate"
+        return self._request(
+            "POST",
+            path,
+            json=payload.model_dump(exclude_none=True),
         )
 
     def delete(self, id: str) -> bool:

@@ -64,12 +64,44 @@ class BaselineConfigurationEndpoint(BaseEndpoint):
         path = "/api/baselineProfiles"
         return BaselineConfigurationResults(self, {}, path=path)
 
+    def profilesById(self, id: str) -> BaselineConfigurationResults:
+        """Retrieves a specific security baselines assessment profile by its ID.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-security-baselines-assessment-profiles
+        """
+        path = f"/api/baselineProfiles/{id}"
+        return BaselineConfigurationResults(self, {}, path=path)
+
     def active(self) -> BaselineConfigurationResults:
         """Retrieves a list of the configurations being assessed in active baseline profiles.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-security-baselines-assessment-configurations
         """
         path = "/api/baselineConfigurations"
+        return BaselineConfigurationResults(self, {}, path=path)
+
+    def activeById(self, id: str) -> BaselineConfigurationResults:
+        """Retrieves a specific security baseline assessment active by its ID.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-security-baselines-assessment-configurations
+        """
+        path = f"/api/baselineConfigurations/{id}"
+        return BaselineConfigurationResults(self, {}, path=path)
+
+    def exceptions(self) -> BaselineConfigurationResults:
+        """Retrieves a list of all security baseline assessment exceptions.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = "/api/baselineExceptions"
+        return BaselineConfigurationResults(self, {}, path=path)
+
+    def exceptionsById(self, id: str) -> BaselineConfigurationResults:
+        """Retrieves a specific security baseline assessment exception by its ID.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"/api/baselineExceptions/{id}"
         return BaselineConfigurationResults(self, {}, path=path)
 
     def assessmentByMachine(self) -> AssetConfigurationResults:

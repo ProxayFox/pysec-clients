@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from .base import BaseEndpoint, BaseQuery, BaseResults
 from .machines import MachinesEndpoint
-from ..schemas import MACHINE_ACTION_SCHEMA
+from ..schemas import MACHINE_ACTION_SCHEMA, ACTION_AVAILABILITY_STATUS_SCHEMA
 from ..models.enums import ACTION_TYPE, ACTION_STATUS
 
 if TYPE_CHECKING:
@@ -40,6 +40,12 @@ class MachineActionsResults(BaseResults):
     SCHEMA = MACHINE_ACTION_SCHEMA
 
 
+class ActionAvailabilityStatusResults(BaseResults):
+    """Results from the /api/machines/{id}/availableMachineActions endpoint."""
+
+    SCHEMA = ACTION_AVAILABILITY_STATUS_SCHEMA
+
+
 class MachineActionsEndpoint(BaseEndpoint):
     """Endpoint for /api/machineactions"""
 
@@ -62,6 +68,13 @@ class MachineActionsEndpoint(BaseEndpoint):
         """
         path = f"{self._PATH}/{id}"
         return MachineActionsResults(self, {}, path=path)
+
+    def availableMachineActions(self, id: str) -> ActionAvailabilityStatusResults:
+        """Get available machine actions for a machine
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        return MachinesEndpoint(self._http, self._auth)._availableMachineActions(id)
 
     def collectInvestigationPackage(
         self, device_id: str, payload: CollectInvestigationPackagePayload

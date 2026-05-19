@@ -27,6 +27,7 @@ from ..schemas import (
     MACHINE_SCHEMA,
     PUBLIC_ASSET_DTO_SCHEMA,
     ASSET_BASELINE_ASSESSMENT_SCHEMA,
+    DLP_MACHINE_SCHEMA,
 )
 from ..models.enums import (
     DEVICE_VALUE,
@@ -47,14 +48,16 @@ from ..models.action_payloads import (
     UnrestrictCodeExecutionPayload,
     RunAntiVirusScanPayload,
     OffBoardPayload,
+    AddOrRemoveTagForMultipleMachinesPayload,
 )
 
 if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionResults
     from .certificateInventory import CertificateInventoryResults
     from .deviceAvHealth import DeviceAVHealthResults
+    from .firmware import FirmwareResults, AssetHardwareFirmwareResults
     from .investigations import InvestigationResults
-    from .machineActions import MachineActionsResults
+    from .machineActions import MachineActionsResults, ActionAvailabilityStatusResults
     from .misc import ProductDTOResults
     from .recommendations import RecommendationResults
     from .securityBaseline import AssetConfigurationResults
@@ -130,6 +133,12 @@ class MachineResults(BaseResults):
     SCHEMA = MACHINE_SCHEMA
 
 
+class DlpMachineResults(BaseResults):
+    """Results from the /api/machines/dlp endpoint."""
+
+    SCHEMA = DLP_MACHINE_SCHEMA
+
+
 class MachinesEndpoint(BaseEndpoint):
     """Client for the /api/machines endpoint.
     This is not intended to be used directly. Instead, used through MDEClient.machines.
@@ -154,6 +163,16 @@ class MachinesEndpoint(BaseEndpoint):
         """
         params = query.to_odata_filters if query else {}
         return MachineResults(self, params)
+
+    def bigPageSize(self) -> MachineResults:
+        """Get all machines with a big page size, with optional filtering.
+
+        This method is identical to `get_all` but sets the page size to 200,000 (the maximum allowed) to reduce the number of requests needed for larger data sets.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machines
+        """
+        path = f"{self._PATH}/bigPageSize"
+        return MachineResults(self, {}, path=path)
 
     def get(self, id: str) -> MachineResults:
         """Get machine by ID
@@ -234,7 +253,9 @@ class MachinesEndpoint(BaseEndpoint):
             else timestamp.replace(tzinfo=timezone.utc)
         )
         timestamp_iso = timestamp_utc.isoformat().replace("+00:00", "Z")
-        path = f"{self._PATH}/findbyip(ip='{ip}',timestamp={timestamp_iso})"
+        payload = f"(ip='{ip}',timestamp={timestamp_iso})"
+        path = f"{self._PATH}/findbyip"
+        path = path + payload
         return MachineResults(self, {}, path=path)
 
     def tag(self, tag: str, useStartsWithFilter: bool = False) -> MachineResults:
@@ -252,6 +273,38 @@ class MachinesEndpoint(BaseEndpoint):
             "useStartsWithFilter": str(useStartsWithFilter).lower(),
         }
         return MachineResults(self, params, path=path)
+
+    def unTaggedMachines(self) -> MachineResults:
+        """Get untagged machines
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/unTaggedMachines"
+        return MachineResults(self, {}, path=path)
+
+    def addOrRemoveTagForMultipleMachines(
+        self, payload: AddOrRemoveTagForMultipleMachinesPayload
+    ) -> MachineResults:
+        """Add or remove a tag for multiple machines
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/addOrRemoveTagForMultipleMachines"
+        return MachineResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def dlp(self) -> DlpMachineResults:
+        """Get Data Loss Prevention (DLP) events for a machine.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/dlp"
+        return DlpMachineResults(self, {}, path=path)
 
     # === Browser Extension related endpoints ===
     # Browser Extension endpoints are on the MachinesEndpoint, intended to use the browserExtensions() method to access, but we can also expose them here if needed.
@@ -326,7 +379,51 @@ class MachinesEndpoint(BaseEndpoint):
         path = f"{self._PATH}/InfoGatheringExport"
         return DeviceAVHealthResults(self, {}, path=path, files=True)
 
+    # === Firmware related endpoints ===
+    def _deviceFirmware(self, id: str) -> FirmwareResults:
+        """Get device firmware information for a machine.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .firmware import FirmwareResults
+
+        path = f"{self._PATH}/{id}/firmware"
+        return FirmwareResults(self, {}, path=path)
+
+    def _firmwareInventoryByMachine(self) -> AssetHardwareFirmwareResults:
+        """Get the firmware inventory for machines.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .firmware import AssetHardwareFirmwareResults
+
+        path = f"{self._PATH}/hardwareFirmwareInventoryByMachine"
+        return AssetHardwareFirmwareResults(self, {}, path=path)
+
+    def _firmwareInventoryByMachineFiles(self) -> AssetHardwareFirmwareResults:
+        """Get the firmware inventory for machines as a file.
+
+        Same Results as `_firmwareInventoryByMachine` but exported as a file instead of in the response body.
+        Recommended for larger data sets, as it returns zipped files with the data instead of returning it in the response body.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .firmware import AssetHardwareFirmwareResults
+
+        path = f"{self._PATH}/hardwareFirmwareInventoryExport"
+        return AssetHardwareFirmwareResults(self, {}, path=path, files=True)
+
     # === Investigations related endpoints ===
+    def _availableMachineActions(self, id: str) -> ActionAvailabilityStatusResults:
+        """Get available machine actions for a machine
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .machineActions import ActionAvailabilityStatusResults
+
+        path = f"{self._PATH}/{id}/availableMachineActions"
+        return ActionAvailabilityStatusResults(self, {}, path=path)
+
     def _startInvestigation(
         self, id: str, payload: StartInvestigationPayload
     ) -> InvestigationResults:

@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 
 class DeviceAVHealthQuery(BaseQuery):
-    """Query parameters for the /api/deviceavinfo endpoint."""
+    """Query parameters for the /api/deviceAvInfo endpoint."""
 
     machineId: str
     computerDnsName: str
@@ -34,7 +34,7 @@ class DeviceAVHealthQuery(BaseQuery):
 
 
 class DeviceAVHealthResults(BaseResults):
-    """Results from the /api/deviceavinfo endpoint."""
+    """Results from the /api/deviceAvInfo endpoint."""
 
     SCHEMA = DEVICE_AV_INFO_SCHEMA
 
@@ -172,7 +172,7 @@ class DeviceAVHealthResults(BaseResults):
 
 
 class DeviceAVHealthEndpoint(BaseEndpoint):
-    """Endpoint for /api/deviceavinfo"""
+    """Endpoint for /api/deviceAvInfo"""
 
     def get_all(
         self, query: DeviceAVHealthQuery | None = None
@@ -183,7 +183,7 @@ class DeviceAVHealthEndpoint(BaseEndpoint):
             - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api
             - https://learn.microsoft.com/en-us/defender-endpoint/api/device-health-export-antivirus-health-report-api#1-export-health-reporting-json-response
         """
-        path = "/api/deviceavinfo"
+        path = "/api/deviceAvInfo"
         params = query.to_odata_filters if query else {}
         return DeviceAVHealthResults(self, params, path=path)
 

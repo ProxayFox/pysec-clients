@@ -31,13 +31,24 @@ if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionEndpoint
     from .certificateInventory import CertificateInventoryEndpoint
     from .deviceAvHealth import DeviceAVHealthEndpoint
+    from .deviceGroups import DeviceGroupsEndpoint
     from .domain import DomainEndpoint, DomainResults
     from .files import FileEndpoint, FileResults
+    from .firmware import (
+        FirmwareEndpoint,
+        FirmwareResults,
+        AssetHardwareFirmwareResults,
+    )
+    from .incidents import IncidentsEndpoint
     from .indicators import IndicatorsEndpoint, IndicatorsResults
     from .investigations import InvestigationsEndpoint
     from .ips import IPEndpoint, IPResults
     from .library import LibraryFilesEndpoint, LibraryFilesResults
-    from .machineActions import MachineActionsEndpoint, MachineActionsResults
+    from .machineActions import (
+        MachineActionsEndpoint,
+        MachineActionsResults,
+        ActionAvailabilityStatusResults,
+    )
     from .machines import (
         MachinesEndpoint,
         MachineResults,
@@ -53,6 +64,7 @@ if TYPE_CHECKING:
         BaselineConfigurationResults,
         AssetConfigurationResults,
     )
+    from .settings import DataExportSettingsEndpoint, DataExportSettingsResults
     from .software import (
         SoftwareEndpoint,
         SoftwareResults,
@@ -82,10 +94,15 @@ _NAME_TO_MODULE = {
     "BrowserExtensionEndpoint": "browserExtension",
     "CertificateInventoryEndpoint": "certificateInventory",
     "DeviceAVHealthEndpoint": "deviceAvHealth",
+    "DeviceGroupsEndpoint": "deviceGroups",
     "DomainEndpoint": "domain",
     "DomainResults": "domain",
     "FileEndpoint": "files",
     "FileResults": "files",
+    "FirmwareEndpoint": "firmware",
+    "FirmwareResults": "firmware",
+    "AssetHardwareFirmwareResults": "firmware",
+    "IncidentsEndpoint": "incidents",
     "IndicatorsEndpoint": "indicators",
     "IndicatorsResults": "indicators",
     "InvestigationsEndpoint": "investigations",
@@ -95,6 +112,7 @@ _NAME_TO_MODULE = {
     "LibraryFilesResults": "library",
     "MachineActionsEndpoint": "machineActions",
     "MachineActionsResults": "machineActions",
+    "ActionAvailabilityStatusResults": "machineActions",
     "MachinesEndpoint": "machines",
     "MachineResults": "machines",
     "MachineReferencesResults": "machines",
@@ -109,6 +127,8 @@ _NAME_TO_MODULE = {
     "BaselineConfigurationEndpoint": "securityBaseline",
     "BaselineConfigurationResults": "securityBaseline",
     "AssetConfigurationResults": "securityBaseline",
+    "DataExportSettingsEndpoint": "settings",
+    "DataExportSettingsResults": "settings",
     "SoftwareEndpoint": "software",
     "SoftwareResults": "software",
     "DistributionDTOResults": "software",
@@ -159,12 +179,20 @@ __all__ = [
     "CertificateInventoryEndpoint",
     # Device AV Health
     "DeviceAVHealthEndpoint",
+    # Device Groups
+    "DeviceGroupsEndpoint",
     # Domain
     "DomainEndpoint",
     "DomainResults",
     # Files
     "FileEndpoint",
     "FileResults",
+    # Firmware
+    "FirmwareEndpoint",
+    "FirmwareResults",
+    "AssetHardwareFirmwareResults",
+    # Incidents
+    "IncidentsEndpoint",
     # Indicators
     "IndicatorsEndpoint",
     "IndicatorsResults",
@@ -179,6 +207,7 @@ __all__ = [
     # Machine Actions
     "MachineActionsEndpoint",
     "MachineActionsResults",
+    "ActionAvailabilityStatusResults",
     # Machines
     "MachinesEndpoint",
     "MachineResults",
@@ -199,6 +228,9 @@ __all__ = [
     "BaselineConfigurationEndpoint",
     "BaselineConfigurationResults",
     "AssetConfigurationResults",
+    # Settings
+    "DataExportSettingsEndpoint",
+    "DataExportSettingsResults",
     # Software
     "SoftwareEndpoint",
     "SoftwareResults",

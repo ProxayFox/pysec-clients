@@ -38,3 +38,11 @@ class ScoreEndpoint(BaseEndpoint):
         """
         path = "/api/configurationScore"
         return ScoreResults(self, {}, path=path)
+
+    def configurationScoreById(self, id: str) -> ScoreResults:
+        """Retrieves Microsoft Secure Score for Devices by ID.
+
+        **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-device-secure-score
+        """
+        path = f"/api/configurationScore/{id}"
+        return ScoreResults(self, {}, path=path)
