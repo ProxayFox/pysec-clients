@@ -1,0 +1,47 @@
+# Endpoints to suppress from the TODO builder output.
+#
+# Each entry must have at least one of:
+#   path      - exact template path from the metadata (e.g. /api/alertEntitySetName)
+#               All operations whose path starts with this prefix are suppressed.
+#   operation - exact operation name from the metadata (e.g. "AlertEntitySetName collection")
+#   http_method - GET / POST / PATCH / DELETE (only meaningful alongside `path`)
+#
+# If multiple fields are given they are ANDed together.
+# The optional `reason` field is for human documentation only.
+#
+# To suppress an entire domain section, add a prefix entry for the base path:
+#   - path: /api/alertEntitySetName
+#     reason: "Phantom alias of /api/alerts; all routes 404"
+
+ignore:
+  # --- Duplicate / phantom EntitySet aliases --------------------------------
+  - path: /api/browserExtensions
+    reason: Phantom alias of /api/browserExtensions; all routes 404
+  - path: /api/alertEntitySetName
+    reason: Phantom alias of /api/alerts; all routes 404
+  - path: "/api/dataExportSettings/{id}"
+    reason: Phantom alias of /api/dataExportSettings; all routes 405
+  - path: /api/deviceAvInfo/{id}
+    reason: Phantom alias of /api/machines/{id}/runAntiVirusScan; all routes 404
+  - path: /api/firmware/{id}
+    reason: Phantom alias of /api/firmwareScore; all routes 404
+  - path: /api/ips
+    reason: Ips endpoint don't pass to /api/ips, /api/ips/{id} and /api/ips/{id}/machines; all routes 404
+  - path: /api/libraryFiles/{id}
+    reason: The endpoint is used for delete and update not Get; all GET routes 405
+  - path: /api/machineAction
+    reason: Phantom alias of /api/machineActions collection; all routes 404
+  - path: /api/publicProductDto 
+    reason: Phantom alias the different software export endpoints; all routes 404
+  - path: /api/publicVulnerabilityDto
+    reason: Phantom alias the different vulnerability export endpoints; all routes 404
+  - path: /api/users
+    reason: Phantom alias of /api/users some extended items available but not this endpoint; all routes 404  
+
+  # --- No Documented API / Undocumented Routes --------------------------------------
+  - path: /api/domains
+    reason: No documented API; all routes 404
+  - path: /api/exposureScore/{id}
+    reason: No documented API; all routes 404
+  - path: /api/files
+    reason: No documented API; all routes 404
