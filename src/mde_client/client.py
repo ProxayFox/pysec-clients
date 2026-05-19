@@ -10,11 +10,13 @@ if TYPE_CHECKING:
         AlertsEndpoint,
         AuthenticatedDefinitionsEndpoint,
         DeviceAuthenticatedAgentsEndpoint,
+        DeviceGroupsEndpoint,
         BaseEndpoint,
         BrowserExtensionEndpoint,
         CertificateInventoryEndpoint,
         DeviceAVHealthEndpoint,
         DomainEndpoint,
+        FirmwareEndpoint,
         FileEndpoint,
         IndicatorsEndpoint,
         InvestigationsEndpoint,
@@ -26,6 +28,7 @@ if TYPE_CHECKING:
         RemediationEndpoint,
         ScoreEndpoint,
         BaselineConfigurationEndpoint,
+        DataExportSettingsEndpoint,
         SoftwareEndpoint,
         UserEndpoint,
         VulnerabilityEndpoint,
@@ -85,6 +88,12 @@ class MDEClient:
     # ------------------------------------------------------------------
 
     @property
+    def misc(self) -> BaseEndpoint:
+        from .endpoints import BaseEndpoint
+
+        return BaseEndpoint(self._http, self._auth)
+
+    @property
     def advanced_queries(self) -> AdvancedHuntingQueriesEndpoint:
         from .endpoints import AdvancedHuntingQueriesEndpoint
 
@@ -109,12 +118,6 @@ class MDEClient:
         return DeviceAuthenticatedAgentsEndpoint(self._http, self._auth)
 
     @property
-    def misc(self) -> BaseEndpoint:
-        from .endpoints import BaseEndpoint
-
-        return BaseEndpoint(self._http, self._auth)
-
-    @property
     def browser_extension(self) -> BrowserExtensionEndpoint:
         from .endpoints import BrowserExtensionEndpoint
 
@@ -133,10 +136,22 @@ class MDEClient:
         return DeviceAVHealthEndpoint(self._http, self._auth)
 
     @property
+    def device_groups(self) -> DeviceGroupsEndpoint:
+        from .endpoints import DeviceGroupsEndpoint
+
+        return DeviceGroupsEndpoint(self._http, self._auth)
+
+    @property
     def domain(self) -> DomainEndpoint:
         from .endpoints import DomainEndpoint
 
         return DomainEndpoint(self._http, self._auth)
+
+    @property
+    def firmware(self) -> FirmwareEndpoint:
+        from .endpoints import FirmwareEndpoint
+
+        return FirmwareEndpoint(self._http, self._auth)
 
     @property
     def files(self) -> FileEndpoint:
@@ -203,6 +218,12 @@ class MDEClient:
         from .endpoints import BaselineConfigurationEndpoint
 
         return BaselineConfigurationEndpoint(self._http, self._auth)
+
+    @property
+    def settings(self) -> DataExportSettingsEndpoint:
+        from .endpoints import DataExportSettingsEndpoint
+
+        return DataExportSettingsEndpoint(self._http, self._auth)
 
     @property
     def software(self) -> SoftwareEndpoint:
