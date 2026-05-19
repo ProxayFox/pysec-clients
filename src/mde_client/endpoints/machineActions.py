@@ -69,6 +69,26 @@ class MachineActionsEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}"
         return MachineActionsResults(self, {}, path=path)
 
+    def getMachineActions(self, machine_id: str) -> MachineActionsResults:
+        """Get machine actions for a specific machine.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(self._http, self._auth)._getMachineActions(machine_id)
+
+    def latestMachineActions(self, machine_id: str) -> MachineActionsResults:
+        """Get the latest machine actions for a machine
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(self._http, self._auth)._latestMachineActions(
+            machine_id
+        )
+
     def availableMachineActions(self, id: str) -> ActionAvailabilityStatusResults:
         """Get available machine actions for a machine
 

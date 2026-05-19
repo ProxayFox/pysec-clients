@@ -52,10 +52,7 @@ class IndicatorsResults(BaseResults):
 
 
 class ImportIndicatorResults(BaseResults):
-    """Results for the /api/indicators/import endpoint.
-
-    TODO: Fix the mde_contract.py script to generate this schema properly instead of using the same schema as for single indicator submission.
-    """
+    """Results for the /api/indicators/import endpoint."""
 
     SCHEMA = pa.schema(
         [

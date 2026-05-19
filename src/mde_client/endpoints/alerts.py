@@ -7,10 +7,7 @@ This module defines:
   IPs, machines, and users.
 
 Most endpoint methods return lazy `BaseResults` subclasses and defer HTTP
-requests until a terminal materialization method is called. Create/update
-operations are declared but currently marked as not implemented.
-
-Note: Needs further Testing and implementation of POST methods for alert creation and updates.
+requests until a terminal materialization method is called.
 
 **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/alerts
 """

@@ -49,9 +49,17 @@ from ..models.action_payloads import (
     RunAntiVirusScanPayload,
     OffBoardPayload,
     AddOrRemoveTagForMultipleMachinesPayload,
+    InitiateInvestigationPayload,
+    LogsCollectionPayload,
+    RunCustomPlaybookPayload,
+    SetDeviceValuePayload,
+    SetExclusionPayload,
+    TagsPayload,
 )
 
 if TYPE_CHECKING:
+    from httpx import Response
+
     from .browserExtension import BrowserExtensionResults
     from .certificateInventory import CertificateInventoryResults
     from .deviceAvHealth import DeviceAVHealthResults
@@ -258,7 +266,23 @@ class MachinesEndpoint(BaseEndpoint):
         path = path + payload
         return MachineResults(self, {}, path=path)
 
-    def tag(self, tag: str, useStartsWithFilter: bool = False) -> MachineResults:
+    def tags(self, id: str, payload: TagsPayload) -> Response:
+        """Get tags for a machine
+
+        **Note:** Unknown results for this endpoint and will return httpx.Response object directly.
+        If you figure out what schema it returns, please log an issue or submit a PR to update the return type and parse the response accordingly.
+        You also need to have this enabled on your tenant for it to work
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/{id}/tags"
+        return self._request(
+            method="POST",
+            path=path,
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def findbytag(self, tag: str, useStartsWithFilter: bool = False) -> MachineResults:
         """Find devices by tag API
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/find-machines-by-tag
@@ -305,6 +329,67 @@ class MachinesEndpoint(BaseEndpoint):
         """
         path = f"{self._PATH}/dlp"
         return DlpMachineResults(self, {}, path=path)
+
+    def logsCollection(self, id: str, payload: LogsCollectionPayload) -> Response:
+        """Get logs collection for a machine.
+
+        **Note:** Unknown results for this endpoint and will return httpx.Response object directly.
+        If you figure out what schema it returns, please log an issue or submit a PR to update the return type and parse the response accordingly.
+        You also need to have this enabled on your tenant for it to work
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/{id}/logsCollection"
+        return self._request(
+            method="POST",
+            path=path,
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def runCustomPlaybook(self, id: str, payload: RunCustomPlaybookPayload) -> Response:
+        """Run a custom playbook on a machine.
+
+        Note: The response schema for this endpoint is currently unknown. This method will return the raw httpx.Response object.
+        If you have information on the response schema, please log an issue or submit a PR to update the return type and parse the response accordingly.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/{id}/runCustomPlaybook"
+        return self._request(
+            method="POST",
+            path=path,
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def setDeviceValue(self, id: str, payload: SetDeviceValuePayload) -> Response:
+        """Set device value for a machine.
+
+        Note: The response schema for this endpoint is currently unknown. This method will return the raw httpx.Response object.
+        If you have information on the response schema, please log an issue or submit a PR to update the return type and parse the response accordingly.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/{id}/setDeviceValue"
+        return self._request(
+            method="POST",
+            path=path,
+            request_kwargs={"json": payload.model_dump()},
+        )
+
+    def setExclusion(self, id: str, payload: SetExclusionPayload) -> Response:
+        """Set exclusion for a machine.
+
+        Note: The response schema for this endpoint is currently unknown. This method will return the raw httpx.Response object.
+        If you have information on the response schema, please log an issue or submit a PR to update the return type and parse the response accordingly.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/{id}/setExclusion"
+        return self._request(
+            method="POST",
+            path=path,
+            request_kwargs={"json": payload.model_dump()},
+        )
 
     # === Browser Extension related endpoints ===
     # Browser Extension endpoints are on the MachinesEndpoint, intended to use the browserExtensions() method to access, but we can also expose them here if needed.
@@ -442,7 +527,43 @@ class MachinesEndpoint(BaseEndpoint):
             request_kwargs={"json": payload.model_dump()},
         )
 
+    def _initiateInvestigation(
+        self, id: str, payload: InitiateInvestigationPayload
+    ) -> InvestigationResults:
+        """Start Investigation
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .investigations import InvestigationResults
+
+        path = f"{self._PATH}/{id}/initiateInvestigation"
+        return InvestigationResults(
+            self,
+            {},
+            path=path,
+            method="POST",
+            request_kwargs={"json": payload.model_dump()},
+        )
+
     # === Machine Action related endpoints ===
+    def _getMachineActions(self, id: str) -> MachineActionsResults:
+        """Get machine actions for a machine
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .machineActions import MachineActionsResults
+
+        path = f"{self._PATH}/{id}/machineActions"
+        return MachineActionsResults(self, {}, path=path)
+
+    def _latestMachineActions(self, id: str) -> MachineActionsResults:
+        """Get the latest machine actions for a machine
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        path = f"{self._PATH}/{id}/latestMachineActions"
+        return MachineActionsResults(self, {}, path=path)
+
     def _collectInvestigationPackage(
         self, id: str, payload: CollectInvestigationPackagePayload
     ) -> MachineActionsResults:

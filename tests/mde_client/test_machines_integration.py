@@ -317,7 +317,7 @@ class TestMachineTags:
             pytest.skip("No machines found for this tag")
 
         direct = resp["value"][0]
-        client_record = mde_client.machines.tag(
+        client_record = mde_client.machines.findbytag(
             machine_tag, useStartsWithFilter=True
         ).to_dicts()[0]
         _assert_response_matches(client_record, direct, context="machine tags")

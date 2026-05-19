@@ -127,23 +127,23 @@ class TestFindByIP:
 
 class TestTag:
     def test_returns_machine_results(self) -> None:
-        result = _make_endpoint().tag("my-tag")
+        result = _make_endpoint().findbytag("my-tag")
         assert isinstance(result, MachineResults)
 
     def test_path_is_findbytag(self) -> None:
-        result = _make_endpoint().tag("my-tag")
+        result = _make_endpoint().findbytag("my-tag")
         assert result._path == "/api/machines/findbytag"
 
     def test_tag_in_params(self) -> None:
-        result = _make_endpoint().tag("my-tag")
+        result = _make_endpoint().findbytag("my-tag")
         assert result._params["tag"] == "my-tag"
 
     def test_starts_with_false_by_default(self) -> None:
-        result = _make_endpoint().tag("my-tag")
+        result = _make_endpoint().findbytag("my-tag")
         assert result._params["useStartsWithFilter"] == "false"
 
     def test_starts_with_true(self) -> None:
-        result = _make_endpoint().tag("my-tag", useStartsWithFilter=True)
+        result = _make_endpoint().findbytag("my-tag", useStartsWithFilter=True)
         assert result._params["useStartsWithFilter"] == "true"
 
 

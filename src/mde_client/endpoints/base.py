@@ -48,7 +48,6 @@ class BaseQuery(BaseModel):
     top: int | None = Field(default=None, ge=1, le=10000)
     skip: int | None = Field(default=None, ge=0)
     sinceTime: datetime | int | str | None = None
-    # TODO: custom_query: str | list[str] | None = None
 
     @property
     def to_odata_filters(self) -> dict[str, str]:

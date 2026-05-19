@@ -5,7 +5,10 @@ from datetime import datetime
 from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import INVESTIGATION_SCHEMA
 from ..models.enums import INVESTIGATION_STATE
-from ..models.action_payloads import StartInvestigationPayload
+from ..models.action_payloads import (
+    StartInvestigationPayload,
+    InitiateInvestigationPayload,
+)
 
 
 class InvestigationQuery(BaseQuery):
@@ -69,4 +72,17 @@ class InvestigationsEndpoint(BaseEndpoint):
 
         return MachinesEndpoint(self._http, self._auth)._startInvestigation(
             deviceId, payload
+        )
+
+    def initiateInvestigation(
+        self, machine_id: str, payload: InitiateInvestigationPayload
+    ) -> InvestigationResults:
+        """Start an investigation.
+
+        **Docs:** Null (undocumented endpoint)
+        """
+        from .machines import MachinesEndpoint
+
+        return MachinesEndpoint(self._http, self._auth)._initiateInvestigation(
+            machine_id, payload
         )

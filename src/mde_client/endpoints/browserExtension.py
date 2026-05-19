@@ -75,8 +75,6 @@ class BrowserExtensionEndpoint(BaseEndpoint):
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-assessment-browser-extensions#2-export-browser-extension-assessment-via-files
-
-        TODO: Need to Implement file download and parsing logic to handle this endpoint
         """
         from .machines import MachinesEndpoint
 
