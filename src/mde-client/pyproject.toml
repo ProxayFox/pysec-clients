@@ -51,10 +51,10 @@ polars = ["polars>=1.40.1"]
 
 [project.urls]
 Homepage = "https://github.com/ProxayFox/pysec-clients"
-Source = "https://github.com/ProxayFox/pysec-clients/tree/main/src/mde_client"
+Source = "https://github.com/ProxayFox/pysec-clients/tree/main/src/mde-client"
 Issues = "https://github.com/ProxayFox/pysec-clients/issues"
-Documentation = "https://github.com/ProxayFox/pysec-clients/blob/main/src/mde_client/README.md"
-Changelog = "https://github.com/ProxayFox/pysec-clients/blob/main/src/mde_client/CHANGELOG.md"
+Documentation = "https://github.com/ProxayFox/pysec-clients/blob/main/src/mde-client/README.md"
+Changelog = "https://github.com/ProxayFox/pysec-clients/blob/main/src/mde-client/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
 where = ["src"]
