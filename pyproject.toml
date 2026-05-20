@@ -3,7 +3,7 @@ name = "pysec-clients"
 version = "0.1.0"
 description = "Monorepo for security vendor API clients, e.g. Defender, CrowdStrike, Tenable, and more to come."
 readme = "README.md"
-license = "AGPL-3.0"
+license = "Apache-2.0"
 authors = [
     { name = "Proxay", email = "28168887+ProxayFox@users.noreply.github.com" },
 ]
