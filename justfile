@@ -68,7 +68,7 @@ build-package package:
     uvx twine check src/{{package}}/dist/*
 
 # Similar to Quality, but only targets schema validation
-quality-schema schemas="src/mde_client/src/mde_client/schemas" models="src/mde_client/src/mde_client/models" schemas_tests="tests/mde_client/test_schema_validator.py" models_tests="tests/mde_client/test_investigation_models.py":
+quality-schema schemas="src/mde-client/src/mde_client/schemas" models="src/mde-client/src/mde_client/models" schemas_tests="tests/mde_client/test_schema_validator.py" models_tests="tests/mde_client/test_investigation_models.py":
     if ! just lint {{schemas}} {{models}}; then just lint-fix {{schemas}} {{models}}; fi
     if ! just format-check {{schemas}} {{models}}; then just format {{schemas}} {{models}}; fi
     just typecheck {{schemas}} {{models}}

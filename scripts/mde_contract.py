@@ -2,8 +2,8 @@
 """MDE Arrow Schema Contract Builder
 
 Reads   tests/mde_client/fixtures/mde_metadata.xml
-Writes  src/mde_client/src/mde_client/schemas/<type_snake>.py     (one file per top-level response type)
-    src/mde_client/src/mde_client/schemas/__init__.py         (re-exports everything, lazily)
+Writes  src/mde-client/src/mde_client/schemas/<type_snake>.py     (one file per top-level response type)
+    src/mde-client/src/mde_client/schemas/__init__.py         (re-exports everything, lazily)
 
 Each generated schema file contains:
   - Named pa.StructType constants for every ComplexType dependency,
@@ -42,8 +42,8 @@ import pyarrow as pa
 # ── Configuration ─────────────────────────────────────────────────────────────
 
 XML_SOURCE = Path("tests/mde_client/fixtures/mde_metadata.xml")
-OUTPUT_DIR = Path("src/mde_client/src/mde_client/schemas")
-MODELS_OUTPUT_DIR = Path("src/mde_client/src/mde_client/models")
+OUTPUT_DIR = Path("src/mde-client/src/mde_client/schemas")
+MODELS_OUTPUT_DIR = Path("src/mde-client/src/mde_client/models")
 METADATA_MAX_AGE = timedelta(days=7)
 
 MDE_NS = "http://docs.oasis-open.org/odata/ns/edm"

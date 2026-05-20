@@ -7,13 +7,13 @@ Monorepo of Python API clients for security vendors. Each client package lives u
 Start with:
 
 - [README.md](README.md) for repository workflow and task runner commands.
-- [src/mde_client/README.md](src/mde_client/README.md) for the current package surface and API usage.
+- [src/mde-client/README.md](src/mde-client/README.md) for the current package surface and API usage.
 
 ## Current repo shape
 
 - `pyproject.toml`: uv workspace, dependency groups, pytest and typechecker config.
 - `justfile`: preferred entrypoint for lint, format, typecheck, test, docs, and schema-generation tasks.
-- `src/mde_client/`: current Microsoft Defender for Endpoint client package.
+- `src/mde-client/`: current Microsoft Defender for Endpoint client package.
 - `tests/`: pytest suite.
 - `scripts/mde_contract.py`: regenerates schema modules from Defender metadata.
 - `.github/workflows/mde-schema-refresh.yml`: weekly schema refresh automation that opens a PR when generated contracts change.

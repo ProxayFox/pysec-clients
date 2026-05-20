@@ -1,19 +1,19 @@
 ---
-applyTo: "src/mde_client/**/*.py"
+applyTo: "src/mde-client/src/mde_client/**/*.py"
 ---
 
 # MDE Client — Implementation Patterns
 
 Follow the patterns established in the existing code. Reference files:
 
-- [client.py](../../src/mde_client/client.py) — `MDEClient`, lazy endpoint properties, context-manager lifecycle.
-- [auth.py](../../src/mde_client/auth.py) — `MSALAuth`, token acquisition, `AuthenticationError`.
-- [endpoints/base.py](../../src/mde_client/endpoints/base.py) — `BaseQuery`, `BaseResults`, authenticated requests, and shared pagination.
-- [endpoints/alerts.py](../../src/mde_client/endpoints/alerts.py) — mutating methods that return either lazy results or `bool`, depending on API shape.
-- [endpoints/library.py](../../src/mde_client/endpoints/library.py) — eager `bool` write helpers for library uploads and deletes.
-- [endpoints/machines.py](../../src/mde_client/endpoints/machines.py) — endpoint class, query models, result wrappers, pagination, and OData filters.
-- [viaFiles.py](../../src/mde_client/viaFiles.py) — async export download, decompression, NDJSON parsing, and batching.
-- [README.md](../../src/mde_client/README.md) — current public package behavior and supported endpoint surface.
+- [client.py](../../src/mde-client/src/mde_client/client.py) — `MDEClient`, lazy endpoint properties, context-manager lifecycle.
+- [auth.py](../../src/mde-client/src/mde_client/auth.py) — `MSALAuth`, token acquisition, `AuthenticationError`.
+- [endpoints/base.py](../../src/mde-client/src/mde_client/endpoints/base.py) — `BaseQuery`, `BaseResults`, authenticated requests, and shared pagination.
+- [endpoints/alerts.py](../../src/mde-client/src/mde_client/endpoints/alerts.py) — mutating methods that return either lazy results or `bool`, depending on API shape.
+- [endpoints/library.py](../../src/mde-client/src/mde_client/endpoints/library.py) — eager `bool` write helpers for library uploads and deletes.
+- [endpoints/machines.py](../../src/mde-client/src/mde_client/endpoints/machines.py) — endpoint class, query models, result wrappers, pagination, and OData filters.
+- [viaFiles.py](../../src/mde-client/src/mde_client/viaFiles.py) — async export download, decompression, NDJSON parsing, and batching.
+- [README.md](../../src/mde-client/README.md) — current public package behavior and supported endpoint surface.
 - [mde_contract.py](../../scripts/mde_contract.py) — schema generation workflow and `quality-schema` handoff.
 
 ## Adding or changing an endpoint

@@ -2,15 +2,15 @@
 
 Python API clients for security vendors, developed as a single `uv` workspace.
 
-The repository currently ships one package, [`mde-client`](src/mde_client/), a Microsoft Defender for Endpoint client built around lazy endpoint results, Arrow and Polars materialization helpers, and dependency injection for HTTP and auth testability.
+The repository currently ships one package, [`mde-client`](src/mde-client/), a Microsoft Defender for Endpoint client built around lazy endpoint results, Arrow and Polars materialization helpers, and dependency injection for HTTP and auth testability.
 
 ## Packages
 
 | Package | Vendor | Summary |
 | ------- | ------ | ------- |
-| [`mde-client`](src/mde_client/) | Microsoft Defender for Endpoint | Client-credentials auth, lazy endpoint wrappers, file-export helpers, Arrow and Polars outputs |
+| [`mde-client`](src/mde-client/) | Microsoft Defender for Endpoint | Client-credentials auth, lazy endpoint wrappers, file-export helpers, Arrow and Polars outputs |
 
-Package-specific setup, examples, and API notes live in [`src/mde_client/README.md`](src/mde_client/README.md).
+Package-specific setup, examples, and API notes live in [`src/mde-client/README.md`](src/mde-client/README.md).
 
 ## Requirements
 
@@ -54,17 +54,25 @@ The repository ships a `.pre-commit-config.yaml` that runs `just quality` before
 
 ```text
 pysec-clients/
-    pyproject.toml         # uv workspace configuration and shared dependency groups
-    justfile               # lint, format, typecheck, test, and docs tasks
-    scripts/               # repo utilities such as schema generation helpers
+    pyproject.toml             # uv workspace configuration and shared dependency groups
+    justfile                   # lint, format, typecheck, test, build, and docs tasks
+    scripts/                   # repo utilities such as schema generation helpers
     src/
-        mde_client/          # Microsoft Defender for Endpoint client package
+        mde-client/            # Microsoft Defender for Endpoint client (workspace member)
+            pyproject.toml     # package metadata, dependencies, classifiers
+            CHANGELOG.md
+            README.md
+            LICENSE
+            src/
+                mde_client/    # Python package — `from mde_client import ...`
     tests/
-        mde_client/          # package-focused pytest suite
+        mde_client/            # package-focused pytest suite
 ```
 
 Each client package follows the same broad shape:
 
+- The workspace member directory matches the distribution name (e.g. `src/mde-client/`).
+- The importable Python package lives at `src/<dist>/src/<import_name>/`.
 - `client.py` exposes the top-level client and lifecycle management.
 - `auth.py` encapsulates vendor authentication.
 - `endpoints/` contains endpoint clients, query models, and lazy result wrappers.
@@ -75,17 +83,27 @@ Each client package follows the same broad shape:
 This repository is currently README-first, with structured package documentation starting under [`docs/mde_client/`](docs/mde_client/index.md).
 
 - Start here for workspace setup and development commands.
-- Use [`src/mde_client/README.md`](src/mde_client/README.md) for the package summary and quick-start example.
+- Use [`src/mde-client/README.md`](src/mde-client/README.md) for the package summary and quick-start example.
 - Use [`docs/mde_client/index.md`](docs/mde_client/index.md) for tutorials, how-to guides, reference pages, and explanation pages for `mde-client`.
 - `just docs-build` and `just docs-serve` exist in [`justfile`](justfile), but the repository does not currently include an `mkdocs.yml`, so those tasks are not runnable from the checked-in state yet.
 
 ## Adding Another Client
 
-1. Create `src/<vendor_client>/` as a workspace member with its own `pyproject.toml`.
-2. Follow the same `Client -> Auth -> Endpoint -> Results -> Schema` shape used by [`src/mde_client/`](src/mde_client/).
-3. Register the workspace member in the root [`pyproject.toml`](pyproject.toml).
-4. Add or extend tests under [`tests/`](tests/).
-5. Document package-specific setup and examples in that package's README.
+1. Create `src/<distribution-name>/` as a workspace member (e.g. `src/crowdstrike-client/`)
+   with its own `pyproject.toml`, `README.md`, `CHANGELOG.md`, and `LICENSE`.
+2. Place the importable Python package at `src/<distribution-name>/src/<import_name>/`
+   (e.g. `src/crowdstrike-client/src/crowdstrike_client/`). Include a `py.typed`
+   marker if the package ships type hints.
+3. Follow the same `Client -> Auth -> Endpoint -> Results -> Schema` shape used
+   by [`src/mde-client/`](src/mde-client/).
+4. The root `[tool.uv.workspace] members = ["src/*"]` picks up the new member
+   automatically; add the import name to root `[tool.uv.sources]` if it is
+   consumed by the root project.
+5. Add or extend tests under [`tests/`](tests/).
+6. Document package-specific setup and examples in that package's README.
+7. Publish via the shared release workflow by tagging
+   `<distribution-name>-v<version>` (see the package's `README.md` Releasing
+   section for the full checklist).
 
 ## License
 

@@ -63,4 +63,4 @@ The current package surface is organized around these ideas:
 
 ## Scope of this docs set
 
-This docs tree focuses on the `mde-client` package under `src/mde_client/`. It does not try to cover Azure portal setup step by step, and it does not replace the repository-level workflow notes in the root README.
+This docs tree focuses on the `mde-client` package under `src/mde-client/`. It does not try to cover Azure portal setup step by step, and it does not replace the repository-level workflow notes in the root README.
