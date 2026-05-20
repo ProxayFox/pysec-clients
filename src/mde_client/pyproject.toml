@@ -5,11 +5,37 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mde-client"
 version = "0.1.0"
-description = "Monorepo for security vendor API clients, e.g. Defender, CrowdStrike, Tenable, and more to come."
+description = "Python client for the Microsoft Defender for Endpoint API with lazy results and Arrow/Polars output."
+readme = "README.md"
 requires-python = ">=3.14"
 license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [
     { name = "Proxay", email = "28168887+ProxayFox@users.noreply.github.com" },
+]
+keywords = [
+    "microsoft-defender",
+    "defender-for-endpoint",
+    "mde",
+    "security",
+    "edr",
+    "msal",
+    "arrow",
+    "polars",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Security",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
 dependencies = [
     "aiohttp>=3.13.5",
@@ -23,5 +49,15 @@ dependencies = [
 arrow = ["pyarrow>=24.0.0"]
 polars = ["polars>=1.40.1"]
 
-[tool.setuptools]
-package-dir = { "mde_client" = "." }
+[project.urls]
+Homepage = "https://github.com/ProxayFox/pysec-clients"
+Source = "https://github.com/ProxayFox/pysec-clients/tree/main/src/mde_client"
+Issues = "https://github.com/ProxayFox/pysec-clients/issues"
+Documentation = "https://github.com/ProxayFox/pysec-clients/blob/main/src/mde_client/README.md"
+Changelog = "https://github.com/ProxayFox/pysec-clients/blob/main/src/mde_client/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mde_client = ["py.typed"]

@@ -12,7 +12,7 @@ import yaml
 
 ROOT = Path("/workspaces/pysec-clients")
 XML_PATH = ROOT / "build" / "mde_metadata.xml"
-ENDPOINTS_DIR = ROOT / "src" / "mde_client" / "endpoints"
+ENDPOINTS_DIR = ROOT / "src" / "mde_client" / "src" / "mde_client" / "endpoints"
 TODO_IGNORE_PATH = ROOT / "scripts" / "mde_todo_ignore.yaml"
 NS = {"edm": "http://docs.oasis-open.org/odata/ns/edm"}
 API_PREFIX = "microsoft.windowsDefenderATP.api."
@@ -676,7 +676,7 @@ def main() -> None:
     lines.append("# MDE Client — Endpoint Coverage TODO")
     lines.append("")
     lines.append(
-        "> Auto-generated gap analysis comparing `build/mde_metadata.xml` against `src/mde_client/endpoints/`"
+        "> Auto-generated gap analysis comparing `build/mde_metadata.xml` against `src/mde_client/src/mde_client/endpoints/`"
     )
     lines.append(f"> Generated: {TODAY}")
     lines.append("")

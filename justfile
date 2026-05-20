@@ -58,9 +58,17 @@ quality:
     if ! just format-check; then just format; fi
     just typecheck
     just test --skip-integration
+    just build-package mde-client
+
+# Build a workspace package and validate the resulting distribution with twine.
+# Usage: just build-package mde-client
+build-package package:
+    rm -rf src/{{package}}/dist
+    uv build --package {{package}} --out-dir src/{{package}}/dist
+    uvx twine check src/{{package}}/dist/*
 
 # Similar to Quality, but only targets schema validation
-quality-schema schemas="src/mde_client/schemas" models="src/mde_client/models" schemas_tests="tests/mde_client/test_schema_validator.py" models_tests="tests/mde_client/test_investigation_models.py":
+quality-schema schemas="src/mde_client/src/mde_client/schemas" models="src/mde_client/src/mde_client/models" schemas_tests="tests/mde_client/test_schema_validator.py" models_tests="tests/mde_client/test_investigation_models.py":
     if ! just lint {{schemas}} {{models}}; then just lint-fix {{schemas}} {{models}}; fi
     if ! just format-check {{schemas}} {{models}}; then just format {{schemas}} {{models}}; fi
     just typecheck {{schemas}} {{models}}
@@ -72,6 +80,7 @@ quality-full:
     if ! just format-check; then just format; fi
     just typecheck
     just test
+    just build-package mde-client
 
 # --- Documentation ---
 docs-build:

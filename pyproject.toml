@@ -53,10 +53,10 @@ markers = [
 
 [tool.ty.environment]
 python = "./.venv"
-root = ["./src", "./tests", "./scripts"]
+root = ["./src/mde_client/src", "./tests", "./scripts"]
 
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
 include = ["src", "tests", "scripts"]
-extraPaths = ["src", "scripts"]
+extraPaths = ["src/mde_client/src", "scripts"]

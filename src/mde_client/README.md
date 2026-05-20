@@ -180,4 +180,24 @@ This makes it straightforward to test request construction, inject custom transp
 
 ## License
 
-[AGPL-3.0](../../LICENSE)
+[Apache-2.0](../../LICENSE)
+
+## Releasing
+
+`mde-client` is published to PyPI from this monorepo via a tag-driven GitHub
+Actions workflow that authenticates with [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/)
+(OIDC, no API tokens).
+
+To cut a release:
+
+1. Bump `version` in [`pyproject.toml`](pyproject.toml).
+2. Add a matching `[<version>] - <date>` section to [`CHANGELOG.md`](CHANGELOG.md)
+   and move items out of `[Unreleased]`.
+3. Run `just quality` locally (includes `uv build` + `twine check`).
+4. Commit the version bump and changelog on `main`.
+5. Tag the commit `mde-client-v<version>` (e.g. `mde-client-v0.1.0`) and push
+   the tag. The release workflow verifies the tag matches the pyproject version,
+   builds the sdist and wheel, and publishes to PyPI.
+
+Future vendor packages in this monorepo follow the same scheme:
+`<distribution-name>-v<version>`.

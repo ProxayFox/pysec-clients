@@ -1,0 +1,204 @@
+name: Release package
+
+on:
+  push:
+    tags:
+      - "*-v[0-9]+.[0-9]+.[0-9]+"
+      - "*-v[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
+      - "*-v[0-9]+.[0-9]+.[0-9]+a[0-9]+"
+      - "*-v[0-9]+.[0-9]+.[0-9]+b[0-9]+"
+  workflow_dispatch:
+    inputs:
+      package:
+        description: "Workspace package to build (must match a directory under src/)"
+        type: string
+        required: true
+      version:
+        description: "Version to build (must match pyproject version)"
+        type: string
+        required: true
+      publish:
+        description: "Publish to PyPI after building"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  derive:
+    name: Derive package and version
+    runs-on: ubuntu-latest
+    outputs:
+      package: ${{ steps.parse.outputs.package }}
+      version: ${{ steps.parse.outputs.version }}
+      publish: ${{ steps.parse.outputs.publish }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Parse tag or inputs
+        id: parse
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PACKAGE: ${{ inputs.package }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_PUBLISH: ${{ inputs.publish }}
+        run: |
+          set -euo pipefail
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            package="${INPUT_PACKAGE}"
+            version="${INPUT_VERSION}"
+            publish="${INPUT_PUBLISH}"
+          else
+            # Tag format: <package>-v<version>
+            if [[ ! "${REF_NAME}" =~ ^(.+)-v([0-9]+\.[0-9]+\.[0-9]+([a-z0-9]+)?)$ ]]; then
+              echo "::error::Tag '${REF_NAME}' does not match '<package>-v<semver>'"
+              exit 1
+            fi
+            package="${BASH_REMATCH[1]}"
+            version="${BASH_REMATCH[2]}"
+            publish="true"
+          fi
+
+          if [[ ! -d "src/${package}" ]]; then
+            echo "::error::Package directory 'src/${package}' does not exist"
+            exit 1
+          fi
+          if [[ ! -f "src/${package}/pyproject.toml" ]]; then
+            echo "::error::Package 'src/${package}/pyproject.toml' does not exist"
+            exit 1
+          fi
+
+          echo "package=${package}" >> "$GITHUB_OUTPUT"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          echo "publish=${publish}" >> "$GITHUB_OUTPUT"
+          echo "Resolved package=${package} version=${version} publish=${publish}"
+
+  build:
+    name: Build ${{ needs.derive.outputs.package }} ${{ needs.derive.outputs.version }}
+    runs-on: ubuntu-latest
+    needs: derive
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Verify pyproject version matches
+        env:
+          PACKAGE: ${{ needs.derive.outputs.package }}
+          VERSION: ${{ needs.derive.outputs.version }}
+        run: |
+          set -euo pipefail
+          pyproject_version="$(python -c "import tomllib, sys; print(tomllib.loads(open('src/${PACKAGE}/pyproject.toml').read())['project']['version'])")"
+          if [[ "${pyproject_version}" != "${VERSION}" ]]; then
+            echo "::error::Tag/input version '${VERSION}' does not match src/${PACKAGE}/pyproject.toml version '${pyproject_version}'"
+            exit 1
+          fi
+          echo "Version match: ${pyproject_version}"
+
+      - name: Sync workspace
+        run: uv sync --all-packages --all-groups
+
+      - name: Build distribution
+        env:
+          PACKAGE: ${{ needs.derive.outputs.package }}
+        run: |
+          set -euo pipefail
+          rm -rf "src/${PACKAGE}/dist"
+          uv build --package "${PACKAGE}" --out-dir "src/${PACKAGE}/dist"
+          ls -la "src/${PACKAGE}/dist"
+
+      - name: Validate distribution with twine
+        env:
+          PACKAGE: ${{ needs.derive.outputs.package }}
+        run: uvx twine check "src/${PACKAGE}/dist"/*
+
+      - name: Upload distribution artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ needs.derive.outputs.package }}-${{ needs.derive.outputs.version }}
+          path: src/${{ needs.derive.outputs.package }}/dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-latest
+    needs: [derive, build]
+    if: needs.derive.outputs.publish == 'true'
+    environment:
+      name: pypi
+      url: https://pypi.org/project/${{ needs.derive.outputs.package }}/${{ needs.derive.outputs.version }}/
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download distribution artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.derive.outputs.package }}-${{ needs.derive.outputs.version }}
+          path: dist/
+
+      - name: Publish to PyPI via Trusted Publishing
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [derive, publish]
+    if: github.event_name == 'push'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download distribution artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist-${{ needs.derive.outputs.package }}-${{ needs.derive.outputs.version }}
+          path: dist/
+
+      - name: Extract changelog section
+        id: changelog
+        env:
+          PACKAGE: ${{ needs.derive.outputs.package }}
+          VERSION: ${{ needs.derive.outputs.version }}
+        run: |
+          set -euo pipefail
+          changelog="src/${PACKAGE}/CHANGELOG.md"
+          if [[ ! -f "${changelog}" ]]; then
+            echo "notes=Release ${PACKAGE} ${VERSION}" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          {
+            echo "notes<<__EOF__"
+            awk -v ver="${VERSION}" '
+              $0 ~ "^## \\[" ver "\\]" { capture=1; next }
+              capture && /^## \[/ { exit }
+              capture { print }
+            ' "${changelog}"
+            echo "__EOF__"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ needs.derive.outputs.package }} ${{ needs.derive.outputs.version }}
+          body: ${{ steps.changelog.outputs.notes }}
+          files: dist/*
+          fail_on_unmatched_files: true
