@@ -51,6 +51,24 @@ markers = [
     "integration: live API integration tests (require Azure credentials)",
 ]
 
+[tool.coverage.run]
+branch = true
+source = ["mde_client"]
+omit = [
+    "*/schemas/*",
+    "*/__init__.py",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "@overload",
+    "raise NotImplementedError",
+    "pragma: no cover",
+]
+
 [tool.ty.environment]
 python = "./.venv"
 root = ["./src/mde-client/src", "./tests", "./scripts"]

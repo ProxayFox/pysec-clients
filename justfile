@@ -41,6 +41,11 @@ test path="tests/" +args="":
 test-all path="tests/" +args="":
     uv run pytest --runslow -q {{path}} {{args}}
 
+# Run the full unit-test suite with coverage and emit a terminal + HTML report.
+# Non-gating: `just quality` is unaffected.
+coverage path="tests/" +args="":
+    uv run pytest -q {{path}} --skip-integration --cov=mde_client --cov-branch --cov-report=term-missing --cov-report=html:build/htmlcov {{args}}
+
 typecheck path="." +args="":
     uv run ty check --project {{path}} {{args}}
     uvx pyright --threads
