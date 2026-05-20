@@ -188,6 +188,8 @@ class AlertsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-alert-related-user-info
         """
+        from .users import UserResults
+
         path = f"{self._PATH}/{id}/user"
         return UserResults(self, {}, path=path)
 
@@ -232,7 +234,8 @@ class AlertsEndpoint(BaseEndpoint):
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/update-alert
         """
         path = f"{self._PATH}/{payload.alertId}"
-        pl = payload.model_dump(exclude_none=True).pop("alertId")
+        pl = payload.model_dump(exclude_none=True)
+        pl.pop("alertId")  # alertId is part of the path, not the bodys
         return AlertsResults(
             self,
             {},

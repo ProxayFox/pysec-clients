@@ -90,5 +90,7 @@ class RecommendationsEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/list-recommendation-vulnerabilities
         """
+        from .vulnerabilities import VulnerabilityDTOResults
+
         path = f"{self._PATH}/{id}/vulnerabilities"
         return VulnerabilityDTOResults(self, {}, path=path)

@@ -195,6 +195,8 @@ class MachinesEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machine-log-on-users
         """
+        from .users import UserResults
+
         path = f"{self._PATH}/{id}/logonusers"
         return UserResults(self, {}, path=path)
 
@@ -223,6 +225,8 @@ class MachinesEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-discovered-vulnerabilities
         """
+        from .vulnerabilities import VulnerabilityDTOResults
+
         path = f"{self._PATH}/{id}/vulnerabilities"
         return VulnerabilityDTOResults(self, {}, path=path)
 
@@ -561,6 +565,8 @@ class MachinesEndpoint(BaseEndpoint):
 
         **Docs:** Null (undocumented endpoint)
         """
+        from .machineActions import MachineActionsResults
+
         path = f"{self._PATH}/{id}/latestMachineActions"
         return MachineActionsResults(self, {}, path=path)
 

@@ -32,6 +32,8 @@ class IPEndpoint(BaseEndpoint):
         **Docs:**
             - https://learn.microsoft.com/en-us/defender-endpoint/api/get-ip-related-alerts
         """
+        from .alerts import AlertsResults
+
         path = f"{self._PATH}/{ip}/alerts"
         return AlertsResults(self, {}, path=path)
 

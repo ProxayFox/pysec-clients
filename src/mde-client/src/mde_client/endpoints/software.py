@@ -83,6 +83,8 @@ class SoftwareEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machines-by-software
         """
+        from .machines import MachineReferencesResults
+
         path = f"{self._PATH}/{id}/machineReferences"
         return MachineReferencesResults(self, {}, path=path)
 
@@ -91,6 +93,8 @@ class SoftwareEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-vuln-by-software
         """
+        from .vulnerabilities import VulnerabilityDTOResults
+
         path = f"{self._PATH}/{id}/vulnerabilities"
         return VulnerabilityDTOResults(self, {}, path=path)
 

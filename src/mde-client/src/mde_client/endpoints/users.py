@@ -26,6 +26,8 @@ class UserEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-user-related-alerts
         """
+        from .alerts import AlertsResults
+
         path = f"{self._PATH}/{id}/alerts"
         return AlertsResults(self, {}, path=path)
 
@@ -34,5 +36,7 @@ class UserEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-user-related-machines
         """
+        from .machines import MachineResults
+
         path = f"{self._PATH}/{id}/machines"
         return MachineResults(self, {}, path=path)
