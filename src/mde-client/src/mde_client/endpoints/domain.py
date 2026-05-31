@@ -1,3 +1,10 @@
+"""Domain endpoint for the Defender for Endpoint API.
+
+Exposes `DomainEndpoint` for alert-related domain lookups
+(`/api/domains/{id}/alerts`, `/machines`, `/stats`) and the `DomainResults` /
+`DomainStatsResults` wrappers that materialise the responses.
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING

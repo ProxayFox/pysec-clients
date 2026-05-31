@@ -45,9 +45,9 @@ class DeviceAuthenticatedAgentsQuery(BaseQuery):
 class AuthenticatedScanHistoryQuery(BaseQuery):
     """OData query parameters for authenticated scan history actions.
 
-    Args:
-        - page_size(None): Number of items to return per page. Forced to None in the endpoint
-        - model_config(dict): Forbid extra fields to prevent accidentally including query parameters in the request body of POST endpoints that use this query model for pagination.
+    The history endpoints are POST-shaped, so the inherited `page_size`
+    pagination hint must not leak into the request body. `extra="forbid"`
+    enforces that and `page_size` is forced to `None` by default.
     """
 
     model_config = {"extra": "forbid"}

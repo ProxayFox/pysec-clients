@@ -1,3 +1,11 @@
+"""Live-response library files endpoint for the Defender for Endpoint API.
+
+Exposes `LibraryFilesEndpoint` for listing, uploading, and deleting scripts
+stored in the live-response library at `/api/libraryfiles`. Upload payloads
+are modelled by `LibraryFilesUpdatePayload`, which produces the multipart
+form-data body required by the API.
+"""
+
 from __future__ import annotations
 
 from typing import Any

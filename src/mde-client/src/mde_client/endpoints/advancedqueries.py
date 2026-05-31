@@ -1,3 +1,11 @@
+"""Advanced Hunting Queries endpoint for the Defender for Endpoint API.
+
+Provides `AdvancedHuntingQueriesEndpoint.run(query)` for executing KQL queries
+against `/api/advancedqueries/run` and an `AdvancedHuntingQueriesResults`
+wrapper that materialises rows to dicts, JSON, PyArrow tables, or Polars
+DataFrames on demand.
+"""
+
 from __future__ import annotations
 
 import polars as pl
