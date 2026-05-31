@@ -3,6 +3,7 @@
 Explanation pages are for understanding, not task execution.
 
 - [Lazy results and caching](lazy-results.md)
+- [Result materialization model](result-materialization.md)
 - [Why query models keep Defender field names](query-models.md)
 - [How export-backed endpoints work](export-backed-endpoints.md)
 - [Why the client supports dependency injection](dependency-injection.md)

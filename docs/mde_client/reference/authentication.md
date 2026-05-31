@@ -35,3 +35,12 @@ HTTP-level API failures that happen after authentication are not wrapped as `Aut
 
 - [Authenticate with client credentials](../how-to/authenticate-with-client-credentials.md)
 - [MDEClient](mde-client.md)
+
+## API
+
+::: mde_client.auth
+    options:
+      heading_level: 3
+      members:
+        - MSALAuth
+        - AuthenticationError

@@ -16,3 +16,13 @@ Manage live response library files.
 
 - `upload()` and `delete()` return booleans rather than results wrappers.
 - `LibraryFilesUpdatePayload` includes file metadata such as `file_name`, `file_content`, `content_type`, and descriptions.
+
+## API
+
+::: mde_client.endpoints.library
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

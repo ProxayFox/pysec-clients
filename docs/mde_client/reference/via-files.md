@@ -43,3 +43,13 @@ Repeated hard failures raise a runtime error.
 
 - [Use export-backed endpoints](../how-to/use-export-backed-endpoints.md)
 - [How export-backed endpoints work](../explanation/export-backed-endpoints.md)
+
+## API
+
+::: mde_client.viaFiles
+    options:
+      heading_level: 3
+      members:
+        - ViaFiles
+        - ViaFilesConfig
+        - EmptyExportBlobError

@@ -15,3 +15,13 @@ Access device antivirus health reporting.
 
 - The export-backed path normalizes nested blob records into the same schema used by the JSON response.
 - `DeviceAVHealthQuery` keeps Defender field names such as `machineId`, `computerDnsName`, and `avSignatureVersion`.
+
+## API
+
+::: mde_client.endpoints.deviceAvHealth
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

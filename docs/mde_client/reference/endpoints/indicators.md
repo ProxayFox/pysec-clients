@@ -19,3 +19,13 @@ Manage threat indicators.
 - `batch_import()` chunks requests larger than 500 indicators and can return a list of result wrappers.
 - `delete()` and `batch_delete()` return booleans instead of results wrappers.
 - `batch_delete()` also chunks oversized requests.
+
+## API
+
+::: mde_client.endpoints.indicators
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

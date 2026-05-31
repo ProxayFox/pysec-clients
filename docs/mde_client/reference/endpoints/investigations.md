@@ -16,3 +16,13 @@ Inspect and start investigations.
 
 - `startInvestigation()` is exposed from the investigations property but delegates to a machine-scoped action under the hood.
 - Read methods use the standard lazy wrapper behavior.
+
+## API
+
+::: mde_client.endpoints.investigations
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

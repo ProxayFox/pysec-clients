@@ -40,3 +40,10 @@ Some wrappers use `files=True`. In that case the initial response is expected to
 
 - [Work with result formats](../how-to/work-with-result-formats.md)
 - [Lazy results and caching](../explanation/lazy-results.md)
+
+## API
+
+::: mde_client.endpoints.base.BaseResults
+    options:
+      heading_level: 3
+      show_bases: false

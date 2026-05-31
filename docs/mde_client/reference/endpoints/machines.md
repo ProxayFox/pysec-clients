@@ -24,3 +24,13 @@ Access machine inventory and machine-scoped related resources.
 - `get_all()` auto-paginates unless `top` or `skip` is set in `MachinesQuery`.
 - `findbyip()` normalizes timestamps to UTC before constructing the request path.
 - This endpoint also contains private helper methods that power public export-backed endpoints such as `browser_extension`, `certificate_inventory`, `device_av_health`, `investigations`, `machine_actions`, and `baseline_configurations`.
+
+## API
+
+::: mde_client.endpoints.machines
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

@@ -24,3 +24,13 @@ Execute Defender advanced hunting queries.
 
 - The output schema depends on the query you run.
 - The result wrapper caches materialized data until `refresh()` is called.
+
+## API
+
+::: mde_client.endpoints.advancedqueries
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

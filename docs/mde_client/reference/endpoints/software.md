@@ -19,3 +19,13 @@ Access software inventory and related records.
 
 - This endpoint uses `/api/Software` with an uppercase `S` because that is the current package path.
 - The method name `machineReferences` follows the current mixed-case package surface.
+
+## API
+
+::: mde_client.endpoints.software
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

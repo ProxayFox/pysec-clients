@@ -15,3 +15,13 @@ Access exposure and configuration score data.
 ## Notes
 
 - All methods return the same `ScoreResults` wrapper even though they target different score paths.
+
+## API
+
+::: mde_client.endpoints.score
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

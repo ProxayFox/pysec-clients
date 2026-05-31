@@ -17,3 +17,13 @@ Access vulnerability records and related machine views.
 
 - `machinesVulnerabilities()` currently accepts an `id` parameter but calls the collection path `/api/vulnerabilities/machinesVulnerabilities` rather than a per-ID path.
 - Use the query models in the endpoint module when you need collection-level filtering for vulnerability datasets.
+
+## API
+
+::: mde_client.endpoints.vulnerabilities
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

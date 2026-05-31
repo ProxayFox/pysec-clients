@@ -48,3 +48,10 @@ This keeps query construction close to the upstream API surface and avoids a sec
 
 - [List and filter machines](../how-to/list-and-filter-machines.md)
 - [Why query models keep Defender field names](../explanation/query-models.md)
+
+## API
+
+::: mde_client.endpoints.base.BaseQuery
+    options:
+      heading_level: 3
+      show_bases: false

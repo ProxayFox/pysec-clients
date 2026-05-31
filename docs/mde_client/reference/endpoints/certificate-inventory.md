@@ -15,3 +15,13 @@ Access certificate inventory assessment exports.
 
 - Both methods produce the same results-wrapper type.
 - Choose `get_all_files()` when you want the export-backed workflow.
+
+## API
+
+::: mde_client.endpoints.certificateInventory
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

@@ -24,3 +24,13 @@ Work with alerts and alert-related entities.
 - `get_all()` uses `AlertsQuery`, which inherits the shared pagination fields.
 - `batchUpdate()` is one of the endpoints that returns a success boolean instead of a results wrapper.
 - `update()` is separate from `batchUpdate()` and targets a single alert ID.
+
+## API
+
+::: mde_client.endpoints.alerts
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

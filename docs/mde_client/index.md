@@ -42,6 +42,10 @@ The current package surface is organized around these ideas:
 - [Work with result formats](how-to/work-with-result-formats.md)
 - [Use export-backed endpoints](how-to/use-export-backed-endpoints.md)
 - [Inject a custom HTTP client or token cache](how-to/inject-http-client-and-token-cache.md)
+- [Handle errors and retries](how-to/handle-errors-and-retries.md)
+- [Tune performance](how-to/tune-performance.md)
+- [Test code that uses mde-client](how-to/test-code-that-uses-mde-client.md)
+- [Build multi-endpoint workflows](how-to/build-multi-endpoint-workflows.md)
 
 ### Reference
 
@@ -57,6 +61,7 @@ The current package surface is organized around these ideas:
 
 - [Explanation index](explanation/index.md)
 - [Lazy results and caching](explanation/lazy-results.md)
+- [Result materialization model](explanation/result-materialization.md)
 - [Why query models keep Defender field names](explanation/query-models.md)
 - [How export-backed endpoints work](explanation/export-backed-endpoints.md)
 - [Why the client supports dependency injection](explanation/dependency-injection.md)

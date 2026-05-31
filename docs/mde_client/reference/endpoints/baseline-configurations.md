@@ -17,3 +17,13 @@ Access security baseline assessments, profiles, and active configurations.
 
 - `get_all()` and `get_all_files()` return assessment rows, not the same wrapper used by `profiles()` and `active()`.
 - Use `profiles()` and `active()` when you need baseline metadata rather than per-device assessment output.
+
+## API
+
+::: mde_client.endpoints.securityBaseline
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

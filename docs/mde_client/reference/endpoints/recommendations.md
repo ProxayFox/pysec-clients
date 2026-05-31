@@ -17,3 +17,13 @@ Access recommendation records and recommendation-related entities.
 ## Notes
 
 - The method name `machineReferences` uses camelCase because it follows the current package surface.
+
+## API
+
+::: mde_client.endpoints.recommendations
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

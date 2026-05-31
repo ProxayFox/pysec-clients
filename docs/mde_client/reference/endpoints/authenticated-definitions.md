@@ -20,3 +20,23 @@ Manage authenticated scan definitions and their history.
 - The history endpoints use POST requests with explicit request bodies even though they read data.
 - Mutating methods still return lazy results wrappers rather than booleans.
 - `AuthenticatedScanHistoryQuery` disables the inherited `page_size` default so it does not leak into POST bodies.
+
+## API
+
+::: mde_client.endpoints.authenticatedScan
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source
+      members:
+        - AuthenticatedDefinitionsQuery
+        - AuthenticatedScanHistoryQuery
+        - AuthenticatedDefinitionsAlterPayload
+        - ScannerAgentRefPayload
+        - ScanHistoryByDefinitionRequestPayload
+        - ScanHistoryBySessionRequestPayload
+        - AuthenticatedDefinitionsResults
+        - AuthenticatedScanHistoryResults
+        - AuthenticatedDefinitionsEndpoint

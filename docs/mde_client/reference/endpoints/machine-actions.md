@@ -28,3 +28,13 @@ Inspect machine actions and trigger machine response operations.
 - Most mutating methods return a `MachineActionsResults` wrapper rather than a boolean.
 - `getPackage()` and `getLiveResponseResultDownloadLink()` are the exceptions: they return temporary download URLs as strings.
 - The action methods delegate to machine-scoped paths under the hood, but the public entry point is `client.machine_actions`.
+
+## API
+
+::: mde_client.endpoints.machineActions
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

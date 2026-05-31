@@ -17,3 +17,13 @@ Look up file details and related entities.
 
 - This endpoint uses the file hash as the lookup key.
 - Relationship methods return the same lazy wrappers used by their primary endpoint families.
+
+## API
+
+::: mde_client.endpoints.files
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

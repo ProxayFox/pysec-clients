@@ -17,3 +17,13 @@ Access browser extension inventory and permission metadata.
 - `get_all()` and `get_all_files()` expose the same results-wrapper interface.
 - `get_all_files()` delegates to the machine endpoint's export-backed implementation.
 - Use `permissionsinfo()` when you need extension permission metadata rather than per-machine inventory rows.
+
+## API
+
+::: mde_client.endpoints.browserExtension
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source

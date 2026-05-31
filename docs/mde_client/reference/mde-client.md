@@ -42,11 +42,15 @@ If you do not use the context-manager form, call `close()` when you are done.
 - `alerts`
 - `authenticated_definitions`
 - `authenticated_agents`
+- `baseline_configurations`
 - `browser_extension`
 - `certificate_inventory`
 - `device_av_health`
+- `device_groups`
 - `domain`
 - `files`
+- `firmware`
+- `incidents`
 - `indicators`
 - `investigations`
 - `ips`
@@ -56,7 +60,7 @@ If you do not use the context-manager form, call `close()` when you are done.
 - `recommendations`
 - `remediations`
 - `score`
-- `baseline_configurations`
+- `settings`
 - `software`
 - `user`
 - `vulnerabilities`
@@ -72,3 +76,13 @@ The package exports these names from `mde_client`:
 - `ViaFiles`
 - `ViaFilesConfig`
 - `EmptyExportBlobError`
+
+## API
+
+::: mde_client.client.MDEClient
+    options:
+      heading_level: 3
+      show_bases: false
+      members:
+        - __init__
+        - close

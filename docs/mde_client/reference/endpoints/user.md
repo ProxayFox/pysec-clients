@@ -15,3 +15,13 @@ Access user-related alert and machine relationships.
 
 - The property name is `user`, not `users`.
 - This endpoint is relationship-oriented and does not expose a user listing method.
+
+## API
+
+::: mde_client.endpoints.users
+    options:
+      heading_level: 3
+      show_bases: false
+      show_root_heading: false
+      show_root_toc_entry: false
+      members_order: source
