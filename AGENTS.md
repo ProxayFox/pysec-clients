@@ -60,7 +60,7 @@ Important implementation detail: read-oriented endpoint methods usually return l
 ## Repo-specific pitfalls
 
 - Integration tests under [tests/mde_client](tests/mde_client/) are marked with `pytest.mark.integration` and env-gated; `just quality` intentionally skips them.
-- Docs tasks exist in [justfile](justfile), but they currently require a checked-in `mkdocs.yml` that is not present in this repository state.
+- Docs tasks (`just docs-build`, `just docs-serve`, `just docs-validate`) build the rendered site from [mkdocs.yml](mkdocs.yml) into `site/`.
 - The schema refresh workflow in [.github/workflows/mde-schema-refresh.yml](.github/workflows/mde-schema-refresh.yml) is automated; review generated diffs instead of hand-editing bulk schema output.
 - The schema builder script already runs `just quality-schema` after writing generated files, so schema work should start from the existing scripted workflow.
 

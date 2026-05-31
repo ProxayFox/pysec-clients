@@ -85,7 +85,7 @@ This repository is currently README-first, with structured package documentation
 - Start here for workspace setup and development commands.
 - Use [`src/mde-client/README.md`](src/mde-client/README.md) for the package summary and quick-start example.
 - Use [`docs/mde_client/index.md`](docs/mde_client/index.md) for tutorials, how-to guides, reference pages, and explanation pages for `mde-client`.
-- `just docs-build` and `just docs-serve` exist in [`justfile`](justfile), but the repository does not currently include an `mkdocs.yml`, so those tasks are not runnable from the checked-in state yet.
+- Build the rendered site with `just docs-build` (writes to `site/`) or run `just docs-serve` for a live-reload preview backed by [`mkdocs.yml`](mkdocs.yml).
 
 ## Adding Another Client
 
