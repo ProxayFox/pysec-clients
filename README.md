@@ -2,6 +2,8 @@
 
 Python API clients for security vendors, developed as a single `uv` workspace.
 
+📖 **Docs:** <https://proxayfox.github.io/pysec-clients/>
+
 The repository currently ships one package, [`mde-client`](src/mde-client/), a Microsoft Defender for Endpoint client built around lazy endpoint results, Arrow and Polars materialization helpers, and dependency injection for HTTP and auth testability.
 
 ## Packages

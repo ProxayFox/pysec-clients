@@ -1,7 +1,9 @@
 site_name: pysec-clients
 site_description: Documentation for pysec-clients and its package surfaces.
+site_url: https://proxayfox.github.io/pysec-clients/
 repo_name: ProxayFox/pysec-clients
 repo_url: https://github.com/ProxayFox/pysec-clients
+edit_uri: edit/main/docs/
 docs_dir: docs
 theme:
   name: material
