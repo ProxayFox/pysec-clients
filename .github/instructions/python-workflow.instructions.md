@@ -14,5 +14,5 @@ applyTo: "**/*.py"
 - Run `just quality` as the default final validation before completing work; it skips integration tests on purpose.
 - Use `just quality-full` only when integration coverage is intended and credentials are available.
 - The pre-commit hook runs `just quality` and may rewrite files before aborting a commit.
-- Docs commands exist in `justfile`, but they currently require a checked-in `mkdocs.yml` that is not present in this repository state.
+- Docs commands (`just docs-build`, `just docs-serve`, `just docs-validate`) render the site from [`mkdocs.yml`](../../mkdocs.yml) into `site/`.
 - Security tooling (`bandit`, `checkov`, `deptry`) is available in the dev group for auditing.
