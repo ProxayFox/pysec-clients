@@ -1,0 +1,123 @@
+name: Tag on version bump
+
+# When `version = "x.y.z"` changes in any `src/<package>/pyproject.toml`
+# on a push to `main`, this workflow creates and pushes an annotated tag
+# `<package>-v<version>`. The existing `release.yml` workflow listens for
+# those tags and handles the build + PyPI publish + GitHub Release.
+#
+# Skipped automatically if the tag already exists (idempotent).
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/*/pyproject.toml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tag-on-version-bump
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+jobs:
+  tag:
+    name: Create version tags
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Need history + previous commit so we can diff pyproject.toml
+          # against its prior version.
+          fetch-depth: 0
+          # Use the default GITHUB_TOKEN; permissions: contents: write above
+          # lets us push tags back to the repo.
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Detect version bumps and push tags
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+          AFTER_SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+
+          # On workflow_dispatch (or first push to a new branch where
+          # BEFORE_SHA is all-zeros), compare against the parent commit.
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" || "${BEFORE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
+            base="$(git rev-parse "${AFTER_SHA}^" 2>/dev/null || echo "")"
+          else
+            base="${BEFORE_SHA}"
+          fi
+          echo "Comparing ${base:-<root>} -> ${AFTER_SHA}"
+
+          # List candidate pyproject files (changed in range, or all on dispatch/root).
+          if [[ -n "${base}" ]]; then
+            mapfile -t changed < <(git diff --name-only "${base}" "${AFTER_SHA}" -- 'src/*/pyproject.toml' || true)
+          else
+            mapfile -t changed < <(git ls-files 'src/*/pyproject.toml')
+          fi
+
+          if [[ ${#changed[@]} -eq 0 ]]; then
+            echo "No src/*/pyproject.toml changes detected; nothing to tag."
+            exit 0
+          fi
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          read_version() {
+            # $1 = git revision (or empty for working tree), $2 = path
+            local rev="$1" path="$2"
+            if [[ -z "${rev}" ]]; then
+              python -c "import tomllib,sys;print(tomllib.loads(open('${path}','rb').read().decode())['project']['version'])"
+            else
+              git show "${rev}:${path}" 2>/dev/null \
+                | python -c "import tomllib,sys;print(tomllib.loads(sys.stdin.buffer.read())['project']['version'])" \
+                || echo ""
+            fi
+          }
+
+          any_tagged=0
+          for path in "${changed[@]}"; do
+            pkg="$(basename "$(dirname "${path}")")"
+            new_version="$(read_version "${AFTER_SHA}" "${path}")"
+            old_version=""
+            if [[ -n "${base}" ]]; then
+              old_version="$(read_version "${base}" "${path}" || true)"
+            fi
+
+            if [[ -z "${new_version}" ]]; then
+              echo "::warning::Could not read version from ${path}; skipping."
+              continue
+            fi
+            if [[ "${new_version}" == "${old_version}" ]]; then
+              echo "${pkg}: version unchanged (${new_version}); skipping."
+              continue
+            fi
+
+            tag="${pkg}-v${new_version}"
+            if git rev-parse -q --verify "refs/tags/${tag}" >/dev/null; then
+              echo "${pkg}: tag ${tag} already exists; skipping."
+              continue
+            fi
+
+            echo "${pkg}: ${old_version:-<none>} -> ${new_version}; creating tag ${tag}"
+            git tag -a "${tag}" -m "Release ${pkg} ${new_version}" "${AFTER_SHA}"
+            git push origin "refs/tags/${tag}"
+            any_tagged=1
+          done
+
+          if [[ "${any_tagged}" -eq 0 ]]; then
+            echo "No new tags created."
+          fi
