@@ -83,7 +83,9 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-vulnerabilities
         """
-        params = query.to_odata_filters if query else {}
+        params = (
+            query.to_odata_filters if isinstance(query, VulnerabilitiesQuery) else {}
+        )
         return VulnerabilityResults(self, params)
 
     def get(self, id: str) -> VulnerabilityResults:
@@ -105,16 +107,23 @@ class VulnerabilityEndpoint(BaseEndpoint):
         return MachineResults(self, {}, path=path)
 
     def machinesVulnerabilities(
-        self, id: str
+        self, query: VulnerabilitiesByMachineAndSoftwareQuery | None = None
     ) -> VulnerabilitiesByMachineAndSoftwareResults:
         """Get machines with a vulnerability
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-vulnerabilities-by-machines
         """
         path = f"{self._PATH}/machinesVulnerabilities"
-        return VulnerabilitiesByMachineAndSoftwareResults(self, {}, path=path)
+        params = (
+            query.to_odata_filters
+            if isinstance(query, VulnerabilitiesByMachineAndSoftwareQuery)
+            else {}
+        )
+        return VulnerabilitiesByMachineAndSoftwareResults(self, params, path=path)
 
-    def softwareVulnerabilitiesByMachine(self) -> AssetVulnerabilityResults:
+    def softwareVulnerabilitiesByMachine(
+        self, page_size: int = 50000
+    ) -> AssetVulnerabilityResults:
         """Get vulnerabilities for a machine with software references.
 
         **Docs:**
@@ -125,7 +134,7 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         return MachinesEndpoint(
             self._http, self._auth
-        )._softwareVulnerabilitiesByMachine()
+        )._softwareVulnerabilitiesByMachine(page_size)
 
     def softwareVulnerabilitiesByMachineFiles(self) -> AssetVulnerabilityResults:
         """Get vulnerabilities for a machine with software references.
@@ -141,7 +150,9 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         return MachinesEndpoint(self._http, self._auth)._softwareVulnerabilitiesExport()
 
-    def softwareVulnerabilityChangesByMachine(self) -> DeltaAssetVulnerabilityResults:
+    def softwareVulnerabilityChangesByMachine(
+        self, page_size: int = 50000, since: datetime | int | str | None = None
+    ) -> DeltaAssetVulnerabilityResults:
         """Get vulnerabilities for a machine with software references.
 
         **Docs:**
@@ -152,4 +163,4 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         return MachinesEndpoint(
             self._http, self._auth
-        )._softwareVulnerabilityChangesByMachine()
+        )._softwareVulnerabilityChangesByMachine(page_size, since)

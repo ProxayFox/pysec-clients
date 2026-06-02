@@ -53,7 +53,7 @@ class TestDelegatedExports:
         monkeypatch.setattr(
             MachinesEndpoint,
             "_softwareVulnerabilitiesByMachine",
-            lambda self: "sentinel",
+            lambda self, page_size=50000: "sentinel",
         )
         assert (
             make_endpoint(VulnerabilityEndpoint).softwareVulnerabilitiesByMachine()
@@ -79,7 +79,7 @@ class TestDelegatedExports:
         monkeypatch.setattr(
             MachinesEndpoint,
             "_softwareVulnerabilityChangesByMachine",
-            lambda self: "sentinel-delta",
+            lambda self, page_size=50000, since=None: "sentinel-delta",
         )
         assert (
             make_endpoint(VulnerabilityEndpoint).softwareVulnerabilityChangesByMachine()
