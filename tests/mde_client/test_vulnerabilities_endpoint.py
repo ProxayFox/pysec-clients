@@ -17,11 +17,13 @@ class TestGetAll:
         assert isinstance(result, VulnerabilityResults)
         assert result._path == "/api/vulnerabilities"
         assert result._single is False
+        assert result._params["pageSize"] == "10000"
 
     def test_query_filter(self, make_endpoint) -> None:
         result = make_endpoint(VulnerabilityEndpoint).get_all(
             VulnerabilitiesQuery(severity="High")
         )
+        assert result._params["pageSize"] == "10000"
         assert "severity eq 'High'" in result._params["$filter"]
 
 
@@ -41,9 +43,10 @@ class TestMachineReferences:
 
 class TestMachinesVulnerabilities:
     def test_path(self, make_endpoint) -> None:
-        result = make_endpoint(VulnerabilityEndpoint).machinesVulnerabilities("ignored")
+        result = make_endpoint(VulnerabilityEndpoint).machinesVulnerabilities()
         assert isinstance(result, VulnerabilitiesByMachineAndSoftwareResults)
         assert result._path == "/api/vulnerabilities/machinesVulnerabilities"
+        assert result._params["pageSize"] == "10000"
 
 
 class TestDelegatedExports:

@@ -83,9 +83,9 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-vulnerabilities
         """
-        params = (
-            query.to_odata_filters if isinstance(query, VulnerabilitiesQuery) else {}
-        )
+        if query is None:
+            query = VulnerabilitiesQuery()
+        params = query.to_odata_filters
         return VulnerabilityResults(self, params)
 
     def get(self, id: str) -> VulnerabilityResults:
@@ -114,11 +114,9 @@ class VulnerabilityEndpoint(BaseEndpoint):
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-vulnerabilities-by-machines
         """
         path = f"{self._PATH}/machinesVulnerabilities"
-        params = (
-            query.to_odata_filters
-            if isinstance(query, VulnerabilitiesByMachineAndSoftwareQuery)
-            else {}
-        )
+        if query is None:
+            query = VulnerabilitiesByMachineAndSoftwareQuery()
+        params = query.to_odata_filters
         return VulnerabilitiesByMachineAndSoftwareResults(self, params, path=path)
 
     def softwareVulnerabilitiesByMachine(

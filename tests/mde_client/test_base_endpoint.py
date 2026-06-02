@@ -287,6 +287,19 @@ class TestBaseQueryFilters:
         assert params["$top"] == "5"
         assert params["$skip"] == "10"
 
+    def test_top_omits_default_page_size(self) -> None:
+        params = _DemoQuery(top=5).to_odata_filters
+        assert params["$top"] == "5"
+        assert "pageSize" not in params
+
+    def test_page_size_cannot_be_combined_with_top(self) -> None:
+        with pytest.raises(ValueError, match="page_size.*\\$top.*\\$skip"):
+            _DemoQuery(page_size=100, top=5).to_odata_filters
+
+    def test_page_size_cannot_be_combined_with_skip(self) -> None:
+        with pytest.raises(ValueError, match="page_size.*\\$top.*\\$skip"):
+            _DemoQuery(page_size=100, skip=10).to_odata_filters
+
     def test_since_time_int_becomes_iso(self) -> None:
         params = _DemoQuery(page_size=None, sinceTime=1).to_odata_filters
         assert "sinceTime" in params

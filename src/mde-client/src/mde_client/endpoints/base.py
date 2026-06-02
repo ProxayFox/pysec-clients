@@ -56,9 +56,20 @@ class BaseQuery(BaseModel):
         This is used by endpoints that support OData filtering. Only fields
         that are not None are included in the output.
         """
+        manual_pagination = self.top is not None or self.skip is not None
+        if (
+            "page_size" in self.model_fields_set
+            and self.page_size is not None
+            and manual_pagination
+        ):
+            raise ValueError(
+                "page_size cannot be combined with $top or $skip. "
+                "Set page_size=None to use manual $top/$skip pagination."
+            )
+
         filter_list: list[str] = []
         params: dict[str, str] = {}
-        if self.page_size is not None:
+        if self.page_size is not None and not manual_pagination:
             params["pageSize"] = str(self.page_size)
         if self.top is not None:
             params["$top"] = str(self.top)
