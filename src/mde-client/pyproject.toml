@@ -40,8 +40,10 @@ classifiers = [
 dependencies = [
     "aiohttp>=3.13.5",
     "http-to-arrow>=0.1.2",
+    "httpx>=0.28.1",
     "msal>=1.36.0",
     "orjson>=3.10.18",
+    "pydantic>=2.13.4",
     "requests>=2.33.1",
 ]
 
