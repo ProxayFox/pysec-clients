@@ -22,6 +22,8 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  # Opt into Node.js 24 for JavaScript-based actions ahead of the
+  # 2026-06-16 deprecation of Node.js 20 on GitHub Actions runners.
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
