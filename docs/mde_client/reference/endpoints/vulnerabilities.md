@@ -10,13 +10,16 @@ Access vulnerability records and related machine views.
 
 - `get_all(query: VulnerabilitiesQuery | None = None) -> VulnerabilityResults`: list vulnerabilities.
 - `get(id: str) -> VulnerabilityResults`: fetch one vulnerability by ID.
-- `machineReferences(id: str) -> MachineResults`: fetch machines related to a vulnerability.
-- `machinesVulnerabilities(id: str) -> VulnerabilitiesByMachineAndSoftwareResults`: fetch the machine-vulnerability collection path.
+- `machineReferences(id: str) -> MachineReferencesResults`: fetch machines related to a vulnerability.
+- `machinesVulnerabilities(query: VulnerabilitiesByMachineAndSoftwareQuery | None = None) -> VulnerabilitiesByMachineAndSoftwareResults`: fetch the machine-vulnerability collection path.
+- `softwareVulnerabilitiesByMachine(page_size: int = 50000) -> AssetVulnerabilityResults`: fetch software vulnerability assessment rows by machine.
+- `softwareVulnerabilitiesByMachineFiles() -> AssetVulnerabilityResults`: fetch software vulnerability assessment rows via export files.
+- `softwareVulnerabilityChangesByMachine(page_size: int = 50000, since: datetime | int | str | None = None) -> DeltaAssetVulnerabilityResults`: fetch delta software vulnerability assessment rows by machine.
 
 ## Notes
 
-- `machinesVulnerabilities()` currently accepts an `id` parameter but calls the collection path `/api/vulnerabilities/machinesVulnerabilities` rather than a per-ID path.
-- Use the query models in the endpoint module when you need collection-level filtering for vulnerability datasets.
+- Use `VulnerabilitiesQuery` and `VulnerabilitiesByMachineAndSoftwareQuery` when you need collection-level filtering for vulnerability datasets.
+- The software vulnerability helpers delegate to the machine assessment endpoints while keeping them discoverable from `client.vulnerabilities`.
 
 ## API
 

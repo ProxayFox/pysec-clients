@@ -11,6 +11,7 @@ Access exposure and configuration score data.
 - `get() -> ScoreResults`: fetch the organization exposure score.
 - `byMachineGroups() -> ScoreResults`: fetch exposure score by machine group.
 - `configurationScore() -> ScoreResults`: fetch Microsoft Secure Score for Devices.
+- `configurationScoreById(id: str) -> ScoreResults`: fetch Microsoft Secure Score for Devices by ID.
 
 ## Notes
 

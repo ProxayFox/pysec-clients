@@ -13,7 +13,7 @@ from ..schemas import (
 )
 
 if TYPE_CHECKING:
-    from .machines import MachineResults
+    from .machines import MachineReferencesResults
 
 
 class VulnerabilitiesQuery(BaseQuery):
@@ -83,8 +83,10 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-vulnerabilities
         """
-        params = query.to_odata_filters if query else {}
-        return VulnerabilityResults(self, params)
+        if query is None:
+            query = VulnerabilitiesQuery()
+        params = query.to_odata_filters
+        return VulnerabilityResults(self, params, use_concurrent_skip_pagination=True)
 
     def get(self, id: str) -> VulnerabilityResults:
         """Get a vulnerability by ID.
@@ -94,27 +96,38 @@ class VulnerabilityEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}"
         return VulnerabilityResults(self, {}, path=path, single=True)
 
-    def machineReferences(self, id: str) -> MachineResults:
-        """Get machine references for a vulnerability
+    def machineReferences(self, id: str) -> MachineReferencesResults:
+        """Get machine references from a Vulnerability CVE ID.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machines-by-vulnerability
         """
-        from .machines import MachineResults
+        from .machines import MachineReferencesResults
 
         path = f"{self._PATH}/{id}/machinereferences"
-        return MachineResults(self, {}, path=path)
+        return MachineReferencesResults(self, {}, path=path)
 
     def machinesVulnerabilities(
-        self, id: str
+        self, query: VulnerabilitiesByMachineAndSoftwareQuery | None = None
     ) -> VulnerabilitiesByMachineAndSoftwareResults:
         """Get machines with a vulnerability
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-all-vulnerabilities-by-machines
         """
         path = f"{self._PATH}/machinesVulnerabilities"
-        return VulnerabilitiesByMachineAndSoftwareResults(self, {}, path=path)
+        if query is None:
+            query = VulnerabilitiesByMachineAndSoftwareQuery()
+        params = query.to_odata_filters
+        return VulnerabilitiesByMachineAndSoftwareResults(
+            self,
+            params,
+            path=path,
+            use_concurrent_skip_pagination=True,
+            skip_page_size=10000,
+        )
 
-    def softwareVulnerabilitiesByMachine(self) -> AssetVulnerabilityResults:
+    def softwareVulnerabilitiesByMachine(
+        self, page_size: int = 50000
+    ) -> AssetVulnerabilityResults:
         """Get vulnerabilities for a machine with software references.
 
         **Docs:**
@@ -125,7 +138,7 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         return MachinesEndpoint(
             self._http, self._auth
-        )._softwareVulnerabilitiesByMachine()
+        )._softwareVulnerabilitiesByMachine(page_size)
 
     def softwareVulnerabilitiesByMachineFiles(self) -> AssetVulnerabilityResults:
         """Get vulnerabilities for a machine with software references.
@@ -141,7 +154,9 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         return MachinesEndpoint(self._http, self._auth)._softwareVulnerabilitiesExport()
 
-    def softwareVulnerabilityChangesByMachine(self) -> DeltaAssetVulnerabilityResults:
+    def softwareVulnerabilityChangesByMachine(
+        self, page_size: int = 50000, since: datetime | int | str | None = None
+    ) -> DeltaAssetVulnerabilityResults:
         """Get vulnerabilities for a machine with software references.
 
         **Docs:**
@@ -152,4 +167,4 @@ class VulnerabilityEndpoint(BaseEndpoint):
 
         return MachinesEndpoint(
             self._http, self._auth
-        )._softwareVulnerabilityChangesByMachine()
+        )._softwareVulnerabilityChangesByMachine(page_size, since)

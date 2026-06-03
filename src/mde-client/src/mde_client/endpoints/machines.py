@@ -928,6 +928,9 @@ class MachinesEndpoint(BaseEndpoint):
         """
         from .vulnerabilities import DeltaAssetVulnerabilityResults
 
+        # Since is mandatory, so default to 24hours if not provided.
+        since = 1 if since is None else since
+
         params = MachinesExportQuery(
             page_size=page_size, sinceTime=since
         ).to_odata_filters

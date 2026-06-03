@@ -9,6 +9,7 @@ Manage authenticated scan definitions and their history.
 ## Methods
 
 - `get_all(query: AuthenticatedDefinitionsQuery | None = None) -> AuthenticatedDefinitionsResults`: list authenticated scan definitions.
+- `get(id: str) -> AuthenticatedDefinitionsResults`: fetch one authenticated scan definition by ID.
 - `definition_history(ids: str | list[str], query: AuthenticatedScanHistoryQuery | None = None) -> AuthenticatedScanHistoryResults`: fetch scan history by definition ID.
 - `session_history(ids: str | list[str], query: AuthenticatedScanHistoryQuery | None = None) -> AuthenticatedScanHistoryResults`: fetch scan history by session ID.
 - `add(payload: AuthenticatedDefinitionsAlterPayload) -> AuthenticatedDefinitionsResults`: create a scan definition.

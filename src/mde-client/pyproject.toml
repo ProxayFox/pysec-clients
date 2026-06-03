@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mde-client"
-version = "0.1.3"
+version = "0.1.4"
 description = "Python client for the Microsoft Defender for Endpoint API with lazy results and Arrow/Polars output."
 readme = "README.md"
 requires-python = ">=3.14"
@@ -38,18 +38,22 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "aiohttp>=3.13.5",
+    "aiohttp>=3.14.0",
     "http-to-arrow>=0.1.2",
     "httpx>=0.28.1",
-    "msal>=1.36.0",
-    "orjson>=3.10.18",
+    "msal>=1.37.0",
+    "orjson>=3.11.9",
     "pydantic>=2.13.4",
-    "requests>=2.33.1",
+    "requests>=2.34.2",
 ]
 
 [project.optional-dependencies]
-arrow = ["pyarrow>=24.0.0"]
-polars = ["polars>=1.40.1"]
+arrow = [
+    "pyarrow>=24.0.0",
+]
+polars = [
+    "polars>=1.41.2",
+]
 
 [project.urls]
 Homepage = "https://github.com/ProxayFox/pysec-clients"
