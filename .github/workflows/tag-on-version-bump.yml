@@ -43,6 +43,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
+          # Use TAG_PUSH_TOKEN when a tag points at a commit GitHub treats as
+          # a workflow update. That token needs Contents + Workflows write.
+          token: ${{ secrets['TAG_PUSH_TOKEN'] || github.token }}
           # Need history + previous commit so we can diff pyproject.toml
           # against its prior version.
           fetch-depth: 0
