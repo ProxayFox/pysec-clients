@@ -54,14 +54,21 @@ jobs:
         run: |
           set -euo pipefail
 
-          # On workflow_dispatch (or first push to a new branch where
-          # BEFORE_SHA is all-zeros), compare against the parent commit.
-          if [[ "${EVENT_NAME}" == "workflow_dispatch" || "${BEFORE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
+          # On workflow_dispatch, check all package pyprojects so missing tags
+          # can be backfilled idempotently. On the first push to a new branch
+          # where BEFORE_SHA is all-zeros, compare against the parent commit.
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            base=""
+          elif [[ "${BEFORE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
             base="$(git rev-parse "${AFTER_SHA}^" 2>/dev/null || echo "")"
           else
             base="${BEFORE_SHA}"
           fi
-          echo "Comparing ${base:-<root>} -> ${AFTER_SHA}"
+          if [[ -n "${base}" ]]; then
+            echo "Comparing ${base} -> ${AFTER_SHA}"
+          else
+            echo "Checking all src/*/pyproject.toml files at ${AFTER_SHA}"
+          fi
 
           # List candidate pyproject files (changed in range, or all on dispatch/root).
           if [[ -n "${base}" ]]; then
@@ -82,11 +89,10 @@ jobs:
             # $1 = git revision (or empty for working tree), $2 = path
             local rev="$1" path="$2"
             if [[ -z "${rev}" ]]; then
-              python -c "import tomllib,sys;print(tomllib.loads(open('${path}','rb').read().decode())['project']['version'])"
+              python -c 'import sys,tomllib;print(tomllib.load(open(sys.argv[1], "rb"))["project"]["version"])' "${path}"
             else
               git show "${rev}:${path}" 2>/dev/null \
-                | python -c "import tomllib,sys;print(tomllib.loads(sys.stdin.buffer.read())['project']['version'])" \
-                || echo ""
+                | python -c 'import sys,tomllib;print(tomllib.load(sys.stdin.buffer)["project"]["version"])'
             fi
           }
 
