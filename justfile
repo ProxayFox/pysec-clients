@@ -10,15 +10,14 @@ help:
 
 # --- Package Management ---
 sync:
-    uv sync
-
-sync-all:
     uv sync --all-groups --all-packages
 
 check-vulns:
     uv export --frozen --no-hashes --no-editable --no-emit-project | uvx pip-audit -r /dev/stdin
 
 upgrade-deps:
+    uv lock --upgrade
+    uv sync --all-groups --all-packages
     uvx uv-upgrade
 
 # --- Development ---

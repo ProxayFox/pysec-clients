@@ -27,7 +27,6 @@ dev = [
     "pytest-xdist>=3.8.0",
     "ruff>=0.15.11",
     "scalene>=2.2.1",
-    "scalene-mcp>=0.1.0",
     "ty>=0.0.32",
     "types-defusedxml>=0.7.0.20260408",
     "types-pyyaml>=6.0.12.20260408",
