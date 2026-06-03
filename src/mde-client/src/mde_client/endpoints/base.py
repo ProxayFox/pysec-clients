@@ -19,10 +19,14 @@ from __future__ import annotations
 
 import httpx
 import asyncio
+import random
+import time
 import pyarrow as pa
 import polars as pl
 import orjson
+from collections import deque
 from datetime import datetime, timedelta, timezone
+from email.utils import parsedate_to_datetime
 from typing import Any
 from collections.abc import Iterator
 from pydantic import BaseModel, ConfigDict, Field
@@ -179,6 +183,9 @@ class BaseResults:
 
     # Subclasses should override this with a Pydantic schema for the expected record shape, if desired.
     SCHEMA: pa.Schema | None
+    USE_CONCURRENT_SKIP_PAGINATION = False
+    SKIP_PAGE_SIZE = 8000
+    SKIP_MAX_CONCURRENT = 10
 
     def __init__(
         self,
@@ -190,6 +197,9 @@ class BaseResults:
         files: bool = False,  # True when endpoint returns file export results
         method: str = "GET",
         request_kwargs: dict[str, Any] | None = None,
+        use_concurrent_skip_pagination: bool | None = None,
+        skip_page_size: int | None = None,
+        skip_max_concurrent: int | None = None,
     ) -> None:
         self._endpoint = endpoint
         self._params = params
@@ -198,6 +208,19 @@ class BaseResults:
         self._single = single
         self._method = method
         self._request_kwargs = dict(request_kwargs or {})
+        self._use_concurrent_skip_pagination = (
+            self.USE_CONCURRENT_SKIP_PAGINATION
+            if use_concurrent_skip_pagination is None
+            else use_concurrent_skip_pagination
+        )
+        self._skip_page_size = (
+            self.SKIP_PAGE_SIZE if skip_page_size is None else skip_page_size
+        )
+        self._skip_max_concurrent = (
+            self.SKIP_MAX_CONCURRENT
+            if skip_max_concurrent is None
+            else skip_max_concurrent
+        )
         self._container: ArrowRecordContainer | None = None
 
     @staticmethod
@@ -270,6 +293,16 @@ class BaseResults:
             response.raise_for_status()
             self._container.extend(self._records_from_body(response.json()))
             del response  # free memory
+        elif self._use_concurrent_skip_pagination:
+            self._endpoint._paginate_skip_into(
+                self._path,
+                self._params,
+                self._container,
+                page_size=self._skip_page_size,
+                max_concurrent=self._skip_max_concurrent,
+                method=self._method,
+                request_kwargs=self._request_kwargs,
+            )
         else:
             self._endpoint._paginate_into(
                 self._path,
@@ -342,11 +375,20 @@ class BaseEndpoint:
     """Base class for API endpoints."""
 
     _PATH: str = ""
+    _RATE_LIMIT_CALLS_PER_MINUTE: int = 100
+    _RATE_LIMIT_CALLS_PER_HOUR: int = 1500
+    _RATE_LIMIT_MAX_RETRIES: int = 5
+    _RATE_LIMIT_BACKOFF_BASE_SECONDS: float = 5.0
 
     def __init__(self, http: httpx.Client, auth: MSALAuth) -> None:
         self._http = http
         self._auth = auth
+        self._rate_limit_minute_calls: deque[float] = deque()
+        self._rate_limit_hour_calls: deque[float] = deque()
+        self._rate_limit_lock: asyncio.Lock | None = None
+        self._rate_limit_lock_loop: asyncio.AbstractEventLoop | None = None
 
+    # === Helpers for child endpoints ===
     @staticmethod
     def _id_list(ids: str | list[str]) -> list[str]:
         return [ids] if isinstance(ids, str) else ids
@@ -357,6 +399,111 @@ class BaseEndpoint:
         for i in range(0, len(lst), n):
             yield lst[i : i + n]
 
+    @staticmethod
+    def _trim_rate_window(calls: deque[float], cutoff: float) -> None:
+        while calls and calls[0] <= cutoff:
+            calls.popleft()
+
+    @staticmethod
+    def _raise_for_response_status(response: httpx.Response) -> None:
+        try:
+            response.raise_for_status()
+        except httpx.HTTPStatusError as e:
+            if e.response is not None and e.response.status_code == 403:
+                error_body = e.response.json()
+                if "error" in error_body and "message" in error_body["error"]:
+                    raise PermissionError(
+                        str(
+                            "Insufficient permissions to access this endpoint. Check the message bellow for required permissions.\n"
+                            f"Code: {error_body['error']['code']}\n"
+                            f"Message:\n{error_body['error']['message']}"
+                        )
+                    ) from None
+
+            raise httpx.HTTPStatusError(
+                str(
+                    f"Request failed for URL: {response.url}\n"
+                    f"Status code: {response.status_code}\n"
+                    f"Response body: {response.text}"
+                ),
+                request=e.request,
+                response=e.response,
+            ) from None
+
+    @staticmethod
+    def _skip_pagination_params(params: dict[str, str]) -> dict[str, str]:
+        return {
+            key: value for key, value in params.items() if key.lower() != "pagesize"
+        }
+
+    # === Rate Limiting Logic ===
+    def _current_rate_limit_lock(self) -> asyncio.Lock:
+        loop = asyncio.get_running_loop()
+        if self._rate_limit_lock is None or self._rate_limit_lock_loop is not loop:
+            self._rate_limit_lock = asyncio.Lock()
+            self._rate_limit_lock_loop = loop
+        return self._rate_limit_lock
+
+    def _monotonic(self) -> float:
+        return time.monotonic()
+
+    async def _asleep(self, delay: float) -> None:
+        await asyncio.sleep(delay)
+
+    def _rate_limit_jitter(self) -> float:
+        return random.uniform(0.0, self._RATE_LIMIT_BACKOFF_BASE_SECONDS)
+
+    async def _wait_for_rate_limit_slot(self) -> None:
+        """Wait until this endpoint instance has capacity for another request."""
+        while True:
+            async with self._current_rate_limit_lock():
+                now = self._monotonic()
+                self._trim_rate_window(self._rate_limit_minute_calls, now - 60.0)
+                self._trim_rate_window(self._rate_limit_hour_calls, now - 3600.0)
+
+                delays: list[float] = []
+                if (
+                    self._RATE_LIMIT_CALLS_PER_MINUTE > 0
+                    and len(self._rate_limit_minute_calls)
+                    >= self._RATE_LIMIT_CALLS_PER_MINUTE
+                ):
+                    delays.append(60.0 - (now - self._rate_limit_minute_calls[0]))
+                if (
+                    self._RATE_LIMIT_CALLS_PER_HOUR > 0
+                    and len(self._rate_limit_hour_calls)
+                    >= self._RATE_LIMIT_CALLS_PER_HOUR
+                ):
+                    delays.append(3600.0 - (now - self._rate_limit_hour_calls[0]))
+
+                if not delays:
+                    self._rate_limit_minute_calls.append(now)
+                    self._rate_limit_hour_calls.append(now)
+                    return
+
+            await self._asleep(max(0.0, max(delays)))
+
+    def _retry_after_delay(self, response: httpx.Response) -> float | None:
+        value = response.headers.get("Retry-After")
+        if value is None:
+            return None
+        try:
+            return max(0.0, float(value))
+        except ValueError:
+            try:
+                retry_at = parsedate_to_datetime(value)
+            except TypeError, ValueError:
+                return None
+            if retry_at.tzinfo is None:
+                retry_at = retry_at.replace(tzinfo=timezone.utc)
+            return max(0.0, (retry_at - datetime.now(tz=timezone.utc)).total_seconds())
+
+    def _backoff_delay(self, attempt: int) -> float:
+        return (
+            self._RATE_LIMIT_BACKOFF_BASE_SECONDS * (2**attempt)
+            + self._rate_limit_jitter()
+        )
+
+    # === Single HTTP Request ===
     async def _arequest(self, method: str, path: str, **kwargs) -> httpx.Response:
         """Make an authenticated async request, refreshing the token as needed."""
         async with httpx.AsyncClient(
@@ -373,6 +520,26 @@ class BaseEndpoint:
         """Async Wrapper for _arequest to be used in sync methods."""
         return asyncio.run(self._arequest(method, path, **kwargs))
 
+    async def _arequest_with_rate_limit(
+        self, method: str, path: str, **kwargs
+    ) -> httpx.Response:
+        """Make an async request with endpoint-scoped throttling and 429 backoff."""
+        for attempt in range(self._RATE_LIMIT_MAX_RETRIES + 1):
+            await self._wait_for_rate_limit_slot()
+            response = await self._arequest(method, path, **kwargs)
+            if response.status_code != 429:
+                return response
+            if attempt >= self._RATE_LIMIT_MAX_RETRIES:
+                return response
+
+            delay = self._retry_after_delay(response)
+            if delay is None:
+                delay = self._backoff_delay(attempt)
+            await self._asleep(delay)
+
+        raise RuntimeError("unreachable rate-limit retry state")
+
+    # === Pagination HTTP Requests ===
     async def _apaginate(
         self,
         path: str,
@@ -417,7 +584,7 @@ class BaseEndpoint:
         method: str = "GET",
         request_kwargs: dict[str, Any] | None = None,
     ) -> list[dict]:
-        """Async Wrapper for _paginate to be used in sync methods."""
+        """Sync wrapper for ``_apaginate``."""
 
         # If the caller specified $top or $skip, we should not paginate
         if params.get("$top") or params.get("$skip"):
@@ -464,31 +631,7 @@ class BaseEndpoint:
                     **request_kwargs,
                 )
 
-            try:
-                response.raise_for_status()
-            except httpx.HTTPStatusError as e:
-                if e.response is not None and e.response.status_code == 403:
-                    # For 403 errors, we want to inform the user about the permissions they require that is returned in the response body
-                    # Rather than just raising a generic HTTP error.
-                    error_body = e.response.json()
-                    if "error" in error_body and "message" in error_body["error"]:
-                        raise PermissionError(
-                            str(
-                                "Insufficient permissions to access this endpoint. Check the message bellow for required permissions.\n"
-                                f"Code: {error_body['error']['code']}\n"
-                                f"Message:\n{error_body['error']['message']}"
-                            )
-                        )
-
-                raise httpx.HTTPStatusError(
-                    str(
-                        f"Request failed for URL: {response.url}\n"
-                        f"Status code: {response.status_code}\n"
-                        f"Response body: {response.text}"
-                    ),
-                    request=e.request,
-                    response=e.response,
-                ) from None
+            self._raise_for_response_status(response)
             body: dict = response.json()
             container.extend(body.get("value", []))
 
@@ -510,7 +653,7 @@ class BaseEndpoint:
         # If the caller specified $top or $skip, we should not paginate
         if params.get("$top") or params.get("$skip"):
             raise ValueError(
-                "Cannot use _paginate when $top or $skip is specified in params."
+                "Cannot use _paginate_into when $top or $skip is specified in params."
                 "Use _request instead, or remove $top/$skip to enable pagination."
             )
 
@@ -519,6 +662,124 @@ class BaseEndpoint:
                 path,
                 params,
                 container,
+                method=method,
+                request_kwargs=request_kwargs,
+            )
+        )
+
+    async def _fetch_skip_page(
+        self,
+        path: str,
+        params: dict[str, str],
+        offset: int,
+        page_size: int,
+        *,
+        method: str,
+        request_kwargs: dict[str, Any],
+    ) -> tuple[int, list[dict[str, Any]]]:
+        page_params = self._skip_pagination_params(params)
+        page_params["$top"] = str(page_size)
+        page_params["$skip"] = str(offset)
+
+        response = await self._arequest_with_rate_limit(
+            method,
+            path,
+            params=page_params,
+            **request_kwargs,
+        )
+        self._raise_for_response_status(response)
+
+        body = response.json()
+        records = body.get("value", []) if isinstance(body, dict) else []
+        if not isinstance(records, list):
+            return offset, []
+        return offset, records
+
+    async def _apaginate_skip_into(
+        self,
+        path: str,
+        params: dict[str, str],
+        container: ArrowRecordContainer,
+        *,
+        page_size: int = 8000,
+        max_concurrent: int = 10,
+        method: str = "GET",
+        request_kwargs: dict[str, Any] = dict(),
+    ) -> None:
+        """Fetch predictable OData $top/$skip windows concurrently into *container*."""
+        if params.get("$top") or params.get("$skip"):
+            raise ValueError(
+                "Cannot use concurrent skip pagination when $top or $skip is specified in params."
+            )
+        if page_size <= 0:
+            raise ValueError("page_size must be greater than 0.")
+        if max_concurrent <= 0:
+            raise ValueError("max_concurrent must be greater than 0.")
+
+        effective_concurrency = max_concurrent
+        if self._RATE_LIMIT_CALLS_PER_MINUTE > 0:
+            effective_concurrency = min(
+                effective_concurrency,
+                self._RATE_LIMIT_CALLS_PER_MINUTE,
+            )
+        if self._RATE_LIMIT_CALLS_PER_HOUR > 0:
+            effective_concurrency = min(
+                effective_concurrency,
+                self._RATE_LIMIT_CALLS_PER_HOUR,
+            )
+
+        offset = 0
+        while True:
+            offsets = [
+                offset + (page_size * index) for index in range(effective_concurrency)
+            ]
+            pages = await asyncio.gather(
+                *(
+                    self._fetch_skip_page(
+                        path,
+                        params,
+                        skip,
+                        page_size,
+                        method=method,
+                        request_kwargs=request_kwargs,
+                    )
+                    for skip in offsets
+                )
+            )
+
+            should_stop = False
+            for _, records in sorted(pages, key=lambda page: page[0]):
+                if not records:
+                    should_stop = True
+                    break
+                container.extend(records)
+                if len(records) < page_size:
+                    should_stop = True
+                    break
+
+            if should_stop:
+                break
+            offset += page_size * effective_concurrency
+
+    def _paginate_skip_into(
+        self,
+        path: str,
+        params: dict[str, str],
+        container: ArrowRecordContainer,
+        *,
+        page_size: int = 8000,
+        max_concurrent: int = 10,
+        method: str = "GET",
+        request_kwargs: dict[str, Any] = dict(),
+    ) -> None:
+        """Sync wrapper for ``_apaginate_skip_into``."""
+        asyncio.run(
+            self._apaginate_skip_into(
+                path,
+                params,
+                container,
+                page_size=page_size,
+                max_concurrent=max_concurrent,
                 method=method,
                 request_kwargs=request_kwargs,
             )

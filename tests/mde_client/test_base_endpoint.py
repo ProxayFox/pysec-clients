@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Any
 from unittest.mock import MagicMock
 
@@ -44,6 +45,47 @@ class _RecordingEndpoint(BaseEndpoint):
     async def _arequest(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
         self.calls.append((method, path, kwargs))
         return self._responses.pop(0)
+
+
+class _SkipEndpoint(BaseEndpoint):
+    _PATH = "/api/test"
+    _RATE_LIMIT_BACKOFF_BASE_SECONDS = 0.0
+
+    def __init__(
+        self,
+        batches: dict[int, list[dict[str, Any]]],
+        *,
+        responses: dict[int, list[httpx.Response]] | None = None,
+    ) -> None:
+        http = MagicMock(spec=httpx.Client)
+        http.base_url = "https://fake.api"
+        auth = MagicMock()
+        auth.token = "fake-token"
+        super().__init__(http, auth)
+        self._batches = batches
+        self._responses = responses or {}
+        self.calls: list[tuple[str, str, dict[str, Any]]] = []
+        self.sleep_calls: list[float] = []
+
+    async def _arequest(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
+        self.calls.append((method, path, kwargs))
+        params = kwargs.get("params", {})
+        offset = int(params.get("$skip", "0"))
+        responses = self._responses.get(offset)
+        if responses:
+            return responses.pop(0)
+        return _resp(200, body={"value": self._batches.get(offset, [])})
+
+    async def _asleep(self, delay: float) -> None:
+        self.sleep_calls.append(delay)
+        await asyncio.sleep(0)
+
+
+class _SkipResults(BaseResults):
+    SCHEMA = None
+    USE_CONCURRENT_SKIP_PAGINATION = True
+    SKIP_PAGE_SIZE = 2
+    SKIP_MAX_CONCURRENT = 3
 
 
 # ---------------------------------------------------------------------------
@@ -148,6 +190,102 @@ class TestPagination:
         container = ArrowRecordContainer(schema=None)
         endpoint._paginate_into("/api/test", {}, container)
         assert container.to_polars.to_dicts() == [{"id": "a"}, {"id": "b"}]
+
+    def test_concurrent_skip_pagination_fetches_ordered_windows(self) -> None:
+        endpoint = _SkipEndpoint(
+            {
+                0: [{"id": 0}, {"id": 1}],
+                2: [{"id": 2}, {"id": 3}],
+                4: [],
+            }
+        )
+        container = ArrowRecordContainer(schema=None)
+        endpoint._paginate_skip_into(
+            "/api/test",
+            {"pageSize": "10000", "$filter": "name eq 'a'"},
+            container,
+            page_size=2,
+            max_concurrent=3,
+        )
+
+        assert container.to_polars.to_dicts() == [
+            {"id": 0},
+            {"id": 1},
+            {"id": 2},
+            {"id": 3},
+        ]
+        call_params = [call[2]["params"] for call in endpoint.calls]
+        assert [params["$skip"] for params in call_params] == ["0", "2", "4"]
+        assert all(params["$top"] == "2" for params in call_params)
+        assert all("pageSize" not in params for params in call_params)
+        assert all(params["$filter"] == "name eq 'a'" for params in call_params)
+
+    def test_concurrent_skip_pagination_stops_after_short_page(self) -> None:
+        endpoint = _SkipEndpoint(
+            {
+                0: [{"id": 0}, {"id": 1}],
+                2: [{"id": 2}],
+                4: [{"id": 4}, {"id": 5}],
+            }
+        )
+        container = ArrowRecordContainer(schema=None)
+        endpoint._paginate_skip_into(
+            "/api/test", {}, container, page_size=2, max_concurrent=3
+        )
+
+        assert container.to_polars.to_dicts() == [
+            {"id": 0},
+            {"id": 1},
+            {"id": 2},
+        ]
+
+    def test_concurrent_skip_pagination_rejects_manual_skip(self) -> None:
+        endpoint = _SkipEndpoint({})
+        container = ArrowRecordContainer(schema=None)
+        with pytest.raises(ValueError, match="concurrent skip pagination"):
+            endpoint._paginate_skip_into("/api/test", {"$skip": "10"}, container)
+
+    def test_concurrent_skip_results_route_through_base_results(self) -> None:
+        endpoint = _SkipEndpoint({0: [{"id": 0}, {"id": 1}], 2: []})
+        results = _SkipResults(endpoint, {"pageSize": "10000"})
+
+        assert results.to_dicts() == [{"id": 0}, {"id": 1}]
+        assert all("pageSize" not in call[2]["params"] for call in endpoint.calls)
+
+    def test_concurrent_skip_pagination_respects_endpoint_rate_cap(self) -> None:
+        class _LimitedSkipEndpoint(_SkipEndpoint):
+            _RATE_LIMIT_CALLS_PER_MINUTE = 2
+
+        endpoint = _LimitedSkipEndpoint({0: [{"id": 0}], 1: []})
+        container = ArrowRecordContainer(schema=None)
+        endpoint._paginate_skip_into(
+            "/api/test", {}, container, page_size=1, max_concurrent=10
+        )
+
+        assert [call[2]["params"]["$skip"] for call in endpoint.calls] == ["0", "1"]
+
+    def test_rate_limit_retry_after_is_used_for_429(self) -> None:
+        endpoint = _SkipEndpoint(
+            {1: []},
+            responses={
+                0: [
+                    httpx.Response(
+                        429,
+                        json={"error": "rate"},
+                        headers={"Retry-After": "2"},
+                        request=httpx.Request("GET", "https://fake.api/path"),
+                    ),
+                    _resp(200, body={"value": [{"id": 0}]}),
+                ]
+            },
+        )
+        container = ArrowRecordContainer(schema=None)
+        endpoint._paginate_skip_into(
+            "/api/test", {}, container, page_size=1, max_concurrent=1
+        )
+
+        assert endpoint.sleep_calls == [2.0]
+        assert container.to_polars.to_dicts() == [{"id": 0}]
 
 
 class TestPaginateIntoErrors:

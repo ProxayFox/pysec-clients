@@ -86,7 +86,7 @@ class VulnerabilityEndpoint(BaseEndpoint):
         if query is None:
             query = VulnerabilitiesQuery()
         params = query.to_odata_filters
-        return VulnerabilityResults(self, params)
+        return VulnerabilityResults(self, params, use_concurrent_skip_pagination=True)
 
     def get(self, id: str) -> VulnerabilityResults:
         """Get a vulnerability by ID.
