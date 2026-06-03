@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime, timedelta, timezone, tzinfo
+from email.utils import format_datetime
 from typing import Any
 from unittest.mock import MagicMock
 
@@ -10,6 +12,7 @@ import httpx
 import pytest
 from http_to_arrow import ArrowRecordContainer
 
+import mde_client.endpoints.base as base_module
 from mde_client.endpoints.base import BaseEndpoint, BaseQuery, BaseResults
 
 
@@ -286,6 +289,118 @@ class TestPagination:
 
         assert endpoint.sleep_calls == [2.0]
         assert container.to_polars.to_dicts() == [{"id": 0}]
+
+    def test_rate_limit_retry_after_http_date_is_used_for_429(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        fixed_now = datetime(2026, 6, 3, 12, 0, 0, tzinfo=timezone.utc)
+        retry_at = fixed_now + timedelta(seconds=90)
+
+        class _FixedDatetime(datetime):
+            @classmethod
+            def now(cls, tz: tzinfo | None = None) -> datetime:
+                if tz is None:
+                    return fixed_now.replace(tzinfo=None)
+                return fixed_now.astimezone(tz)
+
+        monkeypatch.setattr(base_module, "datetime", _FixedDatetime)
+        endpoint = _SkipEndpoint(
+            {1: []},
+            responses={
+                0: [
+                    httpx.Response(
+                        429,
+                        json={"error": "rate"},
+                        headers={"Retry-After": format_datetime(retry_at, usegmt=True)},
+                        request=httpx.Request("GET", "https://fake.api/path"),
+                    ),
+                    _resp(200, body={"value": [{"id": 0}]}),
+                ]
+            },
+        )
+        container = ArrowRecordContainer(schema=None)
+        endpoint._paginate_skip_into(
+            "/api/test", {}, container, page_size=1, max_concurrent=1
+        )
+
+        assert endpoint.sleep_calls == [90.0]
+        assert container.to_polars.to_dicts() == [{"id": 0}]
+
+    def test_rate_limit_without_retry_after_uses_backoff(self) -> None:
+        class _BackoffSkipEndpoint(_SkipEndpoint):
+            _RATE_LIMIT_BACKOFF_BASE_SECONDS = 1.5
+
+            def _rate_limit_jitter(self) -> float:
+                return 0.25
+
+        endpoint = _BackoffSkipEndpoint(
+            {1: []},
+            responses={
+                0: [
+                    httpx.Response(
+                        429,
+                        json={"error": "rate"},
+                        request=httpx.Request("GET", "https://fake.api/path"),
+                    ),
+                    _resp(200, body={"value": [{"id": 0}]}),
+                ]
+            },
+        )
+        container = ArrowRecordContainer(schema=None)
+        endpoint._paginate_skip_into(
+            "/api/test", {}, container, page_size=1, max_concurrent=1
+        )
+
+        assert endpoint.sleep_calls == [1.75]
+        assert container.to_polars.to_dicts() == [{"id": 0}]
+
+    def test_rate_limit_retry_exhaustion_raises_final_429(self) -> None:
+        class _ShortRetrySkipEndpoint(_SkipEndpoint):
+            _RATE_LIMIT_MAX_RETRIES = 2
+
+        endpoint = _ShortRetrySkipEndpoint(
+            {},
+            responses={
+                0: [
+                    httpx.Response(
+                        429,
+                        json={"error": "rate"},
+                        request=httpx.Request("GET", "https://fake.api/path"),
+                    ),
+                    httpx.Response(
+                        429,
+                        json={"error": "rate"},
+                        request=httpx.Request("GET", "https://fake.api/path"),
+                    ),
+                    httpx.Response(
+                        429,
+                        json={"error": "rate"},
+                        request=httpx.Request("GET", "https://fake.api/path"),
+                    ),
+                ]
+            },
+        )
+        container = ArrowRecordContainer(schema=None)
+
+        with pytest.raises(httpx.HTTPStatusError, match="429"):
+            endpoint._paginate_skip_into(
+                "/api/test", {}, container, page_size=1, max_concurrent=1
+            )
+
+        assert len(endpoint.calls) == 3
+        assert endpoint.sleep_calls == [0.0, 0.0]
+
+    def test_backoff_delay_uses_exponential_attempt_and_jitter(self) -> None:
+        class _BackoffSkipEndpoint(_SkipEndpoint):
+            _RATE_LIMIT_BACKOFF_BASE_SECONDS = 1.5
+
+            def _rate_limit_jitter(self) -> float:
+                return 0.25
+
+        endpoint = _BackoffSkipEndpoint({})
+
+        assert endpoint._backoff_delay(0) == 1.75
+        assert endpoint._backoff_delay(2) == 6.25
 
 
 class TestPaginateIntoErrors:
