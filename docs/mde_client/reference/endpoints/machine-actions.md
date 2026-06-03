@@ -10,6 +10,9 @@ Inspect machine actions and trigger machine response operations.
 
 - `get_all(query: MachineActionsQuery | None = None) -> MachineActionsResults`: list machine actions.
 - `get(id: str) -> MachineActionsResults`: fetch one machine action by ID.
+- `getMachineActions(machine_id: str) -> MachineActionsResults`: fetch machine actions for a specific machine.
+- `latestMachineActions(machine_id: str) -> MachineActionsResults`: fetch the latest machine actions for a machine.
+- `availableMachineActions(id: str) -> ActionAvailabilityStatusResults`: fetch available machine actions for a machine.
 - `collectInvestigationPackage(device_id: str, payload) -> MachineActionsResults`: collect an investigation package.
 - `getPackage(id: str) -> str`: return a package download URI for a completed investigation package action.
 - `getLiveResponseResultDownloadLink(id: str, index: int = 0) -> str`: return a live response result download URI.
