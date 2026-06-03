@@ -13,6 +13,15 @@ on:
     paths:
       - "src/*/pyproject.toml"
   workflow_dispatch:
+    inputs:
+      base_ref:
+        description: "Optional base commit/ref to compare from. Defaults to target_ref^ when target_ref is set."
+        required: false
+        type: string
+      target_ref:
+        description: "Optional target commit/ref to compare to and tag. Defaults to the workflow run commit."
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -51,14 +60,27 @@ jobs:
           BEFORE_SHA: ${{ github.event.before }}
           AFTER_SHA: ${{ github.sha }}
           EVENT_NAME: ${{ github.event_name }}
+          INPUT_BASE_REF: ${{ github.event.inputs.base_ref || '' }}
+          INPUT_TARGET_REF: ${{ github.event.inputs.target_ref || '' }}
         run: |
           set -euo pipefail
 
+          target_ref="${INPUT_TARGET_REF:-${AFTER_SHA}}"
+          AFTER_SHA="$(git rev-parse "${target_ref}")"
+
           # On workflow_dispatch, check all package pyprojects so missing tags
-          # can be backfilled idempotently. On the first push to a new branch
-          # where BEFORE_SHA is all-zeros, compare against the parent commit.
+          # can be backfilled idempotently when no refs are provided. When a
+          # target_ref is provided, compare against base_ref or target_ref^.
+          # On the first push to a new branch where BEFORE_SHA is all-zeros,
+          # compare against the parent commit.
           if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
-            base=""
+            if [[ -n "${INPUT_BASE_REF}" ]]; then
+              base="$(git rev-parse "${INPUT_BASE_REF}")"
+            elif [[ -n "${INPUT_TARGET_REF}" ]]; then
+              base="$(git rev-parse "${AFTER_SHA}^" 2>/dev/null || echo "")"
+            else
+              base=""
+            fi
           elif [[ "${BEFORE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
             base="$(git rev-parse "${AFTER_SHA}^" 2>/dev/null || echo "")"
           else
