@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mde_client.endpoints.machines import MachineResults, MachinesEndpoint
+from mde_client.endpoints.machines import MachinesEndpoint, MachineReferencesResults
 from mde_client.endpoints.vulnerabilities import (
     VulnerabilitiesByMachineAndSoftwareResults,
     VulnerabilitiesQuery,
@@ -37,7 +37,9 @@ class TestGet:
 class TestMachineReferences:
     def test_path(self, make_endpoint) -> None:
         result = make_endpoint(VulnerabilityEndpoint).machineReferences("CVE-2025-0001")
-        assert isinstance(result, MachineResults)
+        assert isinstance(result, MachineReferencesResults), (
+            f"{result} is not a MachineReferencesResults"
+        )
         assert result._path == "/api/vulnerabilities/CVE-2025-0001/machinereferences"
 
 

@@ -13,7 +13,7 @@ from ..schemas import (
 )
 
 if TYPE_CHECKING:
-    from .machines import MachineResults
+    from .machines import MachineReferencesResults
 
 
 class VulnerabilitiesQuery(BaseQuery):
@@ -96,15 +96,15 @@ class VulnerabilityEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}"
         return VulnerabilityResults(self, {}, path=path, single=True)
 
-    def machineReferences(self, id: str) -> MachineResults:
-        """Get machine references for a vulnerability
+    def machineReferences(self, id: str) -> MachineReferencesResults:
+        """Get machine references from a Vulnerability CVE ID.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/get-machines-by-vulnerability
         """
-        from .machines import MachineResults
+        from .machines import MachineReferencesResults
 
         path = f"{self._PATH}/{id}/machinereferences"
-        return MachineResults(self, {}, path=path)
+        return MachineReferencesResults(self, {}, path=path)
 
     def machinesVulnerabilities(
         self, query: VulnerabilitiesByMachineAndSoftwareQuery | None = None
@@ -117,7 +117,13 @@ class VulnerabilityEndpoint(BaseEndpoint):
         if query is None:
             query = VulnerabilitiesByMachineAndSoftwareQuery()
         params = query.to_odata_filters
-        return VulnerabilitiesByMachineAndSoftwareResults(self, params, path=path)
+        return VulnerabilitiesByMachineAndSoftwareResults(
+            self,
+            params,
+            path=path,
+            use_concurrent_skip_pagination=True,
+            skip_page_size=10000,
+        )
 
     def softwareVulnerabilitiesByMachine(
         self, page_size: int = 50000
