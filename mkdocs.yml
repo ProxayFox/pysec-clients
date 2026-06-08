@@ -69,6 +69,7 @@ nav:
           - Get related data for one machine: mde_client/how-to/get-machine-related-data.md
           - Run an advanced hunting query: mde_client/how-to/run-advanced-hunting.md
           - Work with result formats: mde_client/how-to/work-with-result-formats.md
+          - Stream results as Arrow IPC: mde_client/how-to/stream-ipc-results.md
           - Use export-backed endpoints: mde_client/how-to/use-export-backed-endpoints.md
           - Inject a custom HTTP client or token cache: mde_client/how-to/inject-http-client-and-token-cache.md
           - Handle errors and retries: mde_client/how-to/handle-errors-and-retries.md
