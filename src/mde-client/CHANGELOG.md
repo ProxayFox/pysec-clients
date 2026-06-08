@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `BaseResults.to_ipc_stream(...)`: an async terminal that streams results as
+  Arrow IPC stream byte chunks via `http-to-arrow`'s `ArrowIPCStream`, keeping
+  peak memory close to a single record batch. Designed for memory-limited
+  runtimes such as a 2 GiB Azure Function exporting millions of rows. Unlike the
+  cached terminals (`to_dicts`, `to_json`, `to_arrow`, `to_polars`) it never
+  materializes the full result set and is not cached. Supports collection
+  pagination, concurrent `$top`/`$skip` pagination, single-object and
+  manual-pagination responses, and export-backed (`files=True`) endpoints.
+- `ViaFiles.stream_export_files(...)`: streams parsed export-file records into
+  any async sink (for example an `ArrowIPCStream`) instead of accumulating an
+  `ArrowRecordContainer`.
+
+### Changed
+
+- Requires `http-to-arrow>=0.2.1` for Arrow IPC streaming support.
+
 ## [0.1.2] - 2026-05-31
 
 ### Added
