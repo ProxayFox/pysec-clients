@@ -9,6 +9,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import httpx
+import pyarrow as pa
 import pytest
 from http_to_arrow import ArrowRecordContainer
 
@@ -564,3 +565,134 @@ class TestBaseQueryFilters:
             page_size=None, sinceTime="2025-01-01T00:00:00Z"
         ).to_odata_filters
         assert params["sinceTime"] == "2025-01-01T00:00:00Z"
+
+
+# ---------------------------------------------------------------------------
+# BaseResults.to_ipc_stream
+# ---------------------------------------------------------------------------
+
+_IPC_SCHEMA = pa.schema([("id", pa.int64())])
+
+
+class _SchemaStreamResults(BaseResults):
+    """BaseResults subclass exposing a concrete SCHEMA for streaming fallback tests."""
+
+    SCHEMA = _IPC_SCHEMA
+
+
+async def _collect_ipc_table(results: BaseResults, **kwargs: Any) -> pa.Table:
+    """Drain ``to_ipc_stream`` and decode the chunks back into a pyarrow Table."""
+    chunks = [chunk async for chunk in results.to_ipc_stream(**kwargs)]
+    return pa.ipc.open_stream(pa.BufferReader(b"".join(chunks))).read_all()
+
+
+class TestBaseResultsIpcStream:
+    @pytest.mark.asyncio
+    async def test_streams_paginated_pages(self) -> None:
+        endpoint = _RecordingEndpoint(
+            [
+                _resp(
+                    200,
+                    body={"value": [{"id": 1}], "@odata.nextLink": "/api/test?p=2"},
+                ),
+                _resp(200, body={"value": [{"id": 2}]}),
+            ]
+        )
+        results = BaseResults(endpoint, {})
+        results.SCHEMA = None
+        table = await _collect_ipc_table(results, schema=_IPC_SCHEMA)
+        assert table.column("id").to_pylist() == [1, 2]
+        # Second page followed the nextLink.
+        assert endpoint.calls[1][1] == "/api/test?p=2"
+        # Streaming must not populate the cached container.
+        assert results._container is None
+
+    @pytest.mark.asyncio
+    async def test_streams_single_object(self) -> None:
+        endpoint = _RecordingEndpoint([_resp(200, body={"id": 7})])
+        results = BaseResults(endpoint, {}, path="/api/test/7", single=True)
+        results.SCHEMA = None
+        table = await _collect_ipc_table(results, schema=_IPC_SCHEMA)
+        assert table.column("id").to_pylist() == [7]
+        assert endpoint.calls[0][1] == "/api/test/7"
+
+    @pytest.mark.asyncio
+    async def test_top_param_skips_pagination(self) -> None:
+        endpoint = _RecordingEndpoint(
+            [_resp(200, body={"value": [{"id": 1}], "@odata.nextLink": "/next"})]
+        )
+        results = BaseResults(endpoint, {"$top": "1"})
+        results.SCHEMA = None
+        table = await _collect_ipc_table(results, schema=_IPC_SCHEMA)
+        assert table.column("id").to_pylist() == [1]
+        # nextLink ignored because $top was requested.
+        assert len(endpoint.calls) == 1
+
+    @pytest.mark.asyncio
+    async def test_streams_concurrent_skip_windows_in_order(self) -> None:
+        endpoint = _SkipEndpoint(
+            {
+                0: [{"id": 0}, {"id": 1}],
+                2: [{"id": 2}, {"id": 3}],
+                4: [],
+            }
+        )
+        results = _SkipResults(endpoint, {"pageSize": "10000"})
+        table = await _collect_ipc_table(results, schema=_IPC_SCHEMA)
+        assert table.column("id").to_pylist() == [0, 1, 2, 3]
+        assert all("pageSize" not in call[2]["params"] for call in endpoint.calls)
+
+    @pytest.mark.asyncio
+    async def test_uses_class_schema_when_not_provided(self) -> None:
+        endpoint = _RecordingEndpoint([_resp(200, body={"value": [{"id": 5}]})])
+        results = _SchemaStreamResults(endpoint, {})
+        table = await _collect_ipc_table(results)
+        assert table.column("id").to_pylist() == [5]
+
+    @pytest.mark.asyncio
+    async def test_missing_schema_raises(self) -> None:
+        endpoint = _RecordingEndpoint([])
+        results = BaseResults(endpoint, {})
+        results.SCHEMA = None
+        with pytest.raises(ValueError, match="schema"):
+            async for _ in results.to_ipc_stream():
+                pass
+        # No request should have been issued.
+        assert endpoint.calls == []
+
+    @pytest.mark.asyncio
+    async def test_http_error_propagates(self) -> None:
+        endpoint = _RecordingEndpoint(
+            [_resp(500, text="boom", url="https://fake.api/api/test")]
+        )
+        results = BaseResults(endpoint, {})
+        results.SCHEMA = None
+        with pytest.raises(httpx.HTTPStatusError, match="boom"):
+            async for _ in results.to_ipc_stream(schema=_IPC_SCHEMA):
+                pass
+
+    @pytest.mark.asyncio
+    async def test_compression_round_trips(self) -> None:
+        endpoint = _RecordingEndpoint([_resp(200, body={"value": [{"id": 9}]})])
+        results = BaseResults(endpoint, {})
+        results.SCHEMA = None
+        table = await _collect_ipc_table(
+            results, schema=_IPC_SCHEMA, compression="zstd"
+        )
+        assert table.column("id").to_pylist() == [9]
+
+    @pytest.mark.asyncio
+    async def test_stream_is_not_cached_and_refetches(self) -> None:
+        endpoint = _RecordingEndpoint(
+            [
+                _resp(200, body={"value": [{"id": 1}]}),
+                _resp(200, body={"value": [{"id": 1}]}),
+            ]
+        )
+        results = BaseResults(endpoint, {})
+        results.SCHEMA = None
+        await _collect_ipc_table(results, schema=_IPC_SCHEMA)
+        await _collect_ipc_table(results, schema=_IPC_SCHEMA)
+        # Each stream issued a fresh request; nothing was cached.
+        assert len(endpoint.calls) == 2
+        assert results._container is None

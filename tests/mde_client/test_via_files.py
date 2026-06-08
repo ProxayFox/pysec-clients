@@ -5,14 +5,16 @@ from __future__ import annotations
 import asyncio
 import gzip
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import aiohttp
+import httpx
 import orjson
 import pyarrow as pa
 import pytest
 from http_to_arrow import ArrowRecordContainer
 
+from mde_client.endpoints.base import BaseEndpoint, BaseResults
 from mde_client.viaFiles import (
     EmptyExportBlobError,
     ViaFiles,
@@ -515,6 +517,145 @@ class TestViaFilesInit:
         via = ViaFiles(config)
         assert via._config.retry_attempts == 10
         assert via._config.download_workers == 32
+
+
+# ------------------------------------------------------------------
+# 10. stream_export_files — async sink streaming
+# ------------------------------------------------------------------
+
+
+class _CollectingSink:
+    """Async sink that records every batch passed to ``extend``."""
+
+    def __init__(self) -> None:
+        self.rows: list[dict[str, Any]] = []
+        self.batches: int = 0
+
+    async def extend(self, rows: list[dict[str, Any]]) -> None:
+        self.batches += 1
+        self.rows.extend(rows)
+
+
+class TestStreamExportFiles:
+    @pytest.mark.asyncio
+    async def test_streams_plain_ndjson_into_sink(self) -> None:
+        records = [{"id": "1", "name": "a"}, {"id": "2", "name": "b"}]
+        blob = _ndjson_bytes(records)
+
+        via = ViaFiles(ViaFilesConfig(download_workers=1, client_timeout=10))
+        sink = _CollectingSink()
+
+        fake_session = _FakeClientSession()
+        fake_session._default_response = _FakeResponse(blob)
+
+        with patch(
+            "mde_client.viaFiles.aiohttp.ClientSession", return_value=fake_session
+        ):
+            await via.stream_export_files(
+                ["https://blob.example.com/file.json?sig=x"], sink
+            )
+
+        assert sink.rows == records
+
+    @pytest.mark.asyncio
+    async def test_streams_gzip_into_sink(self) -> None:
+        records = [{"id": str(i), "name": f"n{i}"} for i in range(4)]
+        blob = _gzip_bytes(_ndjson_bytes(records))
+
+        via = ViaFiles(ViaFilesConfig(download_workers=1, client_timeout=10))
+        sink = _CollectingSink()
+
+        fake_session = _FakeClientSession()
+        fake_session._default_response = _FakeResponse(blob)
+
+        with patch(
+            "mde_client.viaFiles.aiohttp.ClientSession", return_value=fake_session
+        ):
+            await via.stream_export_files(
+                ["https://blob.example.com/file.gz?sig=y"], sink
+            )
+
+        assert sink.rows == records
+
+    @pytest.mark.asyncio
+    async def test_applies_record_transform(self) -> None:
+        records = [{"wrap": {"id": "1", "name": "a"}}]
+        blob = _ndjson_bytes(records)
+
+        via = ViaFiles(ViaFilesConfig(download_workers=1))
+        sink = _CollectingSink()
+
+        fake_session = _FakeClientSession()
+        fake_session._default_response = _FakeResponse(blob)
+
+        with patch(
+            "mde_client.viaFiles.aiohttp.ClientSession", return_value=fake_session
+        ):
+            await via.stream_export_files(
+                ["https://blob.example.com/file.json"],
+                sink,
+                record_transform=lambda record: record["wrap"],
+            )
+
+        assert sink.rows == [{"id": "1", "name": "a"}]
+
+    @pytest.mark.asyncio
+    async def test_empty_urls_list(self) -> None:
+        via = ViaFiles()
+        sink = _CollectingSink()
+        await via.stream_export_files([], sink)
+        assert sink.rows == []
+
+
+# ------------------------------------------------------------------
+# 11. BaseResults files-mode IPC streaming (end-to-end)
+# ------------------------------------------------------------------
+
+
+class _ExportFilesEndpoint(BaseEndpoint):
+    """Endpoint whose async ``_arequest`` returns an ``exportFiles`` response."""
+
+    _PATH = "/api/export"
+
+    def __init__(self, url: str) -> None:
+        http_client = MagicMock(spec=httpx.Client)
+        http_client.base_url = "https://fake.api"
+        auth = MagicMock()
+        auth.token = "fake-token"
+        super().__init__(http_client, auth)
+        self._url = url
+
+    async def _arequest(self, method: str, path: str, **kwargs: Any) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={"exportFiles": [self._url]},
+            request=httpx.Request(method, f"https://fake.api{path}"),
+        )
+
+
+class TestBaseResultsFilesIpcStream:
+    @pytest.mark.asyncio
+    async def test_files_mode_streams_export_records_as_ipc(self) -> None:
+        url = "https://blob.example.com/f.json"
+        records = [{"id": "1", "name": "a"}, {"id": "2", "name": "b"}]
+        blob = _ndjson_bytes(records)
+
+        endpoint = _ExportFilesEndpoint(url)
+        results = BaseResults(endpoint, {}, files=True)
+        results.SCHEMA = _TEST_SCHEMA
+
+        fake_session = _FakeClientSession()
+        fake_session._default_response = _FakeResponse(blob)
+
+        with patch(
+            "mde_client.viaFiles.aiohttp.ClientSession", return_value=fake_session
+        ):
+            chunks = [chunk async for chunk in results.to_ipc_stream()]
+
+        table = pa.ipc.open_stream(pa.BufferReader(b"".join(chunks))).read_all()
+        assert table.column("id").to_pylist() == ["1", "2"]
+        # Streaming must not populate the cached container.
+        assert results._container is None
 
 
 # ------------------------------------------------------------------
