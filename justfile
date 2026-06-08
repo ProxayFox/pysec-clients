@@ -9,8 +9,8 @@ help:
     @just --list
 
 # --- Package Management ---
-sync:
-    uv sync --all-groups --all-packages
+sync +args="":
+    uv sync --all-groups --all-packages {{args}}
 
 check-vulns:
     uv export --frozen --no-hashes --no-editable --no-emit-project | uvx pip-audit -r /dev/stdin
