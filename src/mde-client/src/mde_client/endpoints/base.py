@@ -28,9 +28,9 @@ from collections import deque
 from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from typing import Any
-from collections.abc import Iterator
+from collections.abc import AsyncIterator, Iterator
 from pydantic import BaseModel, ConfigDict, Field
-from http_to_arrow import ArrowRecordContainer
+from http_to_arrow import ArrowIPCStream, ArrowRecordContainer
 
 from ..auth import MSALAuth
 from ..schemas import EXPORT_FILES_RESPONSE_SCHEMA
@@ -340,6 +340,68 @@ class BaseResults:
         """
         return None
 
+    async def _produce_ipc_records(self, stream: ArrowIPCStream) -> None:
+        """Feed fetched records into *stream* according to the wrapper's fetch mode.
+
+        Mirrors the branching in ``_ensure_fetched`` but extends an Arrow IPC
+        stream page-by-page instead of accumulating an ``ArrowRecordContainer``.
+        """
+        endpoint = self._endpoint
+
+        if self._single or self._params.get("$top") or self._params.get("$skip"):
+            response = await endpoint._arequest(
+                self._method,
+                self._path,
+                params=self._params,
+                **self._request_kwargs,
+            )
+            endpoint._raise_for_response_status(response)
+            await stream.extend(self._records_from_body(response.json()))
+        elif self._files:
+            response = await endpoint._arequest(
+                self._method,
+                self._path,
+                params=self._params,
+                **self._request_kwargs,
+            )
+            endpoint._raise_for_response_status(response)
+            await ViaFiles().stream_export_files(
+                self._export_file_urls(response.json()),
+                stream,
+                record_transform=self._normalize_export_record(),
+            )
+        elif self._use_concurrent_skip_pagination:
+            async for page in endpoint._apaginate_skip_pages(
+                self._path,
+                self._params,
+                page_size=self._skip_page_size,
+                max_concurrent=self._skip_max_concurrent,
+                method=self._method,
+                request_kwargs=self._request_kwargs,
+            ):
+                await stream.extend(page)
+        else:
+            async for page in endpoint._apaginate_pages(
+                self._path,
+                self._params,
+                method=self._method,
+                request_kwargs=self._request_kwargs,
+            ):
+                await stream.extend(page)
+
+    @staticmethod
+    def _export_file_urls(body: Any) -> list[str]:
+        """Extract export blob URLs from an ``exportFiles`` response body."""
+        urls: list[str] = []
+        for record in BaseResults._records_from_body(body):
+            if not isinstance(record, dict):
+                continue
+            files = record.get("exportFiles")
+            if not files:
+                continue
+            urls.extend(url for url in files if url)
+        return urls
+
     def to_dicts(self) -> list[dict]:
         """Materialize results into a list of dicts."""
         # Polars is faster at converting from Arrow to dicts than pyarrow.to_pylist, so we use Polars as an intermediary here.
@@ -365,6 +427,74 @@ class BaseResults:
     def to_polars(self) -> pl.DataFrame:
         """Materialize results into a Polars DataFrame."""
         return self._ensure_fetched().to_polars()
+
+    async def to_ipc_stream(
+        self,
+        schema: pa.Schema | None = None,
+        *,
+        batch_size: int = 128_000,
+        queue_maxsize: int = 4,
+        compression: str | None = None,
+    ) -> AsyncIterator[bytes]:
+        """Stream results as Arrow IPC stream byte chunks for memory-limited runtimes.
+
+        Unlike the cached terminal methods (``to_dicts``, ``to_json``,
+        ``to_arrow``, ``to_polars``), this method never materializes the full
+        result set in memory. Each page is fetched, serialized into an Arrow
+        ``RecordBatch``, emitted as Arrow IPC stream bytes, and released, so
+        peak memory stays close to a single batch. This makes it suitable for
+        exporting millions of rows from, for example, a 2 GiB Azure Function.
+
+        The stream is **not cached**: it issues fresh requests on every call and
+        does not populate or reuse the internal container used by the other
+        terminal methods, so ``refresh()`` is unnecessary here.
+
+        Args:
+            schema: Explicit ``pyarrow.Schema`` for the emitted stream. Defaults
+                to the wrapper's ``SCHEMA``. An explicit schema is required
+                because the IPC stream header is written before any rows are
+                fetched and therefore cannot be inferred.
+            batch_size: Target row count per emitted ``RecordBatch``.
+            queue_maxsize: Bounded backpressure between page fetching and batch
+                serialization.
+            compression: Optional Arrow IPC codec (e.g. ``"zstd"``) supported by
+                your PyArrow build.
+
+        Yields:
+            Arrow IPC stream byte chunks. Concatenated, they form a valid Arrow
+            IPC stream readable via ``pyarrow.ipc.open_stream``.
+
+        Raises:
+            ValueError: If no schema is available from *schema* or ``SCHEMA``.
+
+        Example:
+            ```python
+            results = client.machines.get_all()
+            async for chunk in results.to_ipc_stream(compression="zstd"):
+                ...  # forward each chunk to a streaming HTTP response
+            ```
+        """
+        resolved_schema = schema if schema is not None else self.SCHEMA
+        if resolved_schema is None:
+            raise ValueError(
+                "to_ipc_stream() requires an explicit pyarrow schema. Pass "
+                "schema=... or use a results wrapper that defines SCHEMA, "
+                "because Arrow IPC streaming writes the schema header before any "
+                "rows are fetched and cannot infer it."
+            )
+
+        stream = ArrowIPCStream(
+            schema=resolved_schema,
+            batch_size=batch_size,
+            queue_maxsize=queue_maxsize,
+            compression=compression,
+        )
+
+        async def produce() -> None:
+            await self._produce_ipc_records(stream)
+
+        async for chunk in stream.ipc_chunks(producer=produce):
+            yield chunk
 
     def refresh(self) -> BaseResults:
         """Clear any cached results, forcing the next materialization to re-query the API."""
@@ -603,20 +733,19 @@ class BaseEndpoint:
             )
         )
 
-    async def _apaginate_into(
+    async def _apaginate_pages(
         self,
         path: str,
         params: dict[str, str],
-        container: ArrowRecordContainer,
         *,
         method: str = "GET",
         request_kwargs: dict[str, Any] | None = None,
-    ) -> None:
-        """Walk OData @odata.nextLink pagination, streaming each page into *container*.
+    ) -> AsyncIterator[list[dict]]:
+        """Walk OData @odata.nextLink pagination, yielding each page's records.
 
-        Unlike ``_apaginate`` this never builds a full ``list[dict]`` — each
-        page's ``value`` array is fed directly into the container via
-        ``container.extend()``.
+        Each page's ``value`` array is yielded as a ``list[dict]`` without
+        accumulating a full result set, so callers can stream pages directly
+        into a container or an Arrow IPC stream.
         """
         next_url: str | None = None
         request_kwargs = request_kwargs or {}
@@ -634,11 +763,34 @@ class BaseEndpoint:
 
             self._raise_for_response_status(response)
             body: dict = response.json()
-            container.extend(body.get("value", []))
+            yield body.get("value", [])
 
             next_url = body.get("@odata.nextLink")
             if not next_url:
                 break
+
+    async def _apaginate_into(
+        self,
+        path: str,
+        params: dict[str, str],
+        container: ArrowRecordContainer,
+        *,
+        method: str = "GET",
+        request_kwargs: dict[str, Any] | None = None,
+    ) -> None:
+        """Walk OData @odata.nextLink pagination, streaming each page into *container*.
+
+        Unlike ``_apaginate`` this never builds a full ``list[dict]`` — each
+        page's ``value`` array is fed directly into the container via
+        ``container.extend()``.
+        """
+        async for page in self._apaginate_pages(
+            path,
+            params,
+            method=method,
+            request_kwargs=request_kwargs,
+        ):
+            container.extend(page)
 
     def _paginate_into(
         self,
@@ -696,18 +848,22 @@ class BaseEndpoint:
             return offset, []
         return offset, records
 
-    async def _apaginate_skip_into(
+    async def _apaginate_skip_pages(
         self,
         path: str,
         params: dict[str, str],
-        container: ArrowRecordContainer,
         *,
         page_size: int = 8000,
         max_concurrent: int = 10,
         method: str = "GET",
-        request_kwargs: dict[str, Any] = dict(),
-    ) -> None:
-        """Fetch predictable OData $top/$skip windows concurrently into *container*."""
+        request_kwargs: dict[str, Any] | None = None,
+    ) -> AsyncIterator[list[dict]]:
+        """Fetch predictable OData $top/$skip windows concurrently, yielding ordered pages.
+
+        Each window of records is yielded in ascending ``$skip`` order without
+        accumulating a full result set, so callers can stream pages directly
+        into a container or an Arrow IPC stream.
+        """
         if params.get("$top") or params.get("$skip"):
             raise ValueError(
                 "Cannot use concurrent skip pagination when $top or $skip is specified in params."
@@ -716,6 +872,7 @@ class BaseEndpoint:
             raise ValueError("page_size must be greater than 0.")
         if max_concurrent <= 0:
             raise ValueError("max_concurrent must be greater than 0.")
+        request_kwargs = request_kwargs or {}
 
         effective_concurrency = max_concurrent
         if self._RATE_LIMIT_CALLS_PER_MINUTE > 0:
@@ -753,7 +910,7 @@ class BaseEndpoint:
                 if not records:
                     should_stop = True
                     break
-                container.extend(records)
+                yield records
                 if len(records) < page_size:
                     should_stop = True
                     break
@@ -761,6 +918,28 @@ class BaseEndpoint:
             if should_stop:
                 break
             offset += page_size * effective_concurrency
+
+    async def _apaginate_skip_into(
+        self,
+        path: str,
+        params: dict[str, str],
+        container: ArrowRecordContainer,
+        *,
+        page_size: int = 8000,
+        max_concurrent: int = 10,
+        method: str = "GET",
+        request_kwargs: dict[str, Any] = dict(),
+    ) -> None:
+        """Fetch predictable OData $top/$skip windows concurrently into *container*."""
+        async for page in self._apaginate_skip_pages(
+            path,
+            params,
+            page_size=page_size,
+            max_concurrent=max_concurrent,
+            method=method,
+            request_kwargs=request_kwargs,
+        ):
+            container.extend(page)
 
     def _paginate_skip_into(
         self,
