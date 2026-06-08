@@ -273,7 +273,7 @@ class BaseResults:
             file_tbl.extend(self._records_from_body(response.json()))
 
             urls = (
-                file_tbl.to_polars_frame()
+                file_tbl.to_polars()
                 .get_column("exportFiles")
                 .explode()
                 .drop_nulls()
@@ -343,7 +343,7 @@ class BaseResults:
     def to_dicts(self) -> list[dict]:
         """Materialize results into a list of dicts."""
         # Polars is faster at converting from Arrow to dicts than pyarrow.to_pylist, so we use Polars as an intermediary here.
-        return self._ensure_fetched().to_polars.to_dicts()
+        return self._ensure_fetched().to_polars().to_dicts()
 
     def to_json(self, indent: bool = False) -> str | bytes:
         """Materialize results into a JSON string.
@@ -352,18 +352,19 @@ class BaseResults:
         """
         if indent:
             return orjson.dumps(
-                self._ensure_fetched().to_polars.to_dicts(), option=orjson.OPT_INDENT_2
+                self._ensure_fetched().to_polars().to_dicts(),
+                option=orjson.OPT_INDENT_2,
             ).decode()
         else:
-            return orjson.dumps(self._ensure_fetched().to_polars.to_dicts())
+            return orjson.dumps(self._ensure_fetched().to_polars().to_dicts())
 
     def to_arrow(self) -> pa.Table:
         """Materialize results into a PyArrow Table."""
-        return self._ensure_fetched().to_arrow
+        return self._ensure_fetched().to_arrow()
 
     def to_polars(self) -> pl.DataFrame:
         """Materialize results into a Polars DataFrame."""
-        return self._ensure_fetched().to_polars
+        return self._ensure_fetched().to_polars()
 
     def refresh(self) -> BaseResults:
         """Clear any cached results, forcing the next materialization to re-query the API."""

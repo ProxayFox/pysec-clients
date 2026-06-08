@@ -192,7 +192,7 @@ class TestPagination:
         )
         container = ArrowRecordContainer(schema=None)
         endpoint._paginate_into("/api/test", {}, container)
-        assert container.to_polars.to_dicts() == [{"id": "a"}, {"id": "b"}]
+        assert container.to_polars().to_dicts() == [{"id": "a"}, {"id": "b"}]
 
     def test_concurrent_skip_pagination_fetches_ordered_windows(self) -> None:
         endpoint = _SkipEndpoint(
@@ -211,7 +211,7 @@ class TestPagination:
             max_concurrent=3,
         )
 
-        assert container.to_polars.to_dicts() == [
+        assert container.to_polars().to_dicts() == [
             {"id": 0},
             {"id": 1},
             {"id": 2},
@@ -236,7 +236,7 @@ class TestPagination:
             "/api/test", {}, container, page_size=2, max_concurrent=3
         )
 
-        assert container.to_polars.to_dicts() == [
+        assert container.to_polars().to_dicts() == [
             {"id": 0},
             {"id": 1},
             {"id": 2},
@@ -288,7 +288,7 @@ class TestPagination:
         )
 
         assert endpoint.sleep_calls == [2.0]
-        assert container.to_polars.to_dicts() == [{"id": 0}]
+        assert container.to_polars().to_dicts() == [{"id": 0}]
 
     def test_rate_limit_retry_after_http_date_is_used_for_429(
         self, monkeypatch: pytest.MonkeyPatch
@@ -324,7 +324,7 @@ class TestPagination:
         )
 
         assert endpoint.sleep_calls == [90.0]
-        assert container.to_polars.to_dicts() == [{"id": 0}]
+        assert container.to_polars().to_dicts() == [{"id": 0}]
 
     def test_rate_limit_without_retry_after_uses_backoff(self) -> None:
         class _BackoffSkipEndpoint(_SkipEndpoint):
@@ -352,7 +352,7 @@ class TestPagination:
         )
 
         assert endpoint.sleep_calls == [1.75]
-        assert container.to_polars.to_dicts() == [{"id": 0}]
+        assert container.to_polars().to_dicts() == [{"id": 0}]
 
     def test_rate_limit_retry_exhaustion_raises_final_429(self) -> None:
         class _ShortRetrySkipEndpoint(_SkipEndpoint):
