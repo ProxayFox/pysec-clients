@@ -20,5 +20,10 @@
     "version": "mde-client-0.1.2",
     "title": "mde-client 0.1.2",
     "aliases": []
+  },
+  {
+    "version": "mde-client-0.1.1",
+    "title": "mde-client 0.1.1",
+    "aliases": []
   }
 ]
