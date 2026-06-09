@@ -96,16 +96,28 @@ docs-serve:
 docs-validate:
     DISABLE_MKDOCS_2_WARNING=true uv run --group docs mkdocs build --strict
 
-# Preview the versioned docs site (with the version dropdown) via mike.
+# Preview the multi-version docs site (with the version dropdown) via mike. This
+# serves the local `gh-pages` branch, so it requires at least one deployed
+# version. For a zero-setup local preview use `just docs-versions-preview`; to
+# preview a single version's content without mike, use `just docs-serve`.
 docs-versions-serve +args="":
     DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike serve {{args}}
+
+# Build the working tree as a throwaway `dev` version and preview the versioned
+# site (with the dropdown) locally. Creates/updates a LOCAL-ONLY `gh-pages`
+# branch (never pushed); remove it any time with `git branch -D gh-pages`.
+docs-versions-preview:
+    DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike deploy --update-aliases dev latest
+    DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike set-default latest
+    DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike serve
 
 # Deploy a docs version with mike. Omit --push to stage on the local gh-pages
 # branch; pass --push to publish. Usage: just docs-deploy-version mde-client-0.1.4 latest --push
 docs-deploy-version version alias="latest" +args="":
     DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike deploy --update-aliases {{version}} {{alias}} {{args}}
 
-# Set the default docs version served at the site root. Usage: just docs-set-default latest --push
+# Set the default docs version served at the site root. The alias/version must
+# already exist (deploy first). Usage: just docs-set-default latest --push
 docs-set-default alias="latest" +args="":
     DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike set-default {{alias}} {{args}}
 
