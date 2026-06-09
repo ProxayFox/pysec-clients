@@ -213,6 +213,10 @@ To cut a release:
 5. Tag the commit `mde-client-v<version>` (e.g. `mde-client-v0.1.0`) and push
    the tag. The release workflow verifies the tag matches the pyproject version,
    builds the sdist and wheel, and publishes to PyPI.
+6. The [Docs workflow](../../.github/workflows/docs.yml) publishes a versioned
+   documentation snapshot with `mike` for the same tag. Stable tags move the
+   `latest` alias and the site root; prerelease tags (`rc`/`a`/`b`) publish a
+   browsable version without changing `latest`.
 
 Future vendor packages in this monorepo follow the same scheme:
 `<distribution-name>-v<version>`.

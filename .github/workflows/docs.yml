@@ -1,15 +1,21 @@
 name: Docs
 
+# Versioned documentation is published with mike onto the gh-pages branch.
+# To keep Actions usage low this workflow does not build on every push:
+# - A merged pull request that touches docs runs one strict build to validate
+#   the merged result before any release is cut.
+# - Package release tags (<package>-v<version>, matching release.yml) publish a
+#   versioned snapshot and, for stable releases, move the `latest` alias and the
+#   default root so https://proxayfox.github.io/pysec-clients/ tracks the newest
+#   stable release while older versions stay available from the version dropdown.
+# - workflow_dispatch validates, builds, and deploys on demand.
 "on":
   push:
-    branches: [main]
-    paths:
-      - "docs/**"
-      - "mkdocs.yml"
-      - "src/mde-client/src/**"
-      - "pyproject.toml"
-      - "uv.lock"
-      - ".github/workflows/docs.yml"
+    tags:
+      # on.push.tags uses glob filters, not regex, so "[0-9]+" would match a
+      # literal "+". Match any <package>-v* tag here and let the deploy job's
+      # regex enforce the exact <package>-v<semver> format.
+      - "*-v*"
   pull_request:
     branches: [main]
     types: [closed]
@@ -21,25 +27,45 @@ name: Docs
       - "uv.lock"
       - ".github/workflows/docs.yml"
   workflow_dispatch:
+    inputs:
+      package:
+        description: "Workspace package whose docs to (re)deploy"
+        type: string
+        required: false
+        default: "mde-client"
+      version:
+        description: "Version to deploy (defaults to src/<package>/pyproject.toml)"
+        type: string
+        required: false
+      source_ref:
+        description: "Git ref to build docs from (defaults to the triggering ref)"
+        type: string
+        required: false
+      update_latest:
+        description: "Move the 'latest' alias and default root (stable versions only)"
+        type: boolean
+        default: true
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 env:
   # Opt into Node.js 24 for JavaScript-based actions ahead of the
   # 2026-06-16 deprecation of Node.js 20 on GitHub Actions runners.
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DISABLE_MKDOCS_2_WARNING: "true"
 
 jobs:
   build:
-    name: Build docs
+    name: Build docs (strict)
+    # Validate docs only when a docs-touching pull request is merged, so the
+    # build runs once at merge time instead of on every push. Versioned
+    # publishing is handled separately by the deploy job on release tags.
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    concurrency:
+      group: docs-build-${{ github.ref }}
+      cancel-in-progress: true
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,31 +84,155 @@ jobs:
         run: uv sync --group docs
 
       - name: Build site (strict)
-        env:
-          DISABLE_MKDOCS_2_WARNING: "true"
         run: uv run mkdocs build --strict
 
-      - name: Configure GitHub Pages
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-
-      - name: Upload Pages artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
   deploy:
-    name: Deploy to GitHub Pages
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: build
+    name: Deploy versioned docs
+    # Publish versioned docs when a package release tag is pushed, or via a
+    # manual dispatch used to seed or repair a specific version.
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')) || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      contents: write
+    # Serialize every deploy so concurrent runs never race on the gh-pages
+    # branch, regardless of which tag or dispatch triggered them.
+    concurrency:
+      group: docs-deploy
+      cancel-in-progress: false
     steps:
-      - name: Deploy
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Checkout docs source
+        uses: actions/checkout@v4
+        with:
+          # Build docs from the dispatch source_ref when provided, otherwise the
+          # triggering ref (the release tag for tag pushes).
+          ref: ${{ (github.event_name == 'workflow_dispatch' && inputs.source_ref != '') && inputs.source_ref || github.ref }}
+          # Full history so mike can read/update the existing gh-pages branch.
+          fetch-depth: 0
+
+      - name: Resolve package and version
+        id: resolve
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_PACKAGE: ${{ inputs.package }}
+          INPUT_VERSION: ${{ inputs.version }}
+          INPUT_UPDATE_LATEST: ${{ inputs.update_latest }}
+        run: |
+          set -euo pipefail
+
+          # Packages that ship a documentation surface today. Release tags for
+          # other workspace packages are skipped so the version dropdown is not
+          # polluted with undocumented releases.
+          documented_packages=("mde-client")
+
+          if [[ "${EVENT_NAME}" == "workflow_dispatch" ]]; then
+            package="${INPUT_PACKAGE:-mde-client}"
+            version="${INPUT_VERSION}"
+            update_latest="${INPUT_UPDATE_LATEST}"
+          else
+            # Tag format: <package>-v<version>
+            if [[ ! "${REF_NAME}" =~ ^(.+)-v([0-9]+\.[0-9]+\.[0-9]+([a-z0-9]+)?)$ ]]; then
+              echo "::error::Tag '${REF_NAME}' does not match '<package>-v<semver>'"
+              exit 1
+            fi
+            package="${BASH_REMATCH[1]}"
+            version="${BASH_REMATCH[2]}"
+            update_latest="true"
+          fi
+
+          should_deploy="false"
+          for p in "${documented_packages[@]}"; do
+            if [[ "${p}" == "${package}" ]]; then
+              should_deploy="true"
+              break
+            fi
+          done
+          if [[ "${should_deploy}" != "true" ]]; then
+            echo "::notice::Package '${package}' has no documentation surface; skipping docs deploy."
+            echo "should_deploy=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          pyproject="src/${package}/pyproject.toml"
+          if [[ ! -f "${pyproject}" ]]; then
+            echo "::error::Package '${pyproject}' does not exist"
+            exit 1
+          fi
+          pyproject_version="$(python3 -c "import tomllib; print(tomllib.load(open('${pyproject}', 'rb'))['project']['version'])")"
+
+          if [[ -z "${version}" ]]; then
+            version="${pyproject_version}"
+          elif [[ "${version}" != "${pyproject_version}" ]]; then
+            echo "::error::Version '${version}' does not match ${pyproject} version '${pyproject_version}'"
+            exit 1
+          fi
+
+          # Versions carrying an rc/a/b suffix are prereleases and must not move
+          # the `latest` alias or the default root.
+          is_stable="true"
+          if [[ "${version}" =~ (rc|a|b)[0-9]+$ ]]; then
+            is_stable="false"
+          fi
+
+          {
+            echo "should_deploy=true"
+            echo "package=${package}"
+            echo "version=${version}"
+            echo "version_id=${package}-${version}"
+            echo "is_stable=${is_stable}"
+            echo "update_latest=${update_latest}"
+          } >> "$GITHUB_OUTPUT"
+          echo "Resolved package=${package} version=${version} stable=${is_stable} update_latest=${update_latest}"
+
+      - name: Install uv
+        if: steps.resolve.outputs.should_deploy == 'true'
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        if: steps.resolve.outputs.should_deploy == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install docs dependencies
+        if: steps.resolve.outputs.should_deploy == 'true'
+        run: uv sync --group docs
+
+      - name: Configure git identity
+        if: steps.resolve.outputs.should_deploy == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Deploy versioned docs (stable)
+        if: steps.resolve.outputs.should_deploy == 'true' && steps.resolve.outputs.is_stable == 'true'
+        env:
+          PACKAGE: ${{ steps.resolve.outputs.package }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+          VERSION_ID: ${{ steps.resolve.outputs.version_id }}
+          UPDATE_LATEST: ${{ steps.resolve.outputs.update_latest }}
+        run: |
+          set -euo pipefail
+          if [[ "${UPDATE_LATEST}" == "true" ]]; then
+            uv run --group docs mike deploy --push --update-aliases \
+              --title "${PACKAGE} ${VERSION}" "${VERSION_ID}" latest
+            uv run --group docs mike set-default --push latest
+          else
+            uv run --group docs mike deploy --push --update-aliases \
+              --title "${PACKAGE} ${VERSION}" "${VERSION_ID}"
+          fi
+
+      - name: Deploy versioned docs (prerelease)
+        if: steps.resolve.outputs.should_deploy == 'true' && steps.resolve.outputs.is_stable != 'true'
+        env:
+          PACKAGE: ${{ steps.resolve.outputs.package }}
+          VERSION: ${{ steps.resolve.outputs.version }}
+          VERSION_ID: ${{ steps.resolve.outputs.version_id }}
+        run: |
+          set -euo pipefail
+          # Prereleases publish a browsable version but never move `latest` or
+          # the default root, so stable users are unaffected.
+          uv run --group docs mike deploy --push --update-aliases \
+            --title "${PACKAGE} ${VERSION} (prerelease)" "${VERSION_ID}"

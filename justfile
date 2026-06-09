@@ -96,6 +96,19 @@ docs-serve:
 docs-validate:
     DISABLE_MKDOCS_2_WARNING=true uv run --group docs mkdocs build --strict
 
+# Preview the versioned docs site (with the version dropdown) via mike.
+docs-versions-serve +args="":
+    DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike serve {{args}}
+
+# Deploy a docs version with mike. Omit --push to stage on the local gh-pages
+# branch; pass --push to publish. Usage: just docs-deploy-version mde-client-0.1.4 latest --push
+docs-deploy-version version alias="latest" +args="":
+    DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike deploy --update-aliases {{version}} {{alias}} {{args}}
+
+# Set the default docs version served at the site root. Usage: just docs-set-default latest --push
+docs-set-default alias="latest" +args="":
+    DISABLE_MKDOCS_2_WARNING=true uv run --group docs mike set-default {{alias}} {{args}}
+
 # --- Schema management ---
 
 # Regenerate schemas from existing XML (no credentials required)

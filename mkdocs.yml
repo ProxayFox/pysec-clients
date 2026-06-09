@@ -15,6 +15,9 @@ theme:
     - content.code.annotate
     - search.suggest
     - search.highlight
+extra:
+  version:
+    provider: mike
 plugins:
   - search
   - section-index

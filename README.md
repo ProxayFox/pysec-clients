@@ -89,6 +89,18 @@ This repository is currently README-first, with structured package documentation
 - Use [`docs/mde_client/index.md`](docs/mde_client/index.md) for tutorials, how-to guides, reference pages, and explanation pages for `mde-client`.
 - Build the rendered site with `just docs-build` (writes to `site/`) or run `just docs-serve` for a live-reload preview backed by [`mkdocs.yml`](mkdocs.yml).
 
+### Versioned documentation
+
+The published site at <https://proxayfox.github.io/pysec-clients/> is versioned with [`mike`](https://github.com/jimporter/mike) and served from the `gh-pages` branch. A version selector in the page header lets readers switch between releases, so documentation for an older version stays available even after a feature is removed.
+
+- The site root tracks the latest stable `mde-client` release; prerelease docs are published but never move the `latest` alias.
+- Pushing a `mde-client-v<version>` release tag publishes a versioned snapshot automatically through the [Docs workflow](.github/workflows/docs.yml).
+- Preview the versioned site locally with `just docs-versions-serve`.
+- To stage or repair a version by hand, use `just docs-deploy-version <package>-<version> latest` (add `--push` to publish) and `just docs-set-default latest --push`.
+
+> [!NOTE]
+> GitHub Pages must be set to deploy from the `gh-pages` branch (root) for the versioned site to serve. The first `mike` deploy creates that branch.
+
 ## Adding Another Client
 
 1. Create `src/<distribution-name>/` as a workspace member (e.g. `src/crowdstrike-client/`)
