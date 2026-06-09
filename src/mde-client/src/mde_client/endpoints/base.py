@@ -696,9 +696,12 @@ class BaseEndpoint:
                 )
 
             response.raise_for_status()
-            body: dict = response.json()
-            records: list[dict] | dict = body.get("value", [])
-            all_records.extend(records)
+            body = response.json()
+            if not isinstance(body, dict):
+                break
+            records = body.get("value", [])
+            if isinstance(records, list):
+                all_records.extend(records)
 
             next_url = body.get("@odata.nextLink")
 
@@ -762,8 +765,11 @@ class BaseEndpoint:
                 )
 
             self._raise_for_response_status(response)
-            body: dict = response.json()
-            yield body.get("value", [])
+            body = response.json()
+            if not isinstance(body, dict):
+                break
+            records = body.get("value", [])
+            yield records if isinstance(records, list) else []
 
             next_url = body.get("@odata.nextLink")
             if not next_url:
@@ -928,7 +934,7 @@ class BaseEndpoint:
         page_size: int = 8000,
         max_concurrent: int = 10,
         method: str = "GET",
-        request_kwargs: dict[str, Any] = dict(),
+        request_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Fetch predictable OData $top/$skip windows concurrently into *container*."""
         async for page in self._apaginate_skip_pages(
@@ -950,7 +956,7 @@ class BaseEndpoint:
         page_size: int = 8000,
         max_concurrent: int = 10,
         method: str = "GET",
-        request_kwargs: dict[str, Any] = dict(),
+        request_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Sync wrapper for ``_apaginate_skip_into``."""
         asyncio.run(
