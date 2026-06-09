@@ -59,7 +59,7 @@ polars = [
 Homepage = "https://github.com/ProxayFox/pysec-clients"
 Source = "https://github.com/ProxayFox/pysec-clients/tree/main/src/mde-client"
 Issues = "https://github.com/ProxayFox/pysec-clients/issues"
-Documentation = "https://proxayfox.github.io/pysec-clients/mde_client/"
+Documentation = "https://proxayfox.github.io/pysec-clients"
 Changelog = "https://github.com/ProxayFox/pysec-clients/blob/main/src/mde-client/CHANGELOG.md"
 
 [tool.setuptools.packages.find]
