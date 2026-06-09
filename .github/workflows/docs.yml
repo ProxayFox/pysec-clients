@@ -1,21 +1,21 @@
 name: Docs
 
 # Versioned documentation is published with mike onto the gh-pages branch.
-# - Pull requests and pushes to main run a strict build to validate the docs.
+# To keep Actions usage low this workflow does not build on every push:
+# - A merged pull request that touches docs runs one strict build to validate
+#   the merged result before any release is cut.
 # - Package release tags (<package>-v<version>, matching release.yml) publish a
 #   versioned snapshot and, for stable releases, move the `latest` alias and the
 #   default root so https://proxayfox.github.io/pysec-clients/ tracks the newest
 #   stable release while older versions stay available from the version dropdown.
+# - workflow_dispatch validates, builds, and deploys on demand.
 "on":
   push:
-    # No paths filter: a paths filter cannot be scoped to branches only, and it
-    # would suppress tag pushes (release tags point at already-pushed commits).
-    branches: [main]
     tags:
-      - "*-v[0-9]+.[0-9]+.[0-9]+"
-      - "*-v[0-9]+.[0-9]+.[0-9]+rc[0-9]+"
-      - "*-v[0-9]+.[0-9]+.[0-9]+a[0-9]+"
-      - "*-v[0-9]+.[0-9]+.[0-9]+b[0-9]+"
+      # on.push.tags uses glob filters, not regex, so "[0-9]+" would match a
+      # literal "+". Match any <package>-v* tag here and let the deploy job's
+      # regex enforce the exact <package>-v<semver> format.
+      - "*-v*"
   pull_request:
     branches: [main]
     types: [closed]
@@ -58,9 +58,10 @@ env:
 jobs:
   build:
     name: Build docs (strict)
-    # Validate docs on pull requests and direct pushes to main. Versioned
+    # Validate docs only when a docs-touching pull request is merged, so the
+    # build runs once at merge time instead of on every push. Versioned
     # publishing is handled separately by the deploy job on release tags.
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     concurrency:
       group: docs-build-${{ github.ref }}
