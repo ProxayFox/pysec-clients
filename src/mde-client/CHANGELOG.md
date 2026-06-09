@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-06-09
+
 ### Added
 
 - `BaseResults.to_ipc_stream(...)`: an async terminal that streams results as
@@ -20,10 +22,56 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ViaFiles.stream_export_files(...)`: streams parsed export-file records into
   any async sink (for example an `ArrowIPCStream`) instead of accumulating an
   `ArrowRecordContainer`.
+- Versioned documentation site built with `mike`, plus a new how-to,
+  "Stream Results as Arrow IPC", covering the streaming terminals end to end.
 
 ### Changed
 
 - Requires `http-to-arrow>=0.2.1` for Arrow IPC streaming support.
+
+### Fixed
+
+- `AdvancedHuntingQueriesResults` materialization called `to_polars` and
+  `to_arrow` as properties instead of methods, breaking `to_dicts()`,
+  `to_json()`, `to_arrow()`, and `to_polars()`; the conversions are now invoked
+  correctly.
+- Hardened response handling in `BaseEndpoint` with stricter type checks to
+  avoid errors on unexpected payload shapes.
+- Reworked concurrent processing in `ViaFiles` to improve error propagation and
+  prevent deadlocks during export-file downloads.
+
+## [0.1.4] - 2026-06-03
+
+### Added
+
+- Single-record fetch methods across endpoints, covering authenticated scan
+  definitions, baseline configurations, indicators, investigations, machine
+  actions, machines, score, software, and vulnerabilities.
+- `machineReferences(...)` returning `MachineReferencesResults` on the
+  recommendations, software, and vulnerabilities endpoints, plus
+  `softwareVulnerabilitiesByMachine(...)` and
+  `softwareVulnerabilityChangesByMachine(...)` on the vulnerabilities endpoint.
+- Concurrent `$skip` pagination in `BaseResults`/`BaseEndpoint` with rate
+  limiting, plus tests for pagination behavior and error handling.
+
+### Changed
+
+- Refactored the machines and vulnerabilities endpoints to improve parameter
+  handling and use the correct result classes; `since` now defaults to the last
+  24 hours when omitted.
+- `page_size` can no longer be combined with `top` or `skip`; `BaseQuery`
+  validates the combination and raises accordingly.
+- Raised minimum versions for `aiohttp`, `msal`, `orjson`, and `requests`, and
+  pinned the `arrow`/`polars` optional extras.
+- Opted GitHub Actions workflows into Node.js 24 ahead of the Node.js 20 runner
+  deprecation.
+
+## [0.1.3] - 2026-06-02
+
+### Fixed
+
+- Declared the missing runtime dependencies `httpx` and `pydantic` in the
+  package metadata so installs pull everything the client needs at import time.
 
 ## [0.1.2] - 2026-05-31
 
@@ -78,7 +126,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contract.
 - `py.typed` PEP 561 marker — type information is shipped with the package.
 
-[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.2...HEAD
+[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.0...HEAD
+[0.2.0]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.4...mde-client-v0.2.0
+[0.1.4]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.3...mde-client-v0.1.4
+[0.1.3]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.2...mde-client-v0.1.3
 [0.1.2]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.1...mde-client-v0.1.2
 [0.1.1]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.0...mde-client-v0.1.1
 [0.1.0]: https://github.com/ProxayFox/pysec-clients/releases/tag/mde-client-v0.1.0

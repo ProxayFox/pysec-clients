@@ -209,10 +209,14 @@ To cut a release:
 2. Add a matching `[<version>] - <date>` section to [`CHANGELOG.md`](CHANGELOG.md)
    and move items out of `[Unreleased]`.
 3. Run `just quality` locally (includes `uv build` + `twine check`).
-4. Commit the version bump and changelog on `main`.
-5. Tag the commit `mde-client-v<version>` (e.g. `mde-client-v0.1.0`) and push
-   the tag. The release workflow verifies the tag matches the pyproject version,
-   builds the sdist and wheel, and publishes to PyPI.
+4. Merge the version bump and changelog to `main`. The
+   [tag-on-version-bump workflow](../../.github/workflows/tag-on-version-bump.yml)
+   detects the changed `version` and automatically creates and pushes the
+   annotated tag `mde-client-v<version>` (e.g. `mde-client-v0.2.0`). It is
+   idempotent and skips tags that already exist.
+5. The [release workflow](../../.github/workflows/release.yml) triggers on that
+   tag, verifies it matches the pyproject version, builds the sdist and wheel,
+   and publishes to PyPI.
 6. The [Docs workflow](../../.github/workflows/docs.yml) publishes a versioned
    documentation snapshot with `mike` for the same tag. Stable tags move the
    `latest` alias and the site root; prerelease tags (`rc`/`a`/`b`) publish a
