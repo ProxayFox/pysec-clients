@@ -20,6 +20,10 @@ Given a set of export URLs, `ViaFiles`:
 
 Most package users do not need to call `ViaFiles` directly because export-backed endpoint wrappers already use it internally.
 
+## Streaming into an async sink
+
+`stream_export_files(urls, sink, *, record_transform=None)` mirrors `download_export_files`, but instead of accumulating an `ArrowRecordContainer` it feeds each parsed batch into any async sink exposing `async def extend(rows)` — for example an `http_to_arrow.ArrowIPCStream`. This is what `BaseResults.to_ipc_stream()` uses to stream export-backed endpoints without materializing the full dataset.
+
 ## `ViaFilesConfig`
 
 `ViaFilesConfig` exposes these tuning fields:

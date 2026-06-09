@@ -41,7 +41,7 @@ Caching is also why `refresh()` is explicit. The package never silently re-fetch
 - **Choose your terminal once.** Mixing `.to_dicts()` and `.to_polars()` on the same wrapper is fine and cheap.
 - **Cache lives in the wrapper, not the client.** If you want long-term reuse, keep the wrapper around; if you want to drop it, dereference it.
 - **Schema mismatches surface at fetch time.** If Defender adds a column the package's schema does not know about, you find out when the first terminal method runs, not later in your transformation code.
-- **Streaming reads are still on the table.** The current cache is fully materialised, but the underlying Arrow batching means future iterator-style terminals can be added without changing the user-facing contract.
+- **Streaming reads are available.** When the full materialised cache is too large for your runtime, `to_ipc_stream()` streams Arrow IPC byte chunks page-by-page without caching, keeping peak memory close to a single record batch. It trades the shared cache for bounded memory, so it is the right terminal for memory-limited exports rather than repeated multi-format reads.
 
 ## See also
 

@@ -15,7 +15,7 @@ import codecs
 import logging
 import os
 import zlib
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Callable, Coroutine
 from typing import Any, Protocol, runtime_checkable
 from urllib.parse import urlsplit, urlunsplit
 
@@ -42,6 +42,18 @@ class _StreamableContent(Protocol):
     """Minimal interface for the ``content`` property of a ``StreamableResponse``."""
 
     def iter_chunked(self, n: int) -> AsyncIterator[bytes]: ...
+
+
+@runtime_checkable
+class AsyncRecordSink(Protocol):
+    """Minimal async sink consumed by :meth:`ViaFiles.stream_export_files`.
+
+    An ``http_to_arrow.ArrowIPCStream`` satisfies this protocol, allowing export
+    records to be streamed straight into an Arrow IPC byte stream without
+    materializing an ``ArrowRecordContainer``.
+    """
+
+    async def extend(self, rows: list[dict[str, Any]]) -> None: ...
 
 
 class EmptyExportBlobError(RuntimeError):
@@ -187,6 +199,21 @@ class ViaFiles:
             finally:
                 record_queue.task_done()
 
+    async def _drain_to_async_sink(
+        self,
+        record_queue: asyncio.Queue[list[dict[str, Any]] | None],
+        sink: AsyncRecordSink,
+    ) -> None:
+        """Drain *record_queue* into *sink* via ``await sink.extend`` until a sentinel ``None`` arrives."""
+        while True:
+            records = await record_queue.get()
+            try:
+                if records is None:
+                    return
+                await sink.extend(records)
+            finally:
+                record_queue.task_done()
+
     async def _download_export_file(
         self,
         session: aiohttp.ClientSession,
@@ -268,16 +295,68 @@ class ViaFiles:
         Returns:
             The same *container*, now populated with the parsed records.
         """
+        await self._run_export_pipeline(
+            urls,
+            lambda record_queue: self._append_export_records(record_queue, container),
+            record_transform=record_transform,
+        )
+        return container
+
+    async def stream_export_files(
+        self,
+        urls: list[str],
+        sink: AsyncRecordSink,
+        *,
+        record_transform: RecordTransform | None = None,
+    ) -> None:
+        """Download export blobs concurrently and stream records into *sink*.
+
+        Like :meth:`download_export_files`, but instead of accumulating an
+        :class:`ArrowRecordContainer`, each parsed batch is fed into *sink* via
+        ``await sink.extend(...)``. This pipes export records straight into an
+        :class:`~http_to_arrow.ArrowIPCStream` without materializing the full
+        dataset, keeping peak memory close to a single batch.
+
+        Args:
+            urls: SAS-signed blob URLs returned by an MDE ``exportFiles`` response.
+            sink: An object exposing ``async def extend(rows)`` (for example an
+                ``ArrowIPCStream``) that consumes each parsed batch.
+            record_transform: Optional callable applied to each parsed JSON
+                record before it is batched.
+        """
+        await self._run_export_pipeline(
+            urls,
+            lambda record_queue: self._drain_to_async_sink(record_queue, sink),
+            record_transform=record_transform,
+        )
+
+    async def _run_export_pipeline(
+        self,
+        urls: list[str],
+        drain: Callable[
+            [asyncio.Queue[list[dict[str, Any]] | None]], Coroutine[Any, Any, None]
+        ],
+        *,
+        record_transform: RecordTransform | None = None,
+    ) -> None:
+        """Download *urls* concurrently, streaming parsed batches through *drain*.
+
+        *drain* is a coroutine factory that consumes the shared record queue
+        until it receives the sentinel ``None`` (for example writing into a
+        container or an async sink).
+
+        Producers and the drain consumer run concurrently. If either side
+        raises, the other is cancelled and the original exception is re-raised,
+        so a failing consumer can never deadlock the producers on the bounded
+        queue (and vice versa).
+        """
         semaphore = asyncio.Semaphore(max(1, self._config.download_workers))
         record_queue: asyncio.Queue[list[dict[str, Any]] | None] = asyncio.Queue(
             maxsize=max(1, self._config.download_workers * 2),
         )
         timeout = aiohttp.ClientTimeout(total=self._config.client_timeout)
-        append_task = asyncio.create_task(
-            self._append_export_records(record_queue, container),
-        )
 
-        try:
+        async def produce() -> None:
             async with aiohttp.ClientSession(timeout=timeout) as session:
                 tasks = [
                     self._download_export_file(
@@ -291,9 +370,25 @@ class ViaFiles:
                 ]
                 if tasks:
                     await asyncio.gather(*tasks, return_exceptions=False)
-                await record_queue.join()
-        finally:
+            # Signal end-of-stream exactly once, after every producer succeeds.
             await record_queue.put(None)
-            await append_task
 
-        return container
+        drain_task = asyncio.create_task(drain(record_queue))
+        producer_task = asyncio.create_task(produce())
+        pending = {drain_task, producer_task}
+
+        try:
+            while pending:
+                done, pending = await asyncio.wait(
+                    pending, return_when=asyncio.FIRST_COMPLETED
+                )
+                for task in done:
+                    exc = task.exception()
+                    if exc is not None:
+                        # Re-raise the first failure; finally cancels the rest.
+                        raise exc
+        finally:
+            for task in (drain_task, producer_task):
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(drain_task, producer_task, return_exceptions=True)

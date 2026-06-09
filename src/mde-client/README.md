@@ -112,6 +112,21 @@ Behavior to account for:
 - `to_dicts()` is the simplest Python-native representation for downstream code.
 - Write helpers return either lazy result wrappers or `bool`, depending on whether the underlying API returns an entity payload or an empty success response.
 
+### Streaming Arrow IPC for memory-limited runtimes
+
+For very large result sets (some Defender endpoints return millions of rows), the cached terminal methods can exceed tight memory budgets. `to_ipc_stream()` is an async terminal that streams results as Arrow IPC stream byte chunks, keeping peak memory close to a single record batch — for example when exporting from a 2 GiB Azure Function.
+
+```python
+import pyarrow as pa
+
+results = client.machines.get_all()
+
+async for chunk in results.to_ipc_stream(compression="zstd"):
+    ...  # forward each chunk to a streaming HTTP response
+```
+
+Unlike the other terminals it is not cached and issues fresh requests on every call. It requires an explicit `pyarrow.Schema` (from `schema=` or the wrapper's `SCHEMA`) because the IPC stream header is written before any rows are fetched. It works for collection pagination, concurrent `$top`/`$skip` pagination, single-object responses, and export-backed (`files=True`) endpoints.
+
 ## Endpoint Surface
 
 `MDEClient` exposes endpoint properties for the current Defender surface. The most commonly used groups are:

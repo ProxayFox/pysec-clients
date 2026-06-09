@@ -13,6 +13,7 @@ These guides are task-oriented. Each page solves one problem without trying to t
 - [Get related data for one machine](get-machine-related-data.md)
 - [Run an advanced hunting query](run-advanced-hunting.md)
 - [Work with result formats](work-with-result-formats.md)
+- [Stream results as Arrow IPC](stream-ipc-results.md)
 - [Use export-backed endpoints](use-export-backed-endpoints.md)
 
 ## Building on top of `mde-client`

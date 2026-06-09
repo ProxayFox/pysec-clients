@@ -67,6 +67,17 @@ fresh_table = results.refresh().to_arrow()
 fresh_frame = results.refresh().to_polars()
 ```
 
+## Stream instead of materializing
+
+The terminal methods above build the full dataset in memory. When a result set is too large for your runtime, use `to_ipc_stream()` to stream Arrow IPC byte chunks page-by-page without caching:
+
+```python
+async for chunk in results.to_ipc_stream(compression="zstd"):
+    ...  # forward each chunk to a streaming HTTP response
+```
+
+See [Stream results as Arrow IPC](stream-ipc-results.md) for the full workflow.
+
 ## Notes
 
 - `to_dicts()` is usually the best first choice for application code and debugging.

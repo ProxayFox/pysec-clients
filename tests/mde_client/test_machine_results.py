@@ -8,6 +8,7 @@ from unittest.mock import MagicMock
 import httpx
 import polars as pl
 import pyarrow as pa
+import pytest
 from http_to_arrow import ArrowRecordContainer
 
 from mde_client.endpoints.machines import (
@@ -249,3 +250,25 @@ class TestTerminalFormats:
 
         assert isinstance(frame, pl.DataFrame)
         assert frame.to_dicts() == [{"id": "1", "name": "a"}]
+
+
+# ------------------------------------------------------------------
+# 7. Arrow IPC streaming
+# ------------------------------------------------------------------
+
+
+class TestIpcStreaming:
+    @pytest.mark.asyncio
+    async def test_to_ipc_stream_round_trips_pages(self) -> None:
+        """Streamed IPC chunks should decode back into the full paginated dataset."""
+        page1 = [{"id": "1", "name": "a"}, {"id": "2", "name": "b"}]
+        page2 = [{"id": "3", "name": "c"}]
+        results = _make_results([page1, page2])
+
+        chunks = [chunk async for chunk in results.to_ipc_stream(schema=_TEST_SCHEMA)]
+        table = pa.ipc.open_stream(pa.BufferReader(b"".join(chunks))).read_all()
+
+        assert table.column("id").to_pylist() == ["1", "2", "3"]
+        assert table.column("name").to_pylist() == ["a", "b", "c"]
+        # Streaming bypasses the cached container entirely.
+        assert results._container is None
