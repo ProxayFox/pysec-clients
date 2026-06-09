@@ -33,6 +33,7 @@ dev = [
     "vulture>=2.16",
 ]
 docs = [
+    "mike>=2.2.0",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.7.6",
     "mkdocs-section-index>=0.3.10",
