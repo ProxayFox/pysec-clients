@@ -344,15 +344,19 @@ class ViaFiles:
         *drain* is a coroutine factory that consumes the shared record queue
         until it receives the sentinel ``None`` (for example writing into a
         container or an async sink).
+
+        Producers and the drain consumer run concurrently. If either side
+        raises, the other is cancelled and the original exception is re-raised,
+        so a failing consumer can never deadlock the producers on the bounded
+        queue (and vice versa).
         """
         semaphore = asyncio.Semaphore(max(1, self._config.download_workers))
         record_queue: asyncio.Queue[list[dict[str, Any]] | None] = asyncio.Queue(
             maxsize=max(1, self._config.download_workers * 2),
         )
         timeout = aiohttp.ClientTimeout(total=self._config.client_timeout)
-        drain_task = asyncio.create_task(drain(record_queue))
 
-        try:
+        async def produce() -> None:
             async with aiohttp.ClientSession(timeout=timeout) as session:
                 tasks = [
                     self._download_export_file(
@@ -366,7 +370,25 @@ class ViaFiles:
                 ]
                 if tasks:
                     await asyncio.gather(*tasks, return_exceptions=False)
-                await record_queue.join()
-        finally:
+            # Signal end-of-stream exactly once, after every producer succeeds.
             await record_queue.put(None)
-            await drain_task
+
+        drain_task = asyncio.create_task(drain(record_queue))
+        producer_task = asyncio.create_task(produce())
+        pending = {drain_task, producer_task}
+
+        try:
+            while pending:
+                done, pending = await asyncio.wait(
+                    pending, return_when=asyncio.FIRST_COMPLETED
+                )
+                for task in done:
+                    exc = task.exception()
+                    if exc is not None:
+                        # Re-raise the first failure; finally cancels the rest.
+                        raise exc
+        finally:
+            for task in (drain_task, producer_task):
+                if not task.done():
+                    task.cancel()
+            await asyncio.gather(drain_task, producer_task, return_exceptions=True)
