@@ -5,5 +5,10 @@
     "aliases": [
       "latest"
     ]
+  },
+  {
+    "version": "mde-client-0.1.4",
+    "title": "mde-client 0.1.4",
+    "aliases": []
   }
 ]
