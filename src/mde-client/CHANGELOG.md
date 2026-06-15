@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-06-15
+
+### Changed
+
+- `findbyip(...)` now accepts `datetime` or ISO 8601 string timestamps and
+  normalizes values to UTC `Z` format before calling the Defender API.
+- `inventoryNoProductCodeByMachineFiles()` no longer exposes unused
+  `page_size` or `since` arguments for the export-backed request path.
+
+### Fixed
+
+- Export-backed result fetching now waits briefly after retrieving export file
+  URLs so Microsoft Defender for Endpoint has time to populate blobs before
+  downloads begin, reducing transient 404s and unnecessary retries.
+
+## [0.2.1] - 2026-06-09
+
+### Added
+
+- `just docs-versions-preview`: a local workflow for deploying a throwaway
+  `dev` docs version and previewing the multi-version docs site with `mike`.
+
+### Changed
+
+- The package `Documentation` URL now points at the docs site root so stable
+  releases follow the `latest` versioned docs alias.
+- Clarified local multi-version docs preview and deployment commands in the
+  workspace `justfile`.
+- Bumped package and workspace lock metadata to `0.2.1`.
+
 ## [0.2.0] - 2026-06-09
 
 ### Added
@@ -126,7 +156,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contract.
 - `py.typed` PEP 561 marker — type information is shipped with the package.
 
-[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.0...HEAD
+[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.2...HEAD
+[0.2.2]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.1...mde-client-v0.2.2
+[0.2.1]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.0...mde-client-v0.2.1
 [0.2.0]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.4...mde-client-v0.2.0
 [0.1.4]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.3...mde-client-v0.1.4
 [0.1.3]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.2...mde-client-v0.1.3
