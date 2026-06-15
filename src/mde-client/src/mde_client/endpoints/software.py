@@ -150,9 +150,7 @@ class SoftwareEndpoint(BaseEndpoint):
             self._http, self._auth
         )._softwareInventoryNoProductCodeByMachine(page_size=page_size, since=since)
 
-    def inventoryNoProductCodeByMachineFiles(
-        self, page_size: int = 50000, since: datetime | int | str | None = None
-    ) -> AssetNonCPESoftwareResults:
+    def inventoryNoProductCodeByMachineFiles(self) -> AssetNonCPESoftwareResults:
         """Responds with all the data of installed software that does not have a Common Platform Enumeration(CPE), per device.
 
         Same Results as `inventoryNoProductCodeByMachine` but exported as a file instead of in the response body.
