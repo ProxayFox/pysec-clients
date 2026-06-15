@@ -1,10 +1,15 @@
 [
   {
-    "version": "mde-client-0.2.1",
-    "title": "mde-client 0.2.1",
+    "version": "mde-client-0.2.2",
+    "title": "mde-client 0.2.2",
     "aliases": [
       "latest"
     ]
+  },
+  {
+    "version": "mde-client-0.2.1",
+    "title": "mde-client 0.2.1",
+    "aliases": []
   },
   {
     "version": "mde-client-0.2.0",
