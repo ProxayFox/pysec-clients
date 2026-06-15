@@ -26,6 +26,7 @@ import polars as pl
 import orjson
 from collections import deque
 from datetime import datetime, timedelta, timezone
+from time import sleep
 from email.utils import parsedate_to_datetime
 from typing import Any
 from collections.abc import AsyncIterator, Iterator
@@ -279,6 +280,14 @@ class BaseResults:
                 .drop_nulls()
                 .to_list()
             )
+
+            # Need to sleep for 5-10 seconds to give MDE time to populate
+            # the export blobs before we try to download them, otherwise we get 404s.
+            # This is a known quirk of the MDE export APIs.
+            # Although there is retry logic if the files aren't ready, this sleep is a
+            # simpler way to avoid hitting the retry logic in the first place and adds less overall delay.
+            sleep(10)
+
             self._container = self._files_to_container(urls)
             del file_tbl, response  # free memory
 
