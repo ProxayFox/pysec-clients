@@ -250,20 +250,23 @@ class MachinesEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}/getmissingkbs"
         return ProductDTOResults(self, {}, path=path)
 
-    def findbyip(self, ip: str, timestamp: datetime) -> MachineResults:
+    def findbyip(self, ip: str, timestamp: datetime | str) -> MachineResults:
         """Find devices by internal IP
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/find-machines-by-ip
 
         Args:
             ip(str): The internal IP address to search for.
-            timestamp(datetime): UTC ISO 8601 timestamp to search for.
+            timestamp(datetime | str): UTC ISO 8601 timestamp to search for.
         """
-        timestamp_utc = (
-            timestamp.astimezone(timezone.utc)
-            if timestamp.tzinfo is not None
-            else timestamp.replace(tzinfo=timezone.utc)
-        )
+        if isinstance(timestamp, str):
+            timestamp_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        else:
+            timestamp_utc = (
+                timestamp.astimezone(timezone.utc)
+                if timestamp.tzinfo is not None
+                else timestamp.replace(tzinfo=timezone.utc)
+            )
         timestamp_iso = timestamp_utc.isoformat().replace("+00:00", "Z")
         payload = f"(ip='{ip}',timestamp={timestamp_iso})"
         path = f"{self._PATH}/findbyip"
