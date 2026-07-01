@@ -9,7 +9,9 @@ What is tested
   module/name mismatches produced by camelCase conversion bugs in the builder).
 - Every XML ``Property`` defined on an ``EntityType`` or ``ComplexType`` appears
   as a named field in the corresponding Arrow schema or struct constant.
-- ``Nullable="false"`` in XML → ``nullable=False`` on the Arrow field.
+- ``Nullable="false"`` in XML → ``nullable=False`` on the Arrow field,
+  except for explicit runtime-nullability overrides where Defender payloads are
+  known to violate the published metadata.
 - EDM primitive types map to the expected ``pa.DataType``.
 - ``Collection(X)`` fields are wrapped in ``pa.list_``.
 - ComplexType-valued fields resolve to ``pa.struct`` (not a fallback string).
@@ -36,7 +38,7 @@ import pyarrow as pa
 import pytest
 
 import mde_client.schemas as schemas_pkg
-from mde_contract import EDM_PA_TYPES, to_const
+from mde_contract import EDM_PA_TYPES, RUNTIME_NULLABLE_FIELD_OVERRIDES, to_const
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
@@ -334,20 +336,26 @@ class TestSchemaFieldCoverage:
 
 
 class TestFieldNullability:
-    """Nullable=false in XML must map to nullable=False on the Arrow field."""
+    """Nullable=false in XML must map to nullable=False unless explicitly overridden."""
 
     @pytest.mark.parametrize("const_name", _SCHEMA_NAMES)
     def test_schema_nullability_matches_xml(
         self, const_name: str, mde_xml: _ParsedMetadata
     ) -> None:
         _, xml_props = _schema_props_for_const(const_name, mde_xml)
+        type_name = _xml_name_for_const(
+            const_name,
+            "_SCHEMA",
+            [*mde_xml.entity_types, *mde_xml.complex_types],
+        )
+        assert type_name is not None
 
         schema: pa.Schema = _load_const(const_name)
         xml_non_nullable = {
             p.get("Name", "")
             for p in xml_props
             if p.get("Nullable", "true").lower() == "false"
-        }
+        } - RUNTIME_NULLABLE_FIELD_OVERRIDES.get(type_name, set())
 
         mismatches: list[str] = []
         for field_name in xml_non_nullable:
@@ -386,6 +394,25 @@ class TestFieldNullability:
         assert not mismatches, (
             f"{const_name}: fields marked Nullable=false in XML but nullable=True "
             f"in struct: {mismatches}"
+        )
+
+    @pytest.mark.parametrize(
+        ("type_name", "field_name"),
+        [
+            (type_name, field_name)
+            for type_name, field_names in sorted(
+                RUNTIME_NULLABLE_FIELD_OVERRIDES.items()
+            )
+            for field_name in sorted(field_names)
+        ],
+    )
+    def test_runtime_nullable_overrides_stay_nullable(
+        self, type_name: str, field_name: str
+    ) -> None:
+        schema: pa.Schema = _load_const(f"{to_const(type_name)}_SCHEMA")
+        assert schema.field(field_name).nullable, (
+            f"{type_name}.{field_name} must stay nullable because the runtime "
+            "payload contains nulls despite Nullable=false in metadata"
         )
 
 

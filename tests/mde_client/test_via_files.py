@@ -11,10 +11,12 @@ import aiohttp
 import httpx
 import orjson
 import pyarrow as pa
+import pyarrow.parquet as pq
 import pytest
 from http_to_arrow import ArrowRecordContainer
 
 from mde_client.endpoints.base import BaseEndpoint, BaseResults
+from mde_client.schemas import ASSET_VULNERABILITY_SCHEMA
 from mde_client.viaFiles import (
     EmptyExportBlobError,
     ViaFiles,
@@ -656,6 +658,41 @@ class TestBaseResultsFilesIpcStream:
         assert table.column("id").to_pylist() == ["1", "2"]
         # Streaming must not populate the cached container.
         assert results._container is None
+
+    @pytest.mark.asyncio
+    async def test_streamed_vulnerability_records_with_null_cvss_score_write_to_parquet(
+        self, tmp_path
+    ) -> None:
+        url = "https://blob.example.com/vulns.json"
+        records = [
+            {
+                "id": "1",
+                "deviceId": "dev-1",
+                "rbacGroupId": 183,
+                "securityUpdateAvailable": True,
+                "cvssScore": None,
+            }
+        ]
+        blob = _ndjson_bytes(records)
+
+        endpoint = _ExportFilesEndpoint(url)
+        results = BaseResults(endpoint, {}, files=True)
+        results.SCHEMA = ASSET_VULNERABILITY_SCHEMA
+
+        fake_session = _FakeClientSession()
+        fake_session._default_response = _FakeResponse(blob)
+
+        with patch(
+            "mde_client.viaFiles.aiohttp.ClientSession", return_value=fake_session
+        ):
+            chunks = [chunk async for chunk in results.to_ipc_stream()]
+
+        table = pa.ipc.open_stream(pa.BufferReader(b"".join(chunks))).read_all()
+        output_path = tmp_path / "vulnerabilities.parquet"
+        pq.write_table(table, output_path)
+
+        assert output_path.exists()
+        assert table.column("cvssScore").to_pylist() == [None]
 
 
 # ------------------------------------------------------------------
