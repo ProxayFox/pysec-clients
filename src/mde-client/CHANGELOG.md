@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-07-01
+
+### Changed
+
+- Raised the minimum `aiohttp` and `polars` dependency versions in package
+  metadata to match the validated workspace set used by the client and tests.
+
+### Fixed
+
+- Generated vulnerability export schemas now keep `cvssScore` nullable for the
+  `AssetVulnerability` and `DeltaAssetVulnerability` payloads, matching runtime
+  Defender responses so streamed Arrow IPC results can be written to strict
+  sinks such as Parquet without schema violations.
+
 ## [0.2.2] - 2026-06-15
 
 ### Changed
@@ -156,7 +170,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contract.
 - `py.typed` PEP 561 marker — type information is shipped with the package.
 
-[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.2...HEAD
+[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.3...HEAD
+[0.2.3]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.2...mde-client-v0.2.3
 [0.2.2]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.1...mde-client-v0.2.2
 [0.2.1]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.0...mde-client-v0.2.1
 [0.2.0]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.1.4...mde-client-v0.2.0

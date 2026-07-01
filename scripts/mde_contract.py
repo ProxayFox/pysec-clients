@@ -96,6 +96,14 @@ NO_RETURN_ACTION_RESPONSE_OVERRIDES: dict[tuple[str, str], str] = {
     ): "AuthScanHistoryContract",
 }
 
+# Defender's published OData metadata is occasionally stricter than the payloads
+# returned by the runtime export APIs. Keep these exceptions narrow and explicit
+# so generated Arrow schemas remain writable to strict sinks like Parquet.
+RUNTIME_NULLABLE_FIELD_OVERRIDES: dict[str, set[str]] = {
+    "AssetVulnerability": {"cvssScore"},
+    "DeltaAssetVulnerability": {"cvssScore"},
+}
+
 
 @dataclass(frozen=True)
 class RequestModelSpec:
@@ -500,12 +508,14 @@ class SchemaCodeGen:
 
     # -- Field line ------------------------------------------------------------
 
-    def _field_line(self, prop: ET.Element, indent: int = 8) -> str:
+    def _field_line(self, owner_name: str, prop: ET.Element, indent: int = 8) -> str:
         name = prop.get("Name", "")
         odata_t = prop.get("Type", "Edm.String")
         nullable = prop.get("Nullable", "true").lower() != "false"
         pad = " " * indent
         type_expr = self._type_expr(odata_t)
+        if name in RUNTIME_NULLABLE_FIELD_OVERRIDES.get(owner_name, set()):
+            nullable = True
         if nullable:
             return f'{pad}pa.field("{name}", {type_expr}),'
         return f'{pad}pa.field("{name}", {type_expr}, nullable=False),'
@@ -529,7 +539,7 @@ class SchemaCodeGen:
                 lines.append(f'{pad}pa.field("{name}", {type_expr}),')
         else:
             for prop in self.meta.props_for(ct_name):
-                lines.append(self._field_line(prop, indent=8))
+                lines.append(self._field_line(ct_name, prop, indent=8))
 
         lines += ["    ]", ")"]
         return "\n".join(lines)
@@ -541,7 +551,7 @@ class SchemaCodeGen:
         lines = [f"{const}: pa.Schema = pa.schema("]
         lines += ["    ["]
         for prop in self.meta.props_for(type_name):
-            lines.append(self._field_line(prop, indent=8))
+            lines.append(self._field_line(type_name, prop, indent=8))
         lines += ["    ]", ")"]
         return "\n".join(lines)
 

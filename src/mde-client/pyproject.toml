@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mde-client"
-version = "0.2.2"
+version = "0.2.3"
 description = "Python client for the Microsoft Defender for Endpoint API with lazy results and Arrow/Polars output."
 readme = "README.md"
 requires-python = ">=3.14"
@@ -38,7 +38,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "aiohttp>=3.14.0",
+    "aiohttp>=3.14.1",
     "http-to-arrow>=0.2.1",
     "httpx>=0.28.1",
     "msal>=1.37.0",
@@ -52,7 +52,7 @@ arrow = [
     "pyarrow>=24.0.0",
 ]
 polars = [
-    "polars>=1.41.2",
+    "polars>=1.42.1",
 ]
 
 [project.urls]
