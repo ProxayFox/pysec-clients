@@ -1049,7 +1049,7 @@ wheels = [
 
 [[package]]
 name = "mde-client"
-version = "0.2.2"
+version = "0.2.3"
 source = { editable = "src/mde-client" }
 dependencies = [
     { name = "aiohttp" },

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "mde-client"
-version = "0.2.2"
+version = "0.2.3"
 description = "Python client for the Microsoft Defender for Endpoint API with lazy results and Arrow/Polars output."
 readme = "README.md"
 requires-python = ">=3.14"
