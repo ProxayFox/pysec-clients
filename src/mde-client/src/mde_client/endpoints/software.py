@@ -108,7 +108,9 @@ class SoftwareEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}/getmissingkbs"
         return ProductDTOResults(self, {}, path=path)
 
-    def inventoryByMachine(self, page_size: int = 50000) -> AssetSoftwareResults:
+    def inventoryByMachine(
+        self, page_size: int = 50000, since: datetime | int | None = None
+    ) -> AssetSoftwareResults:
         """Responds with all the data of installed software that has a Common Platform Enumeration(CPE), per device.
 
         **Docs:**
@@ -118,7 +120,7 @@ class SoftwareEndpoint(BaseEndpoint):
         from .machines import MachinesEndpoint
 
         return MachinesEndpoint(self._http, self._auth)._softwareInventoryByMachine(
-            page_size=page_size
+            page_size=page_size, since=since
         )
 
     def inventoryByMachineFiles(self) -> AssetSoftwareResults:

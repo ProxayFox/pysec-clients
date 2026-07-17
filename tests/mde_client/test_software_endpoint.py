@@ -54,16 +54,19 @@ class TestSubResources:
 
 class TestDelegation:
     def test_inventory_by_machine_delegates(self, make_endpoint, monkeypatch) -> None:
-        captured: dict[str, int] = {}
+        captured: dict[str, object] = {}
 
-        def fake(self: MachinesEndpoint, *, page_size: int):
+        def fake(self: MachinesEndpoint, *, page_size: int, since):
             captured["page_size"] = page_size
+            captured["since"] = since
             return "sentinel"
 
         monkeypatch.setattr(MachinesEndpoint, "_softwareInventoryByMachine", fake)
-        result = make_endpoint(SoftwareEndpoint).inventoryByMachine(page_size=123)
+        result = make_endpoint(SoftwareEndpoint).inventoryByMachine(
+            page_size=123, since=7
+        )
         assert result == "sentinel"
-        assert captured["page_size"] == 123
+        assert captured == {"page_size": 123, "since": 7}
 
     def test_inventory_by_machine_files_delegates(
         self, make_endpoint, monkeypatch
