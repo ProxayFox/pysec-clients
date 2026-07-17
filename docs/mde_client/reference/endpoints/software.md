@@ -14,10 +14,10 @@ Access software inventory and related records.
 - `machineReferences(id: str) -> MachineReferencesResults`: fetch machines related to the software record.
 - `vulnerabilities(id: str) -> VulnerabilityDTOResults`: fetch vulnerabilities related to the software record.
 - `getmissingkbs(id: str) -> ProductDTOResults`: fetch missing KBs related to the software record.
-- `inventoryByMachine(page_size: int = 50000) -> AssetSoftwareResults`: fetch CPE software inventory rows by machine.
+- `inventoryByMachine(page_size: int = 50000, since: datetime | int | None = None) -> AssetSoftwareResults`: fetch CPE software inventory rows by machine.
 - `inventoryByMachineFiles() -> AssetSoftwareResults`: fetch CPE software inventory rows via export files.
 - `inventoryNoProductCodeByMachine(page_size: int = 50000, since: datetime | int | str | None = None) -> AssetNonCPESoftwareResults`: fetch non-CPE software inventory rows by machine.
-- `inventoryNoProductCodeByMachineFiles(page_size: int = 50000, since: datetime | int | str | None = None) -> AssetNonCPESoftwareResults`: fetch non-CPE software inventory rows via export files.
+- `inventoryNoProductCodeByMachineFiles() -> AssetNonCPESoftwareResults`: fetch non-CPE software inventory rows via export files.
 
 ## Notes
 

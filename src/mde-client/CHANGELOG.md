@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4] - 2026-07-17
+
+### Fixed
+
+- `client.software.inventoryByMachine(...)` now forwards the optional `since`
+  filter to the underlying machine assessment request, matching the machine
+  inventory surface and restoring datetime-based filtering from the software
+  client surface.
+
 ## [0.2.3] - 2026-07-01
 
 ### Changed
@@ -170,7 +179,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contract.
 - `py.typed` PEP 561 marker — type information is shipped with the package.
 
-[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.3...HEAD
+[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.4...HEAD
+[0.2.4]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.3...mde-client-v0.2.4
 [0.2.3]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.2...mde-client-v0.2.3
 [0.2.2]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.1...mde-client-v0.2.2
 [0.2.1]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.0...mde-client-v0.2.1
