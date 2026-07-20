@@ -18,5 +18,6 @@ ASSET_SOFTWARE_SCHEMA: pa.Schema = pa.schema(
         pa.field("softwareFirstSeenTimestamp", pa.string()),
         pa.field("endOfSupportStatus", pa.string()),
         pa.field("endOfSupportDate", pa.string()),
+        pa.field("softwareTags", pa.list_(pa.string())),
     ]
 )
