@@ -8,12 +8,12 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from .action_availability_status import ACTION_AVAILABILITY_STATUS_SCHEMA
     from .alert import (
-        ALERT_SCHEMA,
-        ALERT_RELATED_USER_TYPE,
-        LOGGED_ON_USER_TYPE,
         ALERT_COMMENT_TYPE,
         ALERT_EVIDENCE_TYPE,
+        ALERT_RELATED_USER_TYPE,
+        ALERT_SCHEMA,
         DOMAIN_TYPE,
+        LOGGED_ON_USER_TYPE,
     )
     from .asset_baseline_assessment import ASSET_BASELINE_ASSESSMENT_SCHEMA
     from .asset_browser_extension import ASSET_BROWSER_EXTENSION_SCHEMA
@@ -29,9 +29,9 @@ if TYPE_CHECKING:
     )
     from .baseline_configuration import BASELINE_CONFIGURATION_SCHEMA
     from .baseline_exception import (
-        BASELINE_EXCEPTION_SCHEMA,
         BASELINE_CONFIGURATION_DTO_TYPE,
         BASELINE_EXCEPTION_DEVICE_DTO_TYPE,
+        BASELINE_EXCEPTION_SCHEMA,
         USER_DTO_TYPE,
     )
     from .baseline_profile import BASELINE_PROFILE_SCHEMA
@@ -39,28 +39,28 @@ if TYPE_CHECKING:
     from .browser_extensions import BROWSER_EXTENSIONS_SCHEMA
     from .configuration_score import CONFIGURATION_SCORE_SCHEMA
     from .data_export_settings import (
+        DATA_EXPORT_SETTINGS_LOG_DEFINITION_TYPE,
         DATA_EXPORT_SETTINGS_SCHEMA,
         EVENT_HUB_PROPERTIES_TYPE,
         STORAGE_ACCOUNT_PROPERTIES_TYPE,
         WORKSPACE_PROPERTIES_TYPE,
-        DATA_EXPORT_SETTINGS_LOG_DEFINITION_TYPE,
     )
     from .delta_asset_vulnerability import DELTA_ASSET_VULNERABILITY_SCHEMA
     from .device_authenticated_scan_agent import DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA
     from .device_authenticated_scan_definition import (
-        DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
-        AUTH_PARAMS_BASE_TYPE,
-        AGENT_CONTRACT_TYPE,
-        SCAN_STATE_TYPE,
         ADVANCED_ACTIVE_CONFIGURATION_TYPE,
+        AGENT_CONTRACT_TYPE,
+        AUTH_PARAMS_BASE_TYPE,
+        DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
+        SCAN_STATE_TYPE,
     )
     from .device_av_info import DEVICE_AV_INFO_SCHEMA
     from .device_group import (
-        DEVICE_GROUP_SCHEMA,
         AAD_USERS_GROUP_TYPE,
-        DEVICE_GROUP_PROPERTY_CONDITION_TYPE,
         DEVICE_GROUP_LIST_PROPERTY_CONDITION_TYPE,
+        DEVICE_GROUP_PROPERTY_CONDITION_TYPE,
         DEVICE_GROUP_RULES_TYPE,
+        DEVICE_GROUP_SCHEMA,
     )
     from .dlp_machine import DLP_MACHINE_SCHEMA
     from .domain import DOMAIN_SCHEMA
@@ -72,14 +72,14 @@ if TYPE_CHECKING:
     from .in_org_ip_stats import IN_ORG_IP_STATS_SCHEMA
     from .incident import (
         INCIDENT_SCHEMA,
-        VM_METADATA_TYPE,
-        MTP_DEVICE_TYPE,
         MTP_ALERT_EVIDENCE_TYPE,
         MTP_ALERT_TYPE,
+        MTP_DEVICE_TYPE,
+        VM_METADATA_TYPE,
     )
     from .indicator import (
-        INDICATOR_SCHEMA,
         CERTIFICATE_INDICATOR_INFORMATION_TYPE,
+        INDICATOR_SCHEMA,
     )
     from .investigation import INVESTIGATION_SCHEMA
     from .ip import IP_SCHEMA
@@ -89,15 +89,15 @@ if TYPE_CHECKING:
     )
     from .list_1_of_indicator import LIST_1_OF_INDICATOR_SCHEMA
     from .machine import (
-        MACHINE_SCHEMA,
         MACHINE_IP_ADDRESS_TYPE,
+        MACHINE_SCHEMA,
     )
     from .machine_action import (
+        CUSTOM_PLAYBOOK_COMMAND_RESULT_TYPE,
+        CUSTOM_PLAYBOOK_COMMAND_TYPE,
+        CUSTOM_PLAYBOOK_PARAMETER_TYPE,
         MACHINE_ACTION_SCHEMA,
         RELATED_FILE_INFO_TYPE,
-        CUSTOM_PLAYBOOK_PARAMETER_TYPE,
-        CUSTOM_PLAYBOOK_COMMAND_TYPE,
-        CUSTOM_PLAYBOOK_COMMAND_RESULT_TYPE,
         TROUBLESHOOT_INFO_TYPE,
     )
     from .public_asset_dto import PUBLIC_ASSET_DTO_SCHEMA
@@ -109,8 +109,8 @@ if TYPE_CHECKING:
     from .recommendation import RECOMMENDATION_SCHEMA
     from .remediation_task import REMEDIATION_TASK_SCHEMA
     from .software import (
-        SOFTWARE_SCHEMA,
         PUBLIC_DISTRIBUTION_DTO_TYPE,
+        SOFTWARE_SCHEMA,
     )
     from .user import USER_SCHEMA
     from .vulnerability import VULNERABILITY_SCHEMA

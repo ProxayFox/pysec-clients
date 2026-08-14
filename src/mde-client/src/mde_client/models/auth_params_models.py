@@ -51,11 +51,11 @@ SCANAUTHENTICATIONPARAMS = Annotated[
 ]
 
 __all__ = [
-    "WINDOWS_AUTH_TYPE",
     "LINUX_AUTH_TYPE",
+    "SCANAUTHENTICATIONPARAMS",
     "SNMP_AUTH_TYPE",
-    "WindowsAuthParams",
+    "WINDOWS_AUTH_TYPE",
     "LinuxAuthParams",
     "SnmpAuthParams",
-    "SCANAUTHENTICATIONPARAMS",
+    "WindowsAuthParams",
 ]

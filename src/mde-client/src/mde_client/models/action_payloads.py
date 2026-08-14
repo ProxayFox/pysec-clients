@@ -2,6 +2,7 @@
 # Re-run the script to regenerate when MDE $metadata changes.
 from __future__ import annotations
 
+from mde_client.endpoints.base import BasePayload
 from mde_client.models.enums import (
     ALERT_CLASSIFICATION,
     ALERT_DETERMINATION,
@@ -14,8 +15,6 @@ from mde_client.models.enums import (
     SCAN_TYPE,
     TAG_ACTION,
 )
-
-from mde_client.endpoints.base import BasePayload
 
 
 class AddDeviceGroupsPayload(BasePayload):
