@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-08-14
+
+### Fixed
+
+- `client.machines.findbyip(...)` now converts ISO 8601 timestamps with an
+  explicit UTC offset to UTC `Z` format before calling the Defender API.
+
 ## [0.3.0] - 2026-08-13
 
 ### Added
@@ -195,7 +202,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contract.
 - `py.typed` PEP 561 marker — type information is shipped with the package.
 
-[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.4...HEAD
+[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.3.1...HEAD
+[0.3.1]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.3.0...mde-client-v0.3.1
 [0.2.4]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.3...mde-client-v0.2.4
 [0.2.3]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.2...mde-client-v0.2.3
 [0.2.2]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.1...mde-client-v0.2.2
