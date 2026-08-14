@@ -8,6 +8,7 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
+import httpx
 import yaml
 
 ROOT = Path("/workspaces/pysec-clients")
@@ -20,7 +21,7 @@ TODAY = "2026-05-13"
 
 
 def strip_prefix(value: str) -> str:
-    return value[len(API_PREFIX) :] if value.startswith(API_PREFIX) else value
+    return value.removeprefix(API_PREFIX)
 
 
 def unwrap_collection(value: str) -> str:
@@ -380,9 +381,9 @@ def _probe_endpoint(client: Any, method: str, path: str) -> dict[str, Any]:
                 msg = error.get("message", error.get("code", ""))
                 if len(msg) > 120:
                     msg = msg[:117] + "..."
-        except Exception:
+        except json.JSONDecodeError, ValueError:
             msg = response.text[:120] if response.text else ""
-    except Exception as exc:
+    except httpx.HTTPError as exc:
         status = 0
         msg = str(exc)[:120]
     return {"status_code": status, "message": msg, "http_method": method}
@@ -398,8 +399,8 @@ def _fetch_sample_id(client: Any, collection_path: str) -> str | None:
         items = body.get("value", [])
         if items and isinstance(items, list) and "id" in items[0]:
             return str(items[0]["id"])
-    except Exception:
-        pass
+    except httpx.HTTPError, json.JSONDecodeError:
+        return None
     return None
 
 

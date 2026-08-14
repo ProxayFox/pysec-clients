@@ -55,6 +55,7 @@ Defender returns `429` when you exceed the API rate budget. Inspect the `Retry-A
 import time
 import httpx
 
+
 def call_with_retry(fn, *, attempts: int = 5):
     for attempt in range(attempts):
         try:
@@ -62,7 +63,7 @@ def call_with_retry(fn, *, attempts: int = 5):
         except httpx.HTTPStatusError as exc:
             if exc.response.status_code != 429 or attempt == attempts - 1:
                 raise
-            wait = int(exc.response.headers.get("Retry-After", 2 ** attempt))
+            wait = int(exc.response.headers.get("Retry-After", 2**attempt))
             time.sleep(wait)
     raise RuntimeError("unreachable")
 ```

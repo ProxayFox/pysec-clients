@@ -85,11 +85,16 @@ with MDEClient(...) as client:
     machines = client.machines.get_all().to_polars()
     alerts = client.alerts.get_all().to_polars()
 
+
 # Bad — closes the pool, drops the token cache, repeats MSAL flow.
 def get_machines():
-    with MDEClient(...) as c: ...
+    with MDEClient(...) as c:
+        ...
+
+
 def get_alerts():
-    with MDEClient(...) as c: ...
+    with MDEClient(...) as c:
+        ...
 ```
 
 If you do need a long-running process (worker, server, scheduler), inject a persistent `msal.SerializableTokenCache` so cached tokens survive process restarts. See [Inject a custom HTTP client or token cache](inject-http-client-and-token-cache.md).
@@ -100,10 +105,10 @@ A results wrapper caches the fetched Arrow data the first time you materialize i
 
 ```python
 results = client.machines.get_all()
-df1 = results.to_polars()    # network fetch
-df2 = results.to_polars()    # cached, no fetch
+df1 = results.to_polars()  # network fetch
+df2 = results.to_polars()  # cached, no fetch
 results.refresh()
-df3 = results.to_polars()    # network fetch again
+df3 = results.to_polars()  # network fetch again
 ```
 
 In long-running pipelines, hold the wrapper and call `refresh()` on a schedule rather than instantiating new endpoint queries.

@@ -15,8 +15,9 @@ from mde_client.endpoints.machines import MachinesQuery
 def alert_summary(client: MDEClient) -> pl.DataFrame:
     # 1. Pull active Windows machines as Polars (one network round-trip set).
     machines = (
-        client.machines
-        .get_all(MachinesQuery(healthStatus="Active", osPlatform="Windows10"))
+        client.machines.get_all(
+            MachinesQuery(healthStatus="Active", osPlatform="Windows10")
+        )
         .to_polars()
         .select(["id", "computerDnsName", "lastSeen"])
     )
@@ -46,11 +47,13 @@ The pattern above is fine for hundreds of machines. For thousands, parallelise t
 ```python
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+
 def _count(machine_id: str) -> dict:
     return {
         "id": machine_id,
         "alert_count": client.machines.alerts(machine_id).to_polars().height,
     }
+
 
 counts: list[dict] = []
 with ThreadPoolExecutor(max_workers=8) as pool:

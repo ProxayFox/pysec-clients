@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """MDE Arrow Schema Contract Builder
 
 Reads   tests/mde_client/fixtures/mde_metadata.xml
@@ -34,7 +33,7 @@ import re
 import subprocess
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pyarrow as pa
@@ -185,7 +184,7 @@ def unwrap_collection(odata_t: str) -> str:
 
 def run_quality() -> None:
     """Run `just quality-schema` so generated files are lint-, format-, and type-clean."""
-    result = subprocess.run(["just", "quality-schema"])
+    result = subprocess.run(["just", "quality-schema"], check=False)
     if result.returncode != 0:
         raise SystemExit(result.returncode)
 
@@ -216,7 +215,7 @@ def metadata_is_stale() -> bool:
     """True when XML_SOURCE is missing or older than METADATA_MAX_AGE."""
     if not XML_SOURCE.exists():
         return True
-    age = datetime.now() - datetime.fromtimestamp(XML_SOURCE.stat().st_mtime)
+    age = datetime.now(UTC) - datetime.fromtimestamp(XML_SOURCE.stat().st_mtime, UTC)
     return age > METADATA_MAX_AGE
 
 
@@ -1079,7 +1078,7 @@ def main() -> None:
             k in os.environ
             for k in ("AZURE_TENANT_ID", "AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET")
         ):
-            raise EnvironmentError(
+            raise OSError(
                 "AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET must be "
                 "set to fetch metadata from the MDE API.\n"
                 "To generate from existing XML without credentials, use --no-fetch."

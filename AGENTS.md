@@ -48,8 +48,8 @@ Start with:
 
 Do not edit the following automatically generated files by hand; they are regenerated from upstream metadata and will be overwritten.
 
-- `src/mde-client/schemas/` - Pydantic models for API payloads.
-- `src/mde-client/models/` - Pydantic models for internal use.
+- `src/mde-client/src/mde_client/schemas/` - Arrow schemas for result materialization.
+- `src/mde-client/src/mde_client/models/` - Pydantic models for API payloads.
 
 Any file that starts with the following, do not edit by hand:
 
