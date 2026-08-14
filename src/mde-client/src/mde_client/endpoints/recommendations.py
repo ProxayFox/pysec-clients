@@ -13,7 +13,7 @@ from ..models.enums import PUBLIC_RECOMMENDATION_EXCEPTION_STATUS
 if TYPE_CHECKING:
     from .vulnerabilities import VulnerabilityDTOResults
     from .machines import MachineReferencesResults
-    from .misc import ProductDTOResults
+    from .misc import PublicProductDTOResults
 
 
 class RecommendationQuery(BaseQuery):
@@ -65,15 +65,15 @@ class RecommendationsEndpoint(BaseEndpoint):
         path = f"{self._PATH}/{id}"
         return RecommendationResults(self, {}, path=path)
 
-    def software(self, id: str) -> ProductDTOResults:
+    def software(self, id: str) -> PublicProductDTOResults:
         """Get software details for a recommendation by ID.
 
         **Docs:** https://learn.microsoft.com/en-us/defender-endpoint/api/list-recommendation-software
         """
-        from .misc import ProductDTOResults
+        from .misc import PublicProductDTOResults
 
         path = f"{self._PATH}/{id}/software"
-        return ProductDTOResults(self, {}, path=path)
+        return PublicProductDTOResults(self, {}, path=path)
 
     def machineReferences(self, id: str) -> MachineReferencesResults:
         """Get machine references for a recommendation by ID.

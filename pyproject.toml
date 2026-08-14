@@ -82,3 +82,16 @@ venvPath = "."
 venv = ".venv"
 include = ["src", "tests", "scripts"]
 extraPaths = ["src/mde-client/src", "scripts"]
+
+[tool.ruff.lint.per-file-ignores]
+# These modules predate the lint rule and are part of the established package
+# import surface; renaming them would be a breaking API change.
+"src/mde-client/src/mde_client/endpoints/__init__.py" = ["RUF022"]
+"src/mde-client/src/mde_client/endpoints/authenticatedScan.py" = ["N999"]
+"src/mde-client/src/mde_client/endpoints/browserExtension.py" = ["N999"]
+"src/mde-client/src/mde_client/endpoints/certificateInventory.py" = ["N999"]
+"src/mde-client/src/mde_client/endpoints/deviceAvHealth.py" = ["N999"]
+"src/mde-client/src/mde_client/endpoints/deviceGroups.py" = ["N999"]
+"src/mde-client/src/mde_client/endpoints/machineActions.py" = ["N999"]
+"src/mde-client/src/mde_client/endpoints/securityBaseline.py" = ["N999"]
+"src/mde-client/src/mde_client/viaFiles.py" = ["N999"]

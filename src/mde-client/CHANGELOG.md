@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-08-13
+
+### Added
+
+- Generated Arrow schemas now expose Defender's `tags` and `softwareTags`
+  fields for supported software and product payloads.
+- `client.recommendations.software(...)` now materializes recommendation
+  software payloads through `PublicProductDTOResults`.
+
+### Changed
+
+- **Breaking:** Renamed the generated public enum export
+  `PUBLIC_VULNERABILITY_EXCEPTION_STATUS_DTO` to
+  `PUBLIC_VULNERABILITY_EXCEPTION_STATUS`. Update imports from both
+  `mde_client.models.enums` and `mde_client.models`.
+
 ## [0.2.4] - 2026-07-17
 
 ### Fixed

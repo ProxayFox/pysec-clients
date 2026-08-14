@@ -15,5 +15,6 @@ PUBLIC_PRODUCT_DTO_SCHEMA: pa.Schema = pa.schema(
         pa.field("impactScore", pa.float32(), nullable=False),
         pa.field("isNormalized", pa.bool_(), nullable=False),
         pa.field("category", pa.string()),
+        pa.field("tags", pa.list_(pa.string())),
     ]
 )

@@ -305,7 +305,7 @@ OPERATOR_TYPE = Literal["StartsWith", "EndsWith", "Equals", "Contains", "In"]
 PUBLIC_RECOMMENDATION_EXCEPTION_STATUS = Literal[
     "Active", "Exception", "PartialException"
 ]
-PUBLIC_VULNERABILITY_EXCEPTION_STATUS_DTO = Literal[
+PUBLIC_VULNERABILITY_EXCEPTION_STATUS = Literal[
     "RemediationRequired", "NoActionRequired", "UnderException", "PartialException"
 ]
 RISK_SCORE = Literal["None", "Informational", "Low", "Medium", "High"]
@@ -425,7 +425,7 @@ __all__ = [
     "ONBOARDING_STATUS",
     "OPERATOR_TYPE",
     "PUBLIC_RECOMMENDATION_EXCEPTION_STATUS",
-    "PUBLIC_VULNERABILITY_EXCEPTION_STATUS_DTO",
+    "PUBLIC_VULNERABILITY_EXCEPTION_STATUS",
     "RISK_SCORE",
     "SCAN_STATUS",
     "SCAN_TYPE",
