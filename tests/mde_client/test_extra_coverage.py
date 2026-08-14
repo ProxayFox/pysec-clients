@@ -13,19 +13,17 @@ from unittest.mock import MagicMock
 import httpx
 import orjson
 import pytest
-
+from mde_client.endpoints.advancedqueries import AdvancedHuntingQueriesEndpoint
 from mde_client.endpoints.alerts import (
     AlertsEndpoint,
     BatchUpdateAlertPayload,
     CreateAlertByReferencePayload,
 )
-from mde_client.endpoints.advancedqueries import AdvancedHuntingQueriesEndpoint
 from mde_client.endpoints.deviceAvHealth import DeviceAVHealthResults
 from mde_client.endpoints.library import (
     LibraryFilesEndpoint,
     LibraryFilesUpdatePayload,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers

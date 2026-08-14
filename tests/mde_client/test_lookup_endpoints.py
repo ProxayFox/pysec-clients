@@ -5,7 +5,7 @@ from __future__ import annotations
 from mde_client.endpoints.alerts import AlertsResults
 from mde_client.endpoints.domain import DomainEndpoint, DomainStatsResults
 from mde_client.endpoints.files import FileEndpoint, FileResults, FileStatsResults
-from mde_client.endpoints.ips import IPEndpoint, InOrgIPStatsResults
+from mde_client.endpoints.ips import InOrgIPStatsResults, IPEndpoint
 from mde_client.endpoints.machines import MachineResults
 
 

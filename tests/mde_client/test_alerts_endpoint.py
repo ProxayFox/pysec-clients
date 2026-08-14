@@ -6,7 +6,6 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import httpx
-
 from mde_client.endpoints.alerts import AlertsEndpoint, AlertsResults
 from mde_client.models.action_payloads import (
     BatchUpdateAlertPayload,

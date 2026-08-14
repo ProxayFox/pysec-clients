@@ -19,10 +19,9 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
-
 from mde_client import MDEClient
 from mde_client.endpoints.machines import MachinesQuery
 
@@ -75,7 +74,7 @@ def _assert_response_matches(
 
         # Timestamp coercion: client returns datetime, API returns ISO string
         if isinstance(actual, datetime) and isinstance(expected, str):
-            expected_dt = datetime.fromisoformat(expected.replace("Z", "+00:00"))
+            expected_dt = datetime.fromisoformat(expected)
             assert actual == expected_dt, (
                 f"{context}: timestamp mismatch for '{key}': {actual!r} vs {expected!r}"
             )
@@ -137,7 +136,7 @@ def machine_ip_and_timestamp(mde_client: MDEClient, all_machines):
     """Find the first IPv4 address that returns results from ``findbyip``."""
     import polars as pl
 
-    timestamp_dt = datetime.now(timezone.utc) - timedelta(days=29.5)
+    timestamp_dt = datetime.now(UTC) - timedelta(days=29.5)
     timestamp_str = timestamp_dt.isoformat().replace("+00:00", "Z")
 
     ip_list: list[str] = (

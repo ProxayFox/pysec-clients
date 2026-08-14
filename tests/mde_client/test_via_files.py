@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import gzip
-from typing import Any
+from typing import Any, Self
 from unittest.mock import MagicMock, patch
 
 import aiohttp
@@ -14,7 +14,6 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 from http_to_arrow import ArrowRecordContainer
-
 from mde_client.endpoints.base import BaseEndpoint, BaseResults
 from mde_client.schemas import ASSET_VULNERABILITY_SCHEMA
 from mde_client.viaFiles import (
@@ -22,7 +21,6 @@ from mde_client.viaFiles import (
     ViaFiles,
     ViaFilesConfig,
 )
-
 
 # ------------------------------------------------------------------
 # Helpers
@@ -79,7 +77,7 @@ class _FakeResponse:
 
     def raise_for_status(self) -> None:
         if self.status >= 400:
-            raise Exception(f"HTTP {self.status}")
+            raise RuntimeError(f"HTTP {self.status}")
 
 
 # ------------------------------------------------------------------
@@ -269,7 +267,7 @@ class _FakeAsyncCtx:
     async def __aenter__(self) -> _FakeResponse:
         return self._response
 
-    async def __aexit__(self, *args: Any) -> None:
+    async def __aexit__(self, *args: object) -> None:
         pass
 
 
@@ -280,10 +278,10 @@ class _FakeClientSession:
         self._get_side_effect = get_side_effect
         self._default_response: _FakeResponse | None = None
 
-    async def __aenter__(self) -> "_FakeClientSession":
+    async def __aenter__(self) -> Self:
         return self
 
-    async def __aexit__(self, *args: Any) -> None:
+    async def __aexit__(self, *args: object) -> None:
         pass
 
     def get(self, url: str, **kwargs: Any) -> _FakeAsyncCtx | _RaisingAsyncCtx:
@@ -302,7 +300,7 @@ class _RaisingAsyncCtx:
     async def __aenter__(self) -> None:
         raise self._exc
 
-    async def __aexit__(self, *args: Any) -> None:
+    async def __aexit__(self, *args: object) -> None:
         pass
 
 
@@ -453,13 +451,13 @@ class TestRetryBehaviour:
 
         fake_session = _FakeClientSession(get_side_effect=get_side_effect)
 
-        with patch(
-            "mde_client.viaFiles.aiohttp.ClientSession", return_value=fake_session
+        with (
+            patch(
+                "mde_client.viaFiles.aiohttp.ClientSession", return_value=fake_session
+            ),
+            pytest.raises(RuntimeError, match="Failed to download"),
         ):
-            with pytest.raises(RuntimeError, match="Failed to download"):
-                await via.download_export_files(
-                    ["https://blob.example.com/bad"], container
-                )
+            await via.download_export_files(["https://blob.example.com/bad"], container)
 
     @pytest.mark.asyncio
     async def test_skips_empty_blob_after_retries(self) -> None:

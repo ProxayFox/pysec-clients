@@ -2,18 +2,18 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
+from mde_client.endpoints.alerts import AlertsResults
 from mde_client.endpoints.machines import (
     MachineResults,
     MachinesEndpoint,
 )
-from mde_client.endpoints.alerts import AlertsResults
+from mde_client.endpoints.misc import ProductDTOResults
 from mde_client.endpoints.recommendations import RecommendationResults
 from mde_client.endpoints.software import SoftwareResults
 from mde_client.endpoints.users import UserResults
 from mde_client.endpoints.vulnerabilities import VulnerabilityDTOResults
-from mde_client.endpoints.misc import ProductDTOResults
 from mde_client.models.action_payloads import (
     AddOrRemoveTagForMultipleMachinesPayload,
 )
@@ -76,7 +76,7 @@ class TestQueryHelpers:
         assert r._params["useStartsWithFilter"] == "true"
 
     def test_findbyip_serializes_timestamp(self, make_endpoint) -> None:
-        ts = datetime(2025, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+        ts = datetime(2025, 1, 2, 3, 4, 5, tzinfo=UTC)
         r = make_endpoint(MachinesEndpoint).findbyip("10.0.0.1", ts)
         assert (
             "/api/machines/findbyip(ip='10.0.0.1',timestamp=2025-01-02T03:04:05Z)"
@@ -84,7 +84,7 @@ class TestQueryHelpers:
         )
 
     def test_findbyip_naive_timestamp_assumed_utc(self, make_endpoint) -> None:
-        ts = datetime(2025, 1, 2, 3, 4, 5)
+        ts = datetime.fromisoformat("2025-01-02T03:04:05")
         r = make_endpoint(MachinesEndpoint).findbyip("10.0.0.1", ts)
         assert "timestamp=2025-01-02T03:04:05Z" in r._path
 

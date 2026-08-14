@@ -3,10 +3,9 @@
 from __future__ import annotations
 
 import pytest
-from pydantic import ValidationError
-
-from mde_client.models.enums import INVESTIGATION_STATE
 from mde_client.models.action_payloads import StartInvestigationPayload
+from mde_client.models.enums import INVESTIGATION_STATE
+from pydantic import ValidationError
 
 
 class TestInvestigationState:

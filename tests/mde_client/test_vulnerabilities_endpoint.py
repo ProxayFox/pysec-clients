@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mde_client.endpoints.machines import MachinesEndpoint, MachineReferencesResults
+from mde_client.endpoints.machines import MachineReferencesResults, MachinesEndpoint
 from mde_client.endpoints.vulnerabilities import (
     VulnerabilitiesByMachineAndSoftwareQuery,
     VulnerabilitiesByMachineAndSoftwareResults,

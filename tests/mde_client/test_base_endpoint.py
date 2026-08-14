@@ -3,19 +3,17 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timedelta, timezone, tzinfo
+from datetime import UTC, datetime, timedelta, tzinfo
 from email.utils import format_datetime
 from typing import Any
 from unittest.mock import MagicMock
 
 import httpx
+import mde_client.endpoints.base as base_module
 import pyarrow as pa
 import pytest
 from http_to_arrow import ArrowRecordContainer
-
-import mde_client.endpoints.base as base_module
 from mde_client.endpoints.base import BaseEndpoint, BaseQuery, BaseResults
-
 
 # ---------------------------------------------------------------------------
 # Helpers / fixtures
@@ -294,7 +292,7 @@ class TestPagination:
     def test_rate_limit_retry_after_http_date_is_used_for_429(
         self, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        fixed_now = datetime(2026, 6, 3, 12, 0, 0, tzinfo=timezone.utc)
+        fixed_now = datetime(2026, 6, 3, 12, 0, 0, tzinfo=UTC)
         retry_at = fixed_now + timedelta(seconds=90)
 
         class _FixedDatetime(datetime):
@@ -548,11 +546,11 @@ class TestBaseQueryFilters:
 
     def test_page_size_cannot_be_combined_with_top(self) -> None:
         with pytest.raises(ValueError, match="page_size.*\\$top.*\\$skip"):
-            _DemoQuery(page_size=100, top=5).to_odata_filters
+            dict(_DemoQuery(page_size=100, top=5).to_odata_filters)
 
     def test_page_size_cannot_be_combined_with_skip(self) -> None:
         with pytest.raises(ValueError, match="page_size.*\\$top.*\\$skip"):
-            _DemoQuery(page_size=100, skip=10).to_odata_filters
+            dict(_DemoQuery(page_size=100, skip=10).to_odata_filters)
 
     def test_since_time_int_becomes_iso(self) -> None:
         params = _DemoQuery(page_size=None, sinceTime=1).to_odata_filters

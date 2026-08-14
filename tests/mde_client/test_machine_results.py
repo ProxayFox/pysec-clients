@@ -10,13 +10,11 @@ import polars as pl
 import pyarrow as pa
 import pytest
 from http_to_arrow import ArrowRecordContainer
-
 from mde_client.endpoints.machines import (
     MachineResults,
     MachinesEndpoint,
     MachinesQuery,
 )
-
 
 # ------------------------------------------------------------------
 # Helpers
