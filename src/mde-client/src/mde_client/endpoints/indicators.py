@@ -1,14 +1,15 @@
 from __future__ import annotations
 
-import pyarrow as pa
 from datetime import datetime
-from httpx import HTTPStatusError, Response
 from typing import cast
 
-from .base import BaseEndpoint, BaseResults, BaseQuery, BasePayload
-from ..schemas import INDICATOR_SCHEMA
+import pyarrow as pa
+from httpx import HTTPStatusError, Response
+
 from ..models.action_payloads import BatchUpdateIndicatorPayload
-from ..models.enums import TI_INDICATOR_TYPE, TI_INDICATOR_ACTION, SEVERITY
+from ..models.enums import SEVERITY, TI_INDICATOR_ACTION, TI_INDICATOR_TYPE
+from ..schemas import INDICATOR_SCHEMA
+from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
 
 
 class IndicatorsQuery(BaseQuery):

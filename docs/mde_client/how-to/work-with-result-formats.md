@@ -45,9 +45,9 @@ Once the first terminal method runs, later terminal methods use the cached paylo
 ```python
 results = client.machines.get_all()
 
-rows = results.to_dicts()   # first fetch
+rows = results.to_dicts()  # first fetch
 table = results.to_arrow()  # reuses cached data
-frame = results.to_polars() # reuses cached data
+frame = results.to_polars()  # reuses cached data
 ```
 
 This makes it practical to inspect the same result in multiple formats during one workflow.

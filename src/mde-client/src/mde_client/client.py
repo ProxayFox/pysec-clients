@@ -1,6 +1,7 @@
-import msal
+from typing import TYPE_CHECKING, Self
+
 import httpx
-from typing import TYPE_CHECKING
+import msal
 
 from .auth import MSALAuth
 
@@ -9,15 +10,17 @@ if TYPE_CHECKING:
         AdvancedHuntingQueriesEndpoint,
         AlertsEndpoint,
         AuthenticatedDefinitionsEndpoint,
-        DeviceAuthenticatedAgentsEndpoint,
-        DeviceGroupsEndpoint,
         BaseEndpoint,
+        BaselineConfigurationEndpoint,
         BrowserExtensionEndpoint,
         CertificateInventoryEndpoint,
+        DataExportSettingsEndpoint,
+        DeviceAuthenticatedAgentsEndpoint,
         DeviceAVHealthEndpoint,
+        DeviceGroupsEndpoint,
         DomainEndpoint,
-        FirmwareEndpoint,
         FileEndpoint,
+        FirmwareEndpoint,
         IncidentsEndpoint,
         IndicatorsEndpoint,
         InvestigationsEndpoint,
@@ -28,8 +31,6 @@ if TYPE_CHECKING:
         RecommendationsEndpoint,
         RemediationEndpoint,
         ScoreEndpoint,
-        BaselineConfigurationEndpoint,
-        DataExportSettingsEndpoint,
         SoftwareEndpoint,
         UserEndpoint,
         VulnerabilityEndpoint,
@@ -285,7 +286,7 @@ class MDEClient:
         """Close the underlying HTTP connection pool."""
         self._http.close()
 
-    def __enter__(self) -> "MDEClient":
+    def __enter__(self) -> Self:
         return self
 
     def __exit__(self, *args) -> None:

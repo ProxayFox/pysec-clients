@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-
+from ..schemas import ASSET_HARDWARE_FIRMWARE_SCHEMA, FIRMWARE_SCHEMA
 from .base import BaseEndpoint, BaseResults
 from .machines import MachinesEndpoint
-from ..schemas import FIRMWARE_SCHEMA, ASSET_HARDWARE_FIRMWARE_SCHEMA
 
 
 class FirmwareResults(BaseResults):

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from .base import BaseEndpoint, BaseQuery, BaseResults
-from ..schemas import INVESTIGATION_SCHEMA
-from ..models.enums import INVESTIGATION_STATE
 from ..models.action_payloads import (
-    StartInvestigationPayload,
     InitiateInvestigationPayload,
+    StartInvestigationPayload,
 )
+from ..models.enums import INVESTIGATION_STATE
+from ..schemas import INVESTIGATION_SCHEMA
+from .base import BaseEndpoint, BaseQuery, BaseResults
 
 
 class InvestigationQuery(BaseQuery):

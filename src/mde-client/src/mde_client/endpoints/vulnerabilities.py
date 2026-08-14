@@ -3,14 +3,14 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from .base import BaseEndpoint, BaseResults, BaseQuery
 from ..schemas import (
-    VULNERABILITY_SCHEMA,
     ASSET_VULNERABILITY_SCHEMA,
     DELTA_ASSET_VULNERABILITY_SCHEMA,
     PUBLIC_ASSET_VULNERABILITY_DTO_SCHEMA,
     PUBLIC_VULNERABILITY_DTO_SCHEMA,
+    VULNERABILITY_SCHEMA,
 )
+from .base import BaseEndpoint, BaseQuery, BaseResults
 
 if TYPE_CHECKING:
     from .machines import MachineReferencesResults

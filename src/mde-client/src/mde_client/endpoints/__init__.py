@@ -27,7 +27,7 @@ if TYPE_CHECKING:
         AuthenticatedDefinitionsEndpoint,
         DeviceAuthenticatedAgentsEndpoint,
     )
-    from .base import BaseEndpoint, BaseResults, BaseQuery, BasePayload
+    from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
     from .browserExtension import BrowserExtensionEndpoint
     from .certificateInventory import CertificateInventoryEndpoint
     from .deviceAvHealth import DeviceAVHealthEndpoint
@@ -35,9 +35,9 @@ if TYPE_CHECKING:
     from .domain import DomainEndpoint, DomainResults
     from .files import FileEndpoint, FileResults
     from .firmware import (
+        AssetHardwareFirmwareResults,
         FirmwareEndpoint,
         FirmwareResults,
-        AssetHardwareFirmwareResults,
     )
     from .incidents import IncidentsEndpoint
     from .indicators import IndicatorsEndpoint, IndicatorsResults
@@ -45,40 +45,40 @@ if TYPE_CHECKING:
     from .ips import IPEndpoint, IPResults
     from .library import LibraryFilesEndpoint, LibraryFilesResults
     from .machineActions import (
+        ActionAvailabilityStatusResults,
         MachineActionsEndpoint,
         MachineActionsResults,
-        ActionAvailabilityStatusResults,
     )
     from .machines import (
-        MachinesEndpoint,
-        MachineResults,
-        MachineReferencesResults,
         AssetBaselineAssessmentResults,
+        MachineReferencesResults,
+        MachineResults,
+        MachinesEndpoint,
     )
     from .misc import ProductDTOResults, PublicProductDTOResults
-    from .recommendations import RecommendationsEndpoint, RecommendationResults
+    from .recommendations import RecommendationResults, RecommendationsEndpoint
     from .remediations import RemediationEndpoint, RemediationResults
     from .score import ScoreEndpoint, ScoreResults
     from .securityBaseline import (
+        AssetConfigurationResults,
         BaselineConfigurationEndpoint,
         BaselineConfigurationResults,
-        AssetConfigurationResults,
     )
     from .settings import DataExportSettingsEndpoint, DataExportSettingsResults
     from .software import (
+        AssetNonCPESoftwareResults,
+        AssetSoftwareResults,
+        DistributionDTOResults,
         SoftwareEndpoint,
         SoftwareResults,
-        DistributionDTOResults,
-        AssetSoftwareResults,
-        AssetNonCPESoftwareResults,
     )
     from .users import UserEndpoint, UserResults
     from .vulnerabilities import (
-        VulnerabilityEndpoint,
-        VulnerabilityResults,
-        VulnerabilityDTOResults,
         AssetVulnerabilityResults,
         DeltaAssetVulnerabilityResults,
+        VulnerabilityDTOResults,
+        VulnerabilityEndpoint,
+        VulnerabilityResults,
     )
 
 _NAME_TO_MODULE = {

@@ -7,8 +7,6 @@ from unittest.mock import MagicMock
 
 import httpx
 import pytest
-from pydantic import ValidationError
-
 from mde_client.endpoints.authenticatedScan import (
     AuthenticatedDefinitionsAlterPayload,
     AuthenticatedDefinitionsEndpoint,
@@ -16,8 +14,8 @@ from mde_client.endpoints.authenticatedScan import (
     AuthenticatedScanHistoryResults,
     DeviceAuthenticatedAgentsEndpoint,
 )
-
 from mde_client.models.auth_params_models import WindowsAuthParams
+from pydantic import ValidationError
 
 
 def _make_definitions_endpoint() -> AuthenticatedDefinitionsEndpoint:

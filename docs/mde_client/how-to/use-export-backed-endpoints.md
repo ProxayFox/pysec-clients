@@ -72,12 +72,14 @@ from http_to_arrow import ArrowRecordContainer
 
 from mde_client import ViaFiles
 
+
 def unwrap(record: dict[str, object]) -> dict[str, object]:
     inner = dict(record.get("wrapper", {}))
     for key, value in record.items():
         if key != "wrapper":
             inner[key] = value
     return inner
+
 
 container = ArrowRecordContainer(schema=None)
 container = asyncio.run(

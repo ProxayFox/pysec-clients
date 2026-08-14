@@ -34,10 +34,9 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+import mde_client.schemas as schemas_pkg
 import pyarrow as pa
 import pytest
-
-import mde_client.schemas as schemas_pkg
 from mde_contract import EDM_PA_TYPES, RUNTIME_NULLABLE_FIELD_OVERRIDES, to_const
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
@@ -283,9 +282,7 @@ class TestSchemaModuleIntegrity:
         assert len(schemas_pkg.__all__) > 0
 
     def test_all_contains_only_schema_and_type_constants(self) -> None:
-        bad = [
-            n for n in _ALL_NAMES if not (n.endswith("_SCHEMA") or n.endswith("_TYPE"))
-        ]
+        bad = [n for n in _ALL_NAMES if not n.endswith(("_SCHEMA", "_TYPE"))]
         assert not bad, f"Unexpected names in __all__: {bad}"
 
     def test_no_duplicate_names_in_all(self) -> None:
@@ -500,10 +497,11 @@ class TestFieldTypes:
 
             if short not in mde_xml.complex_types:
                 continue
-            if short in mde_xml.abstract_types:
+            if short in mde_xml.abstract_types and not _is_mergeable_abstract(
+                short, mde_xml
+            ):
                 # Mergeable abstract types produce structs; non-mergeable → pa.string()
-                if not _is_mergeable_abstract(short, mde_xml):
-                    continue
+                continue
 
             field_name = prop.get("Name", "")
             idx = schema.get_field_index(field_name)

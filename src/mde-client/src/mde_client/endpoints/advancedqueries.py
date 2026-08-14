@@ -8,9 +8,10 @@ DataFrames on demand.
 
 from __future__ import annotations
 
-import polars as pl
-import orjson
 from typing import TYPE_CHECKING
+
+import orjson
+import polars as pl
 from http_to_arrow import ArrowRecordContainer
 
 from .base import BaseEndpoint

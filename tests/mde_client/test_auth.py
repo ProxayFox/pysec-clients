@@ -6,7 +6,6 @@ from unittest.mock import MagicMock
 
 import msal
 import pytest
-
 from mde_client.auth import AuthenticationError, MSALAuth
 
 

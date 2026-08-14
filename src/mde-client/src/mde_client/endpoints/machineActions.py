@@ -3,23 +3,23 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+from ..models.enums import ACTION_STATUS, ACTION_TYPE
+from ..schemas import ACTION_AVAILABILITY_STATUS_SCHEMA, MACHINE_ACTION_SCHEMA
 from .base import BaseEndpoint, BaseQuery, BaseResults
 from .machines import MachinesEndpoint
-from ..schemas import MACHINE_ACTION_SCHEMA, ACTION_AVAILABILITY_STATUS_SCHEMA
-from ..models.enums import ACTION_TYPE, ACTION_STATUS
 
 if TYPE_CHECKING:
     from ..models.action_payloads import (
+        CancelPayload,
         CollectInvestigationPackagePayload,
         IsolatePayload,
-        UnisolatePayload,
+        OffBoardPayload,
         RestrictCodeExecutionPayload,
+        RunAntiVirusScanPayload,
         RunLiveResponsePayload,
         StopAndQuarantineFilePayload,
+        UnisolatePayload,
         UnrestrictCodeExecutionPayload,
-        RunAntiVirusScanPayload,
-        OffBoardPayload,
-        CancelPayload,
     )
 
 

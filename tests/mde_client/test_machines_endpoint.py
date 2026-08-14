@@ -8,17 +8,15 @@ pagination, and caching) by focusing on the per-method contract.
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from unittest.mock import MagicMock
 
 import httpx
-
 from mde_client.endpoints.machines import (
     MachineResults,
     MachinesEndpoint,
     MachinesQuery,
 )
-
 
 # ------------------------------------------------------------------
 # Helpers
@@ -98,18 +96,18 @@ class TestGet:
 
 class TestFindByIP:
     def test_returns_machine_results(self) -> None:
-        ts = datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
+        ts = datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC)
         result = _make_endpoint().findbyip("10.0.0.1", ts)
         assert isinstance(result, MachineResults)
 
     def test_path_contains_ip_and_utc_z(self) -> None:
-        ts = datetime(2025, 1, 15, 12, 0, 0, tzinfo=timezone.utc)
+        ts = datetime(2025, 1, 15, 12, 0, 0, tzinfo=UTC)
         result = _make_endpoint().findbyip("10.0.0.1", ts)
         assert "ip='10.0.0.1'" in result._path
         assert "2025-01-15T12:00:00Z" in result._path
 
     def test_naive_timestamp_treated_as_utc(self) -> None:
-        ts = datetime(2025, 6, 1, 8, 30, 0)
+        ts = datetime.fromisoformat("2025-06-01T08:30:00")
         result = _make_endpoint().findbyip("192.168.1.1", ts)
         assert "2025-06-01T08:30:00Z" in result._path
 
@@ -118,6 +116,14 @@ class TestFindByIP:
         ts = datetime(2025, 6, 1, 8, 0, 0, tzinfo=eastern)  # 13:00 UTC
         result = _make_endpoint().findbyip("10.0.0.1", ts)
         assert "2025-06-01T13:00:00Z" in result._path
+
+    def test_utc_string_preserved_as_utc(self) -> None:
+        result = _make_endpoint().findbyip("10.0.0.1", "2025-01-15T12:00:00Z")
+        assert "2025-01-15T12:00:00Z" in result._path
+
+    def test_offset_string_converted_to_utc(self) -> None:
+        result = _make_endpoint().findbyip("10.0.0.1", "2025-01-15T12:00:00-05:00")
+        assert "2025-01-15T17:00:00Z" in result._path
 
 
 # ------------------------------------------------------------------

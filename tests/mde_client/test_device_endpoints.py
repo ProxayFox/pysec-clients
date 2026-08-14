@@ -7,7 +7,6 @@ from typing import Any
 from unittest.mock import MagicMock
 
 import httpx
-
 from mde_client.endpoints.browserExtension import (
     BrowserExtensionEndpoint,
     BrowserExtensionsPermissionsInfoQuery,

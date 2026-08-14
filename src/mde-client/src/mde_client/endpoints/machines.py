@@ -16,18 +16,29 @@ requests until a terminal materialization method is called.
 from __future__ import annotations
 
 import logging
-
-from pydantic import Field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
-from .alerts import AlertsResults
-from .base import BaseEndpoint, BaseQuery, BaseResults
-from ..schemas import (
-    MACHINE_SCHEMA,
-    PUBLIC_ASSET_DTO_SCHEMA,
-    ASSET_BASELINE_ASSESSMENT_SCHEMA,
-    DLP_MACHINE_SCHEMA,
+from pydantic import Field
+
+from ..models.action_payloads import (
+    AddOrRemoveTagForMultipleMachinesPayload,
+    CollectInvestigationPackagePayload,
+    InitiateInvestigationPayload,
+    IsolatePayload,
+    LogsCollectionPayload,
+    OffBoardPayload,
+    RestrictCodeExecutionPayload,
+    RunAntiVirusScanPayload,
+    RunCustomPlaybookPayload,
+    RunLiveResponsePayload,
+    SetDeviceValuePayload,
+    SetExclusionPayload,
+    StartInvestigationPayload,
+    StopAndQuarantineFilePayload,
+    TagsPayload,
+    UnisolatePayload,
+    UnrestrictCodeExecutionPayload,
 )
 from ..models.enums import (
     DEVICE_VALUE,
@@ -36,26 +47,14 @@ from ..models.enums import (
     ONBOARDING_STATUS,
     RISK_SCORE,
 )
-
-from ..models.action_payloads import (
-    StartInvestigationPayload,
-    CollectInvestigationPackagePayload,
-    IsolatePayload,
-    UnisolatePayload,
-    RestrictCodeExecutionPayload,
-    RunLiveResponsePayload,
-    StopAndQuarantineFilePayload,
-    UnrestrictCodeExecutionPayload,
-    RunAntiVirusScanPayload,
-    OffBoardPayload,
-    AddOrRemoveTagForMultipleMachinesPayload,
-    InitiateInvestigationPayload,
-    LogsCollectionPayload,
-    RunCustomPlaybookPayload,
-    SetDeviceValuePayload,
-    SetExclusionPayload,
-    TagsPayload,
+from ..schemas import (
+    ASSET_BASELINE_ASSESSMENT_SCHEMA,
+    DLP_MACHINE_SCHEMA,
+    MACHINE_SCHEMA,
+    PUBLIC_ASSET_DTO_SCHEMA,
 )
+from .alerts import AlertsResults
+from .base import BaseEndpoint, BaseQuery, BaseResults
 
 if TYPE_CHECKING:
     from httpx import Response
@@ -63,22 +62,22 @@ if TYPE_CHECKING:
     from .browserExtension import BrowserExtensionResults
     from .certificateInventory import CertificateInventoryResults
     from .deviceAvHealth import DeviceAVHealthResults
-    from .firmware import FirmwareResults, AssetHardwareFirmwareResults
+    from .firmware import AssetHardwareFirmwareResults, FirmwareResults
     from .investigations import InvestigationResults
-    from .machineActions import MachineActionsResults, ActionAvailabilityStatusResults
+    from .machineActions import ActionAvailabilityStatusResults, MachineActionsResults
     from .misc import ProductDTOResults
     from .recommendations import RecommendationResults
     from .securityBaseline import AssetConfigurationResults
     from .software import (
-        SoftwareResults,
-        AssetSoftwareResults,
         AssetNonCPESoftwareResults,
+        AssetSoftwareResults,
+        SoftwareResults,
     )
     from .users import UserResults
     from .vulnerabilities import (
-        VulnerabilityDTOResults,
         AssetVulnerabilityResults,
         DeltaAssetVulnerabilityResults,
+        VulnerabilityDTOResults,
     )
 
 log = logging.getLogger(__name__)
@@ -259,14 +258,16 @@ class MachinesEndpoint(BaseEndpoint):
             ip(str): The internal IP address to search for.
             timestamp(datetime | str): UTC ISO 8601 timestamp to search for.
         """
-        if isinstance(timestamp, str):
-            timestamp_utc = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-        else:
-            timestamp_utc = (
-                timestamp.astimezone(timezone.utc)
-                if timestamp.tzinfo is not None
-                else timestamp.replace(tzinfo=timezone.utc)
-            )
+        timestamp_value = (
+            datetime.fromisoformat(timestamp)
+            if isinstance(timestamp, str)
+            else timestamp
+        )
+        timestamp_utc = (
+            timestamp_value.astimezone(UTC)
+            if timestamp_value.tzinfo is not None
+            else timestamp_value.replace(tzinfo=UTC)
+        )
         timestamp_iso = timestamp_utc.isoformat().replace("+00:00", "Z")
         payload = f"(ip='{ip}',timestamp={timestamp_iso})"
         path = f"{self._PATH}/findbyip"
@@ -822,7 +823,7 @@ class MachinesEndpoint(BaseEndpoint):
         from .software import AssetSoftwareResults
 
         if isinstance(since, int):
-            since = datetime.fromtimestamp(since, tz=timezone.utc)
+            since = datetime.fromtimestamp(since, tz=UTC)
 
         params = (
             MachinesExportQuery(page_size=page_size, sinceTime=since)

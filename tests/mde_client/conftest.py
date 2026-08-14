@@ -26,7 +26,6 @@ from unittest.mock import MagicMock
 
 import httpx
 import pytest
-
 from mde_client.endpoints.base import BaseEndpoint
 
 FAKE_BASE_URL = "https://fake.api"

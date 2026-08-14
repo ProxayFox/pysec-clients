@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from .base import BaseResults
 from ..schemas import PUBLIC_PRODUCT_DTO_SCHEMA, PUBLIC_PRODUCT_FIX_DTO_SCHEMA
+from .base import BaseResults
 
 
 class PublicProductDTOResults(BaseResults):

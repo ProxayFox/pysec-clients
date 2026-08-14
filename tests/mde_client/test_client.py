@@ -7,7 +7,6 @@ from unittest.mock import MagicMock
 import httpx
 import msal
 import pytest
-
 from mde_client import MDEClient
 from mde_client.auth import MSALAuth
 from mde_client.endpoints import (

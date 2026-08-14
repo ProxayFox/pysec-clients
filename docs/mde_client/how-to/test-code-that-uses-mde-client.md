@@ -12,8 +12,8 @@ client = MDEClient(
     tenant_id="...",
     client_id="...",
     client_secret="...",
-    http_client=httpx.Client(...),       # substitute transport
-    token_cache=msal.TokenCache(),       # substitute cache
+    http_client=httpx.Client(...),  # substitute transport
+    token_cache=msal.TokenCache(),  # substitute cache
 )
 ```
 
@@ -48,7 +48,9 @@ def test_get_all_machines(monkeypatch):
         transport=httpx.MockTransport(_machines_response),
     )
     client = MDEClient(
-        tenant_id="t", client_id="c", client_secret="s",
+        tenant_id="t",
+        client_id="c",
+        client_secret="s",
         http_client=http,
     )
 

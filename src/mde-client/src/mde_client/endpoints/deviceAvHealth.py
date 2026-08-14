@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
-import orjson
 from typing import Any
 
-from .base import BaseEndpoint, BaseQuery, BaseResults
+import orjson
+
 from ..schemas import DEVICE_AV_INFO_SCHEMA
 from ..viaFiles import RecordTransform
+from .base import BaseEndpoint, BaseQuery, BaseResults
 
 log = logging.getLogger(__name__)
 
@@ -89,7 +90,7 @@ class DeviceAVHealthResults(BaseResults):
             if isinstance(raw_nested, str):
                 try:
                     nested = orjson.loads(raw_nested)
-                except Exception:
+                except orjson.JSONDecodeError, TypeError:
                     log.debug("Failed to parse DeviceGatheredInfo as JSON")
                     nested = {}
             elif isinstance(raw_nested, dict):
@@ -123,8 +124,8 @@ class DeviceAVHealthResults(BaseResults):
                         "fullScanError", full.get("ErrorCode") or scan_empty
                     )
                     nested.setdefault("fullScanTime", full.get("Timestamp"))
-                except Exception:
-                    pass
+                except orjson.JSONDecodeError, TypeError, AttributeError:
+                    log.debug("Failed to parse AvScanResults as JSON")
             elif is_non_windows:
                 # Non-Windows devices without AvScanResults use '-' placeholder.
                 nested.setdefault("quickScanResult", scan_empty)

@@ -17,7 +17,7 @@ Access machine inventory and machine-scoped related resources.
 - `vulnerabilities(id: str) -> VulnerabilityDTOResults`: fetch vulnerabilities for a machine.
 - `recommendations(id: str) -> RecommendationResults`: fetch recommendations for a machine.
 - `getmissingkbs(id: str) -> ProductDTOResults`: fetch missing KBs for a machine.
-- `findbyip(ip: str, timestamp: datetime) -> MachineResults`: find machines by internal IP and timestamp.
+- `findbyip(ip: str, timestamp: datetime | str) -> MachineResults`: find machines by internal IP and timestamp.
 - `tags(id: str, payload: TagsPayload) -> Response`: submit a machine tag request and return the raw response.
 - `findbytag(tag: str, useStartsWithFilter: bool = False) -> MachineResults`: find machines by tag.
 - `unTaggedMachines() -> MachineResults`: fetch untagged machines.
@@ -31,7 +31,8 @@ Access machine inventory and machine-scoped related resources.
 ## Notes
 
 - `get_all()` auto-paginates unless `top` or `skip` is set in `MachinesQuery`.
-- `findbyip()` normalizes timestamps to UTC before constructing the request path.
+- `findbyip()` accepts `datetime` or ISO 8601 strings and normalizes timestamps
+  to UTC `Z` format before constructing the request path.
 - Methods returning `Response` expose raw `httpx.Response` objects because their response schemas are currently unknown.
 - This endpoint also contains private helper methods that power public export-backed endpoints such as `browser_extension`, `certificate_inventory`, `device_av_health`, `investigations`, `machine_actions`, and `baseline_configurations`.
 

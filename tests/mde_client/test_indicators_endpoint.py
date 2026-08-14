@@ -7,7 +7,6 @@ from unittest.mock import MagicMock
 
 import httpx
 import pytest
-
 from mde_client.endpoints.indicators import (
     ImportIndicatorResults,
     IndicatorsEndpoint,
