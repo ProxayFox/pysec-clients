@@ -88,7 +88,7 @@ class ViaFiles:
         try:
             parts = urlsplit(url)
             return urlunsplit((parts.scheme, parts.netloc, parts.path, "", ""))
-        except Exception:
+        except ValueError:
             return "[redacted-url]"
 
     async def _stream_export_records(
@@ -241,11 +241,7 @@ class ViaFiles:
                             f"(content_length={response.content_length})"
                         )
                 break  # success
-            except (
-                aiohttp.ClientError,
-                asyncio.TimeoutError,
-                EmptyExportBlobError,
-            ) as exc:
+            except (TimeoutError, aiohttp.ClientError, EmptyExportBlobError) as exc:
                 last_error = exc
                 status_suffix = (
                     f" (status {exc.status})"  # type: ignore[union-attr]

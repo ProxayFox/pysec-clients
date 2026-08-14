@@ -10,6 +10,8 @@ Exports:
     AuthenticationError: Raised when MSAL fails to return an access token.
 """
 
+from typing import ClassVar
+
 import msal
 
 
@@ -29,7 +31,7 @@ class MSALAuth:
             in-memory `msal.TokenCache()`.
     """
 
-    _SCOPES = ["https://api.securitycenter.microsoft.com/.default"]
+    _SCOPES: ClassVar = ("https://api.securitycenter.microsoft.com/.default",)
 
     def __init__(
         self,

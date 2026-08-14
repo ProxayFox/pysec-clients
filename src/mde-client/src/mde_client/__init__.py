@@ -1,11 +1,11 @@
-from .client import MDEClient
 from .auth import AuthenticationError
+from .client import MDEClient
 from .viaFiles import EmptyExportBlobError, ViaFiles, ViaFilesConfig
 
 __all__ = [
-    "MDEClient",
     "AuthenticationError",
     "EmptyExportBlobError",
+    "MDEClient",
     "ViaFiles",
     "ViaFilesConfig",
 ]
