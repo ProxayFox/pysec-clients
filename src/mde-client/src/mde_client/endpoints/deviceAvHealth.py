@@ -124,7 +124,7 @@ class DeviceAVHealthResults(BaseResults):
                         "fullScanError", full.get("ErrorCode") or scan_empty
                     )
                     nested.setdefault("fullScanTime", full.get("Timestamp"))
-                except orjson.JSONDecodeError, AttributeError:
+                except orjson.JSONDecodeError, TypeError, AttributeError:
                     log.debug("Failed to parse AvScanResults as JSON")
             elif is_non_windows:
                 # Non-Windows devices without AvScanResults use '-' placeholder.

@@ -258,14 +258,16 @@ class MachinesEndpoint(BaseEndpoint):
             ip(str): The internal IP address to search for.
             timestamp(datetime | str): UTC ISO 8601 timestamp to search for.
         """
-        if isinstance(timestamp, str):
-            timestamp_utc = datetime.fromisoformat(timestamp)
-        else:
-            timestamp_utc = (
-                timestamp.astimezone(UTC)
-                if timestamp.tzinfo is not None
-                else timestamp.replace(tzinfo=UTC)
-            )
+        timestamp_value = (
+            datetime.fromisoformat(timestamp)
+            if isinstance(timestamp, str)
+            else timestamp
+        )
+        timestamp_utc = (
+            timestamp_value.astimezone(UTC)
+            if timestamp_value.tzinfo is not None
+            else timestamp_value.replace(tzinfo=UTC)
+        )
         timestamp_iso = timestamp_utc.isoformat().replace("+00:00", "Z")
         payload = f"(ip='{ip}',timestamp={timestamp_iso})"
         path = f"{self._PATH}/findbyip"

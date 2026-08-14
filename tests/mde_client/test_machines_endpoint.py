@@ -117,6 +117,14 @@ class TestFindByIP:
         result = _make_endpoint().findbyip("10.0.0.1", ts)
         assert "2025-06-01T13:00:00Z" in result._path
 
+    def test_utc_string_preserved_as_utc(self) -> None:
+        result = _make_endpoint().findbyip("10.0.0.1", "2025-01-15T12:00:00Z")
+        assert "2025-01-15T12:00:00Z" in result._path
+
+    def test_offset_string_converted_to_utc(self) -> None:
+        result = _make_endpoint().findbyip("10.0.0.1", "2025-01-15T12:00:00-05:00")
+        assert "2025-01-15T17:00:00Z" in result._path
+
 
 # ------------------------------------------------------------------
 # tag — path and params
