@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ..schemas import IN_ORG_IP_STATS_SCHEMA, IP_SCHEMA
 from .base import BaseEndpoint, BaseResults
-from ..schemas import IP_SCHEMA, IN_ORG_IP_STATS_SCHEMA
 
 if TYPE_CHECKING:
     from .alerts import AlertsResults

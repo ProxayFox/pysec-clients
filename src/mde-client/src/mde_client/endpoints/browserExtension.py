@@ -20,8 +20,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import ASSET_BROWSER_EXTENSION_SCHEMA, BROWSER_EXTENSIONS_SCHEMA
+from .base import BaseEndpoint, BaseQuery, BaseResults
 
 
 class BrowserExtensionsPermissionsInfoQuery(BaseQuery):

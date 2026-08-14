@@ -2,19 +2,20 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .base import BaseEndpoint, BaseResults, BaseQuery
 from ..schemas import (
-    SOFTWARE_SCHEMA,
-    PUBLIC_DISTRIBUTION_DTO_SCHEMA,
-    ASSET_SOFTWARE_SCHEMA,
     ASSET_NON_CPE_SOFTWARE_SCHEMA,
+    ASSET_SOFTWARE_SCHEMA,
+    PUBLIC_DISTRIBUTION_DTO_SCHEMA,
+    SOFTWARE_SCHEMA,
 )
+from .base import BaseEndpoint, BaseQuery, BaseResults
 
 if TYPE_CHECKING:
     from datetime import datetime
+
     from .machines import MachineReferencesResults
-    from .vulnerabilities import VulnerabilityDTOResults
     from .misc import ProductDTOResults
+    from .vulnerabilities import VulnerabilityDTOResults
 
 
 class SoftwareQuery(BaseQuery):

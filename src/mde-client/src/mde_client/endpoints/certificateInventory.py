@@ -2,16 +2,14 @@ from __future__ import annotations
 
 import logging
 
-from .base import BaseEndpoint, BaseQuery, BaseResults
 from ..schemas import ASSET_CERTIFICATE_ASSESSMENT_SCHEMA
+from .base import BaseEndpoint, BaseQuery, BaseResults
 
 log = logging.getLogger(__name__)
 
 
 class CertificateInventoryQuery(BaseQuery):
     """Query parameters for the /api/certificatesinventory endpoint."""
-
-    pass
 
 
 class CertificateInventoryResults(BaseResults):

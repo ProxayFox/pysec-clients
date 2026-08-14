@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from ..schemas import ASSET_CONFIGURATION_SCHEMA, BASELINE_CONFIGURATION_SCHEMA
 from .base import BaseEndpoint, BaseResults
-from ..schemas import BASELINE_CONFIGURATION_SCHEMA, ASSET_CONFIGURATION_SCHEMA
 
 if TYPE_CHECKING:
     from .machines import AssetBaselineAssessmentResults

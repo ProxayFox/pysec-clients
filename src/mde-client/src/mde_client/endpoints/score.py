@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-
-from .base import BaseEndpoint, BaseResults
 from ..schemas import CONFIGURATION_SCORE_SCHEMA
+from .base import BaseEndpoint, BaseResults
 
 
 class ScoreResults(BaseResults):

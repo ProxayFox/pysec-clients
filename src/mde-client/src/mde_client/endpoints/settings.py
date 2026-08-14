@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-
-from .base import BaseEndpoint, BaseResults
 from ..schemas import DATA_EXPORT_SETTINGS_SCHEMA
+from .base import BaseEndpoint, BaseResults
 
 
 class DataExportSettingsResults(BaseResults):

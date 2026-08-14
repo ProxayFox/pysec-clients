@@ -21,15 +21,16 @@ from __future__ import annotations
 
 import logging
 
+from pydantic import ConfigDict
 
-from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
-from ..schemas import (
-    AUTH_SCAN_HISTORY_CONTRACT_SCHEMA,
-    DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
-    DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA,
-)
 from ..models.auth_params_models import SCANAUTHENTICATIONPARAMS
 from ..models.enums import AUTH_SCAN_TYPE, TARGET_TYPE
+from ..schemas import (
+    AUTH_SCAN_HISTORY_CONTRACT_SCHEMA,
+    DEVICE_AUTHENTICATED_SCAN_AGENT_SCHEMA,
+    DEVICE_AUTHENTICATED_SCAN_DEFINITION_SCHEMA,
+)
+from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
 
 log = logging.getLogger(__name__)
 
@@ -38,8 +39,6 @@ class DeviceAuthenticatedAgentsQuery(BaseQuery):
     """Query parameters for the /api/DeviceAuthenticatedScanAgents endpoint.
     Endpoint doesn't have any documented query parameters, but this class is left here for consistency and future-proofing.
     """
-
-    pass
 
 
 class AuthenticatedScanHistoryQuery(BaseQuery):
@@ -50,7 +49,7 @@ class AuthenticatedScanHistoryQuery(BaseQuery):
     enforces that and `page_size` is forced to `None` by default.
     """
 
-    model_config = {"extra": "forbid"}
+    model_config = ConfigDict(extra="forbid")
     page_size: int | None = None
 
 
@@ -58,8 +57,6 @@ class AuthenticatedDefinitionsQuery(BaseQuery):
     """Query parameters for the /api/DeviceAuthenticatedScanDefinitions endpoint.
     Endpoint doesn't have any documented query parameters, but this class is left here for consistency and future-proofing.
     """
-
-    pass
 
 
 class ScannerAgentRefPayload(BasePayload):

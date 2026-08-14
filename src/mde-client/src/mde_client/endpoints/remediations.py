@@ -2,10 +2,10 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from ..models.enums import TASK_STATE_VALUE_TYPE_DTO
+from ..schemas import REMEDIATION_TASK_SCHEMA
 from .base import BaseEndpoint, BaseQuery, BaseResults
 from .machines import MachineReferencesResults
-from ..schemas import REMEDIATION_TASK_SCHEMA
-from ..models.enums import TASK_STATE_VALUE_TYPE_DTO
 
 
 class RemediationQuery(BaseQuery):

@@ -2,13 +2,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .base import BaseEndpoint, BaseResults
-from ..schemas import DEVICE_GROUP_SCHEMA
 from ..models.action_payloads import (
     AddDeviceGroupsPayload,
-    PostDeviceGroupsPayload,
     DeleteDeviceGroupsPayload,
+    PostDeviceGroupsPayload,
 )
+from ..schemas import DEVICE_GROUP_SCHEMA
+from .base import BaseEndpoint, BaseResults
 
 if TYPE_CHECKING:
     from httpx import Response

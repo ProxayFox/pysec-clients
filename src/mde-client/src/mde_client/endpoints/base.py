@@ -17,21 +17,22 @@ This module defines:
 
 from __future__ import annotations
 
-import httpx
 import asyncio
 import random
 import time
-import pyarrow as pa
-import polars as pl
-import orjson
 from collections import deque
-from datetime import datetime, timedelta, timezone
-from time import sleep
-from email.utils import parsedate_to_datetime
-from typing import Any
 from collections.abc import AsyncIterator, Iterator
-from pydantic import BaseModel, ConfigDict, Field
+from datetime import UTC, datetime, timedelta
+from email.utils import parsedate_to_datetime
+from time import sleep
+from typing import Any
+
+import httpx
+import orjson
+import polars as pl
+import pyarrow as pa
 from http_to_arrow import ArrowIPCStream, ArrowRecordContainer
+from pydantic import BaseModel, ConfigDict, Field
 
 from ..auth import MSALAuth
 from ..schemas import EXPORT_FILES_RESPONSE_SCHEMA
@@ -82,14 +83,12 @@ class BaseQuery(BaseModel):
             params["$skip"] = str(self.skip)
         match self.sinceTime:
             case int() as days:
-                dateTime = (
-                    datetime.now(tz=timezone.utc) - timedelta(days=days)
-                ).isoformat()
+                dateTime = (datetime.now(tz=UTC) - timedelta(days=days)).isoformat()
             case datetime():
                 if self.sinceTime.tzinfo is None:
-                    dateTime = self.sinceTime.replace(tzinfo=timezone.utc).isoformat()
+                    dateTime = self.sinceTime.replace(tzinfo=UTC).isoformat()
                 else:
-                    dateTime = self.sinceTime.astimezone(timezone.utc).isoformat()
+                    dateTime = self.sinceTime.astimezone(UTC).isoformat()
             case str() as s:
                 dateTime = s.replace("'", "''")
             case None:
@@ -113,7 +112,7 @@ class BaseQuery(BaseModel):
                     filter_list.append(f"{field} eq '{val}'")
                 case datetime():
                     val = value.isoformat()
-                    filter_list.append((f"{field} eq {val}"))
+                    filter_list.append(f"{field} eq {val}")
                 case list() if all(isinstance(v, str) for v in value):
                     values = ", ".join(f"'{v}'" for v in value)
                     filter_list.append(f"{field} in ({values})")
@@ -140,18 +139,14 @@ class BaseQuery(BaseModel):
 
         match self.sinceTime:
             case int() as days:
-                self.sinceTime = (
-                    datetime.now(tz=timezone.utc) - timedelta(days=days)
-                ).strftime(format)
+                self.sinceTime = (datetime.now(tz=UTC) - timedelta(days=days)).strftime(
+                    format
+                )
             case datetime():
                 if self.sinceTime.tzinfo is None:
-                    self.sinceTime = self.sinceTime.replace(
-                        tzinfo=timezone.utc
-                    ).strftime(format)
+                    self.sinceTime = self.sinceTime.replace(tzinfo=UTC).strftime(format)
                 else:
-                    self.sinceTime = self.sinceTime.astimezone(timezone.utc).strftime(
-                        format
-                    )
+                    self.sinceTime = self.sinceTime.astimezone(UTC).strftime(format)
             case str() as s:
                 if regex is not None and not match(regex, s):
                     raise ValueError(
@@ -634,8 +629,8 @@ class BaseEndpoint:
             except TypeError, ValueError:
                 return None
             if retry_at.tzinfo is None:
-                retry_at = retry_at.replace(tzinfo=timezone.utc)
-            return max(0.0, (retry_at - datetime.now(tz=timezone.utc)).total_seconds())
+                retry_at = retry_at.replace(tzinfo=UTC)
+            return max(0.0, (retry_at - datetime.now(tz=UTC)).total_seconds())
 
     def _backoff_delay(self, attempt: int) -> float:
         return (

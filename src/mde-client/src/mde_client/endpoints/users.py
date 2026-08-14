@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .base import BaseEndpoint, BaseResults
 from ..schemas import USER_SCHEMA
+from .base import BaseEndpoint, BaseResults
 
 if TYPE_CHECKING:
     from .alerts import AlertsResults

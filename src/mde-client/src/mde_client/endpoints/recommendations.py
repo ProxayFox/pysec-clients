@@ -2,18 +2,16 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from .base import BaseEndpoint, BaseQuery, BaseResults
-
+from ..models.enums import PUBLIC_RECOMMENDATION_EXCEPTION_STATUS
 from ..schemas import (
     RECOMMENDATION_SCHEMA,
 )
-from ..models.enums import PUBLIC_RECOMMENDATION_EXCEPTION_STATUS
-
+from .base import BaseEndpoint, BaseQuery, BaseResults
 
 if TYPE_CHECKING:
-    from .vulnerabilities import VulnerabilityDTOResults
     from .machines import MachineReferencesResults
     from .misc import PublicProductDTOResults
+    from .vulnerabilities import VulnerabilityDTOResults
 
 
 class RecommendationQuery(BaseQuery):

@@ -18,8 +18,10 @@ import logging
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
-from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
-from ..schemas import ALERT_SCHEMA
+from ..models.action_payloads import (
+    BatchUpdateAlertPayload,
+    CreateAlertByReferencePayload,
+)
 from ..models.enums import (
     ALERT_CLASSIFICATION,
     ALERT_DETERMINATION,
@@ -27,16 +29,14 @@ from ..models.enums import (
     ALERT_STATUS,
     IOA_CATEGORY,
 )
-from ..models.action_payloads import (
-    CreateAlertByReferencePayload,
-    BatchUpdateAlertPayload,
-)
+from ..schemas import ALERT_SCHEMA
+from .base import BaseEndpoint, BasePayload, BaseQuery, BaseResults
 
 if TYPE_CHECKING:
     from .domain import DomainResults
     from .files import FileResults
-    from .machines import MachineResults
     from .ips import IPResults
+    from .machines import MachineResults
     from .users import UserResults
 
 log = logging.getLogger(__name__)
@@ -84,7 +84,7 @@ class AlertCreateQuery(BaseQuery):
     recommendedAction: str
     category: IOA_CATEGORY
 
-    def model_post_init(self, __context: Any) -> None:
+    def model_post_init(self, __context: Any, /) -> None:
         """Validate that the category is not 'Unknown' because alert creation does not allow 'Unknown' category."""
         if "Unknown" in self.category:
             raise ValueError(
