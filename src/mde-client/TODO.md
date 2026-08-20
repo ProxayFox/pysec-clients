@@ -1,6 +1,6 @@
 # MDE Client — Endpoint Coverage TODO
 
-> Auto-generated gap analysis comparing `build/mde_metadata.xml` against `src/mde_client/endpoints/`
+> Auto-generated gap analysis comparing `tools/mde-contract-gen/metadata/mde_metadata.xml` against `src/mde_client/endpoints/`
 > Generated: 2026-05-13
 
 Assumptions: EntitySets are counted as separate collection/item GET operations; private endpoint helpers that issue real requests count as implemented; duplicate EntitySets are preserved as separate contract rows.
@@ -161,4 +161,4 @@ Assumptions: EntitySets are counted as separate collection/item GET operations; 
 
 ## Singletons
 
-- None present in `build/mde_metadata.xml`.
+- None present in `tools/mde-contract-gen/metadata/mde_metadata.xml`.

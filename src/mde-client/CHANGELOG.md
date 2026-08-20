@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Vendored canonical MDE source contracts with PyArrow and Draft 2020-12 JSON
+  Schema projections, deterministic hashes, and a runtime contract registry.
+- Added a standalone workspace generator with checked-in metadata overrides,
+  semantic-version governance, drift checks, and Arrow parity gates.
+
+### Changed
+
+- Existing `mde_client.schemas` imports now delegate to canonical contract
+  projections while preserving the same schema and struct objects.
+
 ## [0.3.1] - 2026-08-14
 
 ### Fixed

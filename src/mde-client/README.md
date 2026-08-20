@@ -87,6 +87,23 @@ The top-level package exports:
 - `ViaFilesConfig`
 - `EmptyExportBlobError`
 
+The wheel also vendors canonical source contracts for downstream contract
+management. Load them without XML parsing or generator dependencies:
+
+```python
+from mde_client.contracts.registry import get_contract, list_contracts
+
+machine = get_contract("machine")
+print(machine.name, machine.version, machine.definition_hash)
+
+canonical = machine.contract
+json_schema = machine.json_schema
+arrow_schema = machine.arrow_schema
+```
+
+`mde_client.schemas` remains the compatibility import for endpoint Arrow
+constants; those constants now resolve to the generated contract projections.
+
 ## Result Model
 
 Most endpoint methods return a lazy results wrapper rather than an eager list or model.

@@ -64,6 +64,7 @@ Changelog = "https://github.com/ProxayFox/pysec-clients/blob/main/src/mde-client
 
 [tool.setuptools.packages.find]
 where = ["src"]
+namespaces = true
 
 [tool.setuptools.package-data]
-mde_client = ["py.typed"]
+mde_client = ["py.typed", "contracts/*/*.json"]
