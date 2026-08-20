@@ -7,17 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-20
+
 ### Added
 
-- Vendored canonical MDE source contracts with PyArrow and Draft 2020-12 JSON
-  Schema projections, deterministic hashes, and a runtime contract registry.
-- Added a standalone workspace generator with checked-in metadata overrides,
-  semantic-version governance, drift checks, and Arrow parity gates.
+- Vendored 51 canonical MDE source contracts with PyArrow and Draft 2020-12 JSON
+  Schema projections, deterministic hashes, and a runtime contract registry at
+  `mde_client.contracts.registry`.
+- Added a standalone workspace generator (`mde-contract-gen`) with checked-in
+  metadata overrides, semantic-version governance, drift checks, and Arrow
+  parity gates.
 
 ### Changed
 
 - Existing `mde_client.schemas` imports now delegate to canonical contract
   projections while preserving the same schema and struct objects.
+- Regenerated software and vulnerability Arrow schemas now include Defender's
+  additive `productCategory` field on `AssetSoftware`, `AssetVulnerability`,
+  and `DeltaAssetVulnerability`.
+
+### Fixed
+
+- MSAL client-credential token acquisition now passes scopes as a `list`,
+  matching MSAL's runtime contract and restoring metadata refresh against
+  Azure AD.
+
+### Compatibility
+
+- Existing endpoint, `BaseResults`, schema, and public import surfaces remain
+  supported. No migration is required for current `mde_client.schemas` or
+  endpoint callers.
 
 ## [0.3.1] - 2026-08-14
 
@@ -214,7 +233,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   contract.
 - `py.typed` PEP 561 marker — type information is shipped with the package.
 
-[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.3.1...HEAD
+[Unreleased]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.4.0...HEAD
+[0.4.0]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.3.1...mde-client-v0.4.0
 [0.3.1]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.3.0...mde-client-v0.3.1
 [0.2.4]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.3...mde-client-v0.2.4
 [0.2.3]: https://github.com/ProxayFox/pysec-clients/compare/mde-client-v0.2.2...mde-client-v0.2.3
