@@ -31,7 +31,9 @@ class MSALAuth:
             in-memory `msal.TokenCache()`.
     """
 
-    _SCOPES: ClassVar = ("https://api.securitycenter.microsoft.com/.default",)
+    # MSAL requires a concrete list here; tuples trigger its runtime
+    # ``isinstance(scopes, list)`` assertion before token acquisition.
+    _SCOPES: ClassVar[list[str]] = ["https://api.securitycenter.microsoft.com/.default"]
 
     def __init__(
         self,
