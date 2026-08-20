@@ -1,0 +1,209 @@
+{
+  "formatVersion": "1.0.0",
+  "contracts": {
+    "action_availability_status": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "alert": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "asset_baseline_assessment": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "asset_browser_extension": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "asset_certificate_assessment": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "asset_configuration": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "asset_hardware_firmware": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "asset_non_cpe_software": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "asset_software": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "asset_vulnerability": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "auth_scan_history_contract": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "baseline_configuration": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "baseline_exception": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "baseline_profile": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "browser_extension_permission": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "browser_extensions": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "configuration_score": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "data_export_settings": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "delta_asset_vulnerability": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "device_authenticated_scan_agent": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "device_authenticated_scan_definition": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "device_av_info": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "device_group": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "dlp_machine": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "domain": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "export_files_response": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "file": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "firmware": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "in_org_domain_stats": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "in_org_file_stats": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "in_org_ip_stats": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "incident": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "indicator": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "investigation": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "ip": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "library_files": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "list_1_of_import_indicator_result": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "list_1_of_indicator": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "machine": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "machine_action": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "public_asset_dto": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "public_asset_vulnerability_dto": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "public_distribution_dto": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "public_product_dto": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "public_product_fix_dto": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "public_vulnerability_dto": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "recommendation": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "remediation_task": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "software": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "user": {
+      "version": "1.0.0",
+      "released": false
+    },
+    "vulnerability": {
+      "version": "1.0.0",
+      "released": false
+    }
+  }
+}
