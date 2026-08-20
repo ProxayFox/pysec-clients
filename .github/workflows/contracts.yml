@@ -1,0 +1,62 @@
+name: MDE Contract Drift
+
+on:
+  pull_request:
+    paths:
+      - "tools/mde-contract-gen/**"
+      - "src/mde-client/src/mde_client/contracts/**"
+      - "src/mde-client/src/mde_client/schemas/**"
+      - "src/mde-client/src/mde_client/models/**"
+      - "scripts/fetch_mde_metadata.py"
+      - "scripts/mde_contract.py"
+      - "tests/mde_contract_gen/**"
+      - "tests/mde_client/test_contract_*.py"
+      - "tests/mde_client/test_schema_*.py"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "justfile"
+      - ".github/workflows/contracts.yml"
+  push:
+    branches: [main]
+    paths:
+      - "tools/mde-contract-gen/**"
+      - "src/mde-client/src/mde_client/contracts/**"
+      - "src/mde-client/src/mde_client/schemas/**"
+      - "src/mde-client/src/mde_client/models/**"
+      - "tests/mde_contract_gen/**"
+      - "pyproject.toml"
+      - "uv.lock"
+      - "justfile"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contracts:
+    name: Drift, parity, and package validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
+
+      - name: Install workspace
+        run: uv sync --all-packages --all-groups --frozen
+
+      - name: Validate canonical contracts
+        run: just quality-contracts
