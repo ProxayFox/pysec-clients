@@ -1,7 +1,7 @@
 {
   "contractFormatVersion": "1.0.0",
   "name": "mde.asset-software.source",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "title": "AssetSoftware",
   "description": "Canonical MDE source contract for the AssetSoftware response shape.",
   "stage": "source",
@@ -211,7 +211,7 @@
     }
   ],
   "hashes": {
-    "definition": "sha256:d5b5999e827ad2dcc7469ac7b16ae99bbc5cedc00bd79d20379698ff7b3ed7db",
+    "definition": "sha256:68dcfc5ad4b2eeb307cd98799d847dfc8ece73324be931e4d35cd8d265560edc",
     "arrow": "sha256:331ff5c1da743a4cac0e7658cb165b9c8e99e95e901e58efd3d9f4cf83c06b17"
   },
   "generation": {

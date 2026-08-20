@@ -249,12 +249,12 @@ _CONTRACT_INDEX: dict[str, dict[str, str]] = {
     "asset_software": {
         "name": "mde.asset-software.source",
         "schema": "ASSET_SOFTWARE_SCHEMA",
-        "version": "1.0.0",
+        "version": "1.1.0",
     },
     "asset_vulnerability": {
         "name": "mde.asset-vulnerability.source",
         "schema": "ASSET_VULNERABILITY_SCHEMA",
-        "version": "1.0.0",
+        "version": "1.1.0",
     },
     "auth_scan_history_contract": {
         "name": "mde.auth-scan-history-contract.source",
@@ -299,7 +299,7 @@ _CONTRACT_INDEX: dict[str, dict[str, str]] = {
     "delta_asset_vulnerability": {
         "name": "mde.delta-asset-vulnerability.source",
         "schema": "DELTA_ASSET_VULNERABILITY_SCHEMA",
-        "version": "1.0.0",
+        "version": "1.1.0",
     },
     "device_authenticated_scan_agent": {
         "name": "mde.device-authenticated-scan-agent.source",

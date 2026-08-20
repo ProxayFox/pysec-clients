@@ -1754,6 +1754,13 @@
             }
           }
         }
+      },
+      {
+        "name": "productCategory",
+        "nullable": true,
+        "type": {
+          "kind": "string"
+        }
       }
     ]
   },
@@ -1957,6 +1964,13 @@
       },
       {
         "name": "cveMitigationStatus",
+        "nullable": true,
+        "type": {
+          "kind": "string"
+        }
+      },
+      {
+        "name": "productCategory",
         "nullable": true,
         "type": {
           "kind": "string"
@@ -3410,6 +3424,13 @@
       },
       {
         "name": "cveMitigationStatus",
+        "nullable": true,
+        "type": {
+          "kind": "string"
+        }
+      },
+      {
+        "name": "productCategory",
         "nullable": true,
         "type": {
           "kind": "string"
