@@ -5,6 +5,7 @@ requires-python = ">=3.14"
 [manifest]
 members = [
     "mde-client",
+    "mde-contract-gen",
     "pysec-clients",
 ]
 
@@ -1204,6 +1205,27 @@ requires-dist = [
     { name = "requests", specifier = ">=2.34.2" },
 ]
 provides-extras = ["arrow", "polars"]
+
+[[package]]
+name = "mde-contract-gen"
+version = "0.1.0"
+source = { editable = "tools/mde-contract-gen" }
+dependencies = [
+    { name = "defusedxml" },
+    { name = "jsonschema" },
+    { name = "pyarrow" },
+    { name = "pydantic" },
+    { name = "ruff" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "defusedxml", specifier = ">=0.7.1" },
+    { name = "jsonschema", specifier = ">=4.26.0" },
+    { name = "pyarrow", specifier = ">=24.0.0" },
+    { name = "pydantic", specifier = ">=2.13.4" },
+    { name = "ruff", specifier = ">=0.15.11" },
+]
 
 [[package]]
 name = "mdurl"
