@@ -1,0 +1,406 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.remediation-task.source",
+  "version": "1.0.0",
+  "title": "RemediationTask",
+  "description": "Canonical MDE source contract for the RemediationTask response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "RemediationTask",
+    "entitySet": "RemediationTasks",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "RemediationTasks",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.RemediationTask)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "TaskCategoryDto": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Software",
+        "SecurityConfiguration"
+      ],
+      "isFlags": false
+    },
+    "TaskCompletionMethod": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Manual",
+        "Automatic"
+      ],
+      "isFlags": false
+    },
+    "TaskPriorityDto": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "None",
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "isFlags": false
+    },
+    "TaskProductivityImpactTypeDto": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "AllExposedAssets",
+        "NonImpactedAssets"
+      ],
+      "isFlags": false
+    },
+    "TaskStateValueTypeDto": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Active",
+        "Completed"
+      ],
+      "isFlags": false
+    },
+    "TaskTypeDto": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Update",
+        "Uninstall",
+        "ConfigurationChange",
+        "AttentionRequired",
+        "Upgrade",
+        "FirmwareUpdate"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "title",
+      "sourceName": "title",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "createdOn",
+      "sourceName": "createdOn",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "requesterId",
+      "sourceName": "requesterId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "requesterEmail",
+      "sourceName": "requesterEmail",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "status",
+      "sourceName": "status",
+      "sourceType": "microsoft.windowsDefenderATP.api.TaskStateValueTypeDto",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "TaskStateValueTypeDto",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "statusLastModifiedOn",
+      "sourceName": "statusLastModifiedOn",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "description",
+      "sourceName": "description",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "relatedComponent",
+      "sourceName": "relatedComponent",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "targetDevices",
+      "sourceName": "targetDevices",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "rbacGroupNames",
+      "sourceName": "rbacGroupNames",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "fixedDevices",
+      "sourceName": "fixedDevices",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "requesterNotes",
+      "sourceName": "requesterNotes",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "dueOn",
+      "sourceName": "dueOn",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "category",
+      "sourceName": "category",
+      "sourceType": "microsoft.windowsDefenderATP.api.TaskCategoryDto",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "TaskCategoryDto",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "productivityImpactRemediationType",
+      "sourceName": "productivityImpactRemediationType",
+      "sourceType": "microsoft.windowsDefenderATP.api.TaskProductivityImpactTypeDto",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "TaskProductivityImpactTypeDto",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "priority",
+      "sourceName": "priority",
+      "sourceType": "microsoft.windowsDefenderATP.api.TaskPriorityDto",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "TaskPriorityDto",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "completionMethod",
+      "sourceName": "completionMethod",
+      "sourceType": "microsoft.windowsDefenderATP.api.TaskCompletionMethod",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "TaskCompletionMethod",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "completerId",
+      "sourceName": "completerId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "completerEmail",
+      "sourceName": "completerEmail",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "scid",
+      "sourceName": "scid",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "type",
+      "sourceName": "type",
+      "sourceType": "microsoft.windowsDefenderATP.api.TaskTypeDto",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "TaskTypeDto",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "productId",
+      "sourceName": "productId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "vendorId",
+      "sourceName": "vendorId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "nameId",
+      "sourceName": "nameId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendedVersion",
+      "sourceName": "recommendedVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendedVendor",
+      "sourceName": "recommendedVendor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendedProgram",
+      "sourceName": "recommendedProgram",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendationReference",
+      "sourceName": "recommendationReference",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:8b9e39783292ad91047153e965cb5cb9de5f36bae675f2e69da2aaf2db6e6ad3",
+    "arrow": "sha256:0d5dbbd2f50073d17e6876372a10722448c5cc6eba3166a4365f53d276b79c29"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.084912Z",
+    "doNotEdit": true
+  }
+}

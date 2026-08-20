@@ -60,6 +60,8 @@ hooks-run +args="":
 quality:
     if ! uv run ruff check .; then uv run ruff check --fix .; fi
     if ! uv run ruff format --check .; then uv run ruff format .; fi
+    just contracts-check
+    just contracts-doctor
     just typecheck
     just test --skip-integration
     just build-package mde-client
@@ -73,10 +75,7 @@ build-package package:
 
 # Similar to Quality, but only targets schema validation
 quality-schema schemas="src/mde-client/src/mde_client/schemas" models="src/mde-client/src/mde_client/models" schemas_tests="tests/mde_client/test_schema_validator.py" models_tests="tests/mde_client/test_investigation_models.py":
-    if ! uv run ruff check {{schemas}} {{models}}; then uv run ruff check --fix {{schemas}} {{models}}; fi
-    if ! uv run ruff format --check {{schemas}} {{models}}; then uv run ruff format {{schemas}} {{models}}; fi
-    just typecheck {{schemas}} {{models}}
-    just test {{schemas_tests}} {{models_tests}} --skip-integration
+    just quality-contracts
 
 # Like Quality, but also includes integration tests that require Azure credentials. Use with caution in CI/CD pipelines.
 quality-full:
@@ -123,18 +122,35 @@ docs-set-default alias="latest" +args="":
 
 # --- Schema management ---
 
-# Regenerate schemas from existing XML (no credentials required)
+# Generate canonical contracts and both schema projections from checked-in EDMX.
+contracts-generate:
+    @uv run --package mde-contract-gen mde-contract-gen generate
+
+# Regenerate into a temporary tree and fail when vendored artifacts differ.
+contracts-check:
+    @uv run --package mde-contract-gen mde-contract-gen check-drift
+
+# Validate metadata, overrides, contracts, hashes, versions, and generated source.
+contracts-doctor:
+    @uv run --package mde-contract-gen mde-contract-gen doctor
+
+# Focused quality gate for the standalone generator and vendored runtime surface.
+quality-contracts:
+    @just contracts-check
+    @just contracts-doctor
+    @just lint tools/mde-contract-gen src/mde-client/src/mde_client/contracts src/mde-client/src/mde_client/schemas src/mde-client/src/mde_client/models scripts/mde_contract.py scripts/fetch_mde_metadata.py tests/mde_contract_gen tests/mde_client/test_contract_artifacts.py tests/mde_client/test_contract_registry.py tests/mde_client/test_schema_parity.py tests/mde_client/test_schema_validator.py
+    @just format-check tools/mde-contract-gen src/mde-client/src/mde_client/contracts src/mde-client/src/mde_client/schemas src/mde-client/src/mde_client/models scripts/mde_contract.py scripts/fetch_mde_metadata.py tests/mde_contract_gen tests/mde_client/test_contract_artifacts.py tests/mde_client/test_contract_registry.py tests/mde_client/test_schema_parity.py tests/mde_client/test_schema_validator.py
+    @just typecheck
+    @just test tests/mde_contract_gen tests/mde_client/test_contract_artifacts.py tests/mde_client/test_contract_registry.py tests/mde_client/test_schema_parity.py tests/mde_client/test_schema_validator.py tests/mde_client/test_investigation_models.py --skip-integration
+    @just build-package mde-client
+
+# Backwards-compatible aliases.
 schema-build:
-    uv run scripts/mde_contract.py --no-fetch
+    just contracts-generate
 
-# Preview what schema-build would write, without touching any files
 schema-build-dry:
-    uv run scripts/mde_contract.py --no-fetch --dry-run
+    just contracts-check
 
-# Re-fetch $metadata from the live API then regenerate (requires Azure credentials)
 schema-refresh:
-    uv run scripts/mde_contract.py --refresh-metadata
-
-# Preview what schema-refresh would write, without touching any files
-schema-refresh-dry:
-    uv run scripts/mde_contract.py --refresh-metadata --dry-run
+    @uv run scripts/fetch_mde_metadata.py
+    @just contracts-generate

@@ -1,0 +1,276 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.data-export-settings.source",
+  "version": "1.0.0",
+  "title": "DataExportSettings",
+  "description": "Canonical MDE source contract for the DataExportSettings response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "DataExportSettings",
+    "entitySet": "DataExportSettings",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "DataExportSettings",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.DataExportSettings)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {
+    "EventHubProperties": {
+      "sourceType": "microsoft.windowsDefenderATP.api.EventHubProperties",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "eventHubResourceId",
+          "sourceName": "eventHubResourceId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "subscriptionId",
+          "sourceName": "subscriptionId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "resourceGroup",
+          "sourceName": "resourceGroup",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "namespace",
+          "sourceName": "namespace",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "name",
+          "sourceName": "name",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "StorageAccountProperties": {
+      "sourceType": "microsoft.windowsDefenderATP.api.StorageAccountProperties",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "storageAccountResourceId",
+          "sourceName": "storageAccountResourceId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "subscriptionId",
+          "sourceName": "subscriptionId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "resourceGroup",
+          "sourceName": "resourceGroup",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "name",
+          "sourceName": "name",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "WorkspaceProperties": {
+      "sourceType": "microsoft.windowsDefenderATP.api.WorkspaceProperties",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "workspaceResourceId",
+          "sourceName": "workspaceResourceId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "subscriptionId",
+          "sourceName": "subscriptionId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "resourceGroup",
+          "sourceName": "resourceGroup",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "name",
+          "sourceName": "name",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "DataExportSettingsLogDefinition": {
+      "sourceType": "microsoft.windowsDefenderATP.api.DataExportSettingsLogDefinition",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "category",
+          "sourceName": "category",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "enabled",
+          "sourceName": "enabled",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": true,
+          "nullable": false,
+          "key": false
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "designatedTenantId",
+      "sourceName": "designatedTenantId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "eventHubProperties",
+      "sourceName": "eventHubProperties",
+      "sourceType": "microsoft.windowsDefenderATP.api.EventHubProperties",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "EventHubProperties"
+    },
+    {
+      "name": "storageAccountProperties",
+      "sourceName": "storageAccountProperties",
+      "sourceType": "microsoft.windowsDefenderATP.api.StorageAccountProperties",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "StorageAccountProperties"
+    },
+    {
+      "name": "workspaceProperties",
+      "sourceName": "workspaceProperties",
+      "sourceType": "microsoft.windowsDefenderATP.api.WorkspaceProperties",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "WorkspaceProperties"
+    },
+    {
+      "name": "logs",
+      "sourceName": "logs",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.DataExportSettingsLogDefinition)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.DataExportSettingsLogDefinition",
+        "ref": "DataExportSettingsLogDefinition"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:cb9f1012334c5063aabda3850de5d865785d8eabae76e14f9a99e40fbead2f96",
+    "arrow": "sha256:758ca52c5cc0291f05e20369b51cc02bf3ba3284f480f25d65f59b12427605d2"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.073513Z",
+    "doNotEdit": true
+  }
+}

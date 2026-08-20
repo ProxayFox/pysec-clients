@@ -1,0 +1,489 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.indicator.source",
+  "version": "1.0.0",
+  "title": "Indicator",
+  "description": "Canonical MDE source contract for the Indicator response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "Indicator",
+    "entitySet": "Indicators",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Indicators",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Indicator)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "KnownRequestSource": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Unspecified",
+        "PublicApi",
+        "Portal",
+        "MCAS",
+        "TVM",
+        "CustomDetection",
+        "BulkAction",
+        "ISG",
+        "NDR",
+        "EndpointConfigManagement",
+        "IncidentTasks",
+        "MDI",
+        "ActiveScan"
+      ],
+      "isFlags": false
+    },
+    "severity": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Informational",
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "isFlags": false
+    },
+    "tiIndicatorAction": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Allowed",
+        "Alert",
+        "AlertAndBlock",
+        "Warn",
+        "Block",
+        "Audit",
+        "BlockAndRemediate"
+      ],
+      "isFlags": false
+    },
+    "tiIndicatorType": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "FileSha1",
+        "FileSha256",
+        "FileMd5",
+        "IpAddress",
+        "DomainName",
+        "Url",
+        "CertificateThumbprint",
+        "ProcessMemorySimilarityHash",
+        "WebCategory"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {
+    "CertificateIndicatorInformation": {
+      "sourceType": "microsoft.windowsDefenderATP.api.CertificateIndicatorInformation",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "issuer",
+          "sourceName": "issuer",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "serial",
+          "sourceName": "serial",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "subject",
+          "sourceName": "subject",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "sha256",
+          "sourceName": "sha256",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "indicatorValue",
+      "sourceName": "indicatorValue",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "indicatorType",
+      "sourceName": "indicatorType",
+      "sourceType": "microsoft.windowsDefenderATP.api.tiIndicatorType",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "tiIndicatorType",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "action",
+      "sourceName": "action",
+      "sourceType": "microsoft.windowsDefenderATP.api.tiIndicatorAction",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "tiIndicatorAction",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "createdBy",
+      "sourceName": "createdBy",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "severity",
+      "sourceName": "severity",
+      "sourceType": "microsoft.windowsDefenderATP.api.severity",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "severity",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "category",
+      "sourceName": "category",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "application",
+      "sourceName": "application",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "educateUrl",
+      "sourceName": "educateUrl",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "bypassDurationHours",
+      "sourceName": "bypassDurationHours",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "title",
+      "sourceName": "title",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "description",
+      "sourceName": "description",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendedActions",
+      "sourceName": "recommendedActions",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "creationTimeDateTimeUtc",
+      "sourceName": "creationTimeDateTimeUtc",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "expirationTime",
+      "sourceName": "expirationTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastUpdateTime",
+      "sourceName": "lastUpdateTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastUpdatedBy",
+      "sourceName": "lastUpdatedBy",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "rbacGroupNames",
+      "sourceName": "rbacGroupNames",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "rbacGroupIds",
+      "sourceName": "rbacGroupIds",
+      "sourceType": "Collection(Edm.Int32)",
+      "logicalType": "array",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "items": {
+        "logicalType": "integer",
+        "nullable": true,
+        "sourceType": "Edm.Int32",
+        "constraints": {
+          "bitWidth": 32,
+          "signed": true
+        }
+      }
+    },
+    {
+      "name": "certificateInfo",
+      "sourceName": "certificateInfo",
+      "sourceType": "microsoft.windowsDefenderATP.api.CertificateIndicatorInformation",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "CertificateIndicatorInformation"
+    },
+    {
+      "name": "notificationId",
+      "sourceName": "notificationId",
+      "sourceType": "Edm.Byte",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 8,
+        "signed": false
+      }
+    },
+    {
+      "name": "notificationBody",
+      "sourceName": "notificationBody",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "version",
+      "sourceName": "version",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "mitreTechniques",
+      "sourceName": "mitreTechniques",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "historicalDetection",
+      "sourceName": "historicalDetection",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "lookBackPeriod",
+      "sourceName": "lookBackPeriod",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "generateAlert",
+      "sourceName": "generateAlert",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "additionalInfo",
+      "sourceName": "additionalInfo",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "createdByDisplayName",
+      "sourceName": "createdByDisplayName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "externalId",
+      "sourceName": "externalId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "createdBySource",
+      "sourceName": "createdBySource",
+      "sourceType": "microsoft.windowsDefenderATP.api.KnownRequestSource",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "KnownRequestSource",
+      "enumRepresentation": "name"
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:e399be38d8c825869ea88e375edf2f47941b15e16434c6fcd7f7131e977876d2",
+    "arrow": "sha256:fac1bbf6920ebd4e8516a0812e9897a2a9597da67efbf5d82fe5af3a85603bf4"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.079945Z",
+    "doNotEdit": true
+  }
+}

@@ -1,0 +1,995 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.alert.source",
+  "version": "1.0.0",
+  "title": "Alert",
+  "description": "Canonical MDE source contract for the Alert response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "Alert",
+    "entitySet": "Alerts",
+    "boundFunction": "Alerts",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [
+      "machine",
+      "user",
+      "files",
+      "iPs"
+    ],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Alerts",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+        "collection": true
+      },
+      {
+        "kind": "EntitySet",
+        "name": "AlertEntitySetName",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Alerts",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Alerts",
+        "bindingType": "microsoft.windowsDefenderATP.api.File",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Alerts",
+        "bindingType": "microsoft.windowsDefenderATP.api.Ip",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Alerts",
+        "bindingType": "microsoft.windowsDefenderATP.api.Domain",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Alerts",
+        "bindingType": "microsoft.windowsDefenderATP.api.User",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+        "collection": true
+      },
+      {
+        "kind": "Action",
+        "name": "CreateAlertByReference",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Alert)",
+        "returnType": "microsoft.windowsDefenderATP.api.Alert",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "AlertClassification": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Unknown",
+        "FalsePositive",
+        "TruePositive",
+        "InformationalExpectedActivity"
+      ],
+      "isFlags": false
+    },
+    "AlertDetermination": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "NotAvailable",
+        "Apt",
+        "Malware",
+        "SecurityPersonnel",
+        "SecurityTesting",
+        "UnwantedSoftware",
+        "Other",
+        "MultiStagedAttack",
+        "CompromisedAccount",
+        "Phishing",
+        "MaliciousUserActivity",
+        "NotMalicious",
+        "NoEnoughDataToValidate",
+        "ConfirmedActivity",
+        "LineOfBusinessApplication"
+      ],
+      "isFlags": false
+    },
+    "AlertSeverity": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "UnSpecified",
+        "Informational",
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "isFlags": false
+    },
+    "AlertStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Unknown",
+        "Unspecified",
+        "New",
+        "InProgress",
+        "Resolved",
+        "Hidden"
+      ],
+      "isFlags": false
+    },
+    "DetectionSource": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Unknown",
+        "WindowsDefenderAtp",
+        "WindowsDefenderAv",
+        "WindowsDefenderSmartScreen",
+        "iSight",
+        "Bitdefender",
+        "CustomerTI",
+        "Ziften",
+        "Lookout",
+        "SentinelOne",
+        "ThirdPartySensors",
+        "OfficeATP",
+        "AutomatedInvestigation",
+        "ThreatExperts",
+        "CustomDetection",
+        "AzureATP",
+        "MCAS",
+        "MTP",
+        "AAD",
+        "MAPG",
+        "Manual",
+        "DLP",
+        "AppGPolicy",
+        "AppGDetection",
+        "MDC",
+        "Compliance",
+        "Forms",
+        "MailFlow",
+        "MSTIC",
+        "Unspecified",
+        "Sentinel",
+        "All",
+        "ThirdParty",
+        "DefenderForIoT",
+        "DefenderForServers",
+        "DefenderForStorage",
+        "DefenderForDNS",
+        "DefenderForDatabases",
+        "DefenderForContainers",
+        "DefenderForNetwork",
+        "DefenderForAppService",
+        "DefenderForKeyVault",
+        "DefenderForResourceManager",
+        "DefenderForApiManagement",
+        "NRTAlerts",
+        "ScheduledAlerts",
+        "MicrosoftDefenderThreatIntelligenceAnalytics",
+        "BuiltInML",
+        "MicrosoftInsiderRiskManagement",
+        "Nsn",
+        "DefenderForAIServices",
+        "SecurityCopilot"
+      ],
+      "isFlags": true
+    },
+    "EntityType": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Url",
+        "User",
+        "File",
+        "Machine",
+        "Ip",
+        "Process",
+        "Mailbox",
+        "MailCluster",
+        "MailMessage",
+        "SecurityGroup",
+        "RegistryKey",
+        "Registry",
+        "CommandLine",
+        "CloudApplication",
+        "OAuthApplication"
+      ],
+      "isFlags": false
+    },
+    "InvestigationState": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Unknown",
+        "Terminated",
+        "SuccessfullyRemediated",
+        "Benign",
+        "Failed",
+        "PartiallyRemediated",
+        "Running",
+        "PendingApproval",
+        "PendingResource",
+        "Disabled",
+        "Queued",
+        "InnerFailure",
+        "PreexistingAlert",
+        "UnsupportedOs",
+        "UnsupportedAlertType",
+        "SuppressedAlert",
+        "PartiallyInvestigated",
+        "TerminatedByUser",
+        "TerminatedBySystem"
+      ],
+      "isFlags": true
+    }
+  },
+  "definitions": {
+    "AlertRelatedUser": {
+      "sourceType": "microsoft.windowsDefenderATP.api.AlertRelatedUser",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "userName",
+          "sourceName": "userName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "domainName",
+          "sourceName": "domainName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "LoggedOnUser": {
+      "sourceType": "microsoft.windowsDefenderATP.api.LoggedOnUser",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "accountName",
+          "sourceName": "accountName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "domainName",
+          "sourceName": "domainName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "AlertComment": {
+      "sourceType": "microsoft.windowsDefenderATP.api.AlertComment",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "comment",
+          "sourceName": "comment",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "createdBy",
+          "sourceName": "createdBy",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "createdTime",
+          "sourceName": "createdTime",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        }
+      ]
+    },
+    "AlertEvidence": {
+      "sourceType": "microsoft.windowsDefenderATP.api.AlertEvidence",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "entityType",
+          "sourceName": "entityType",
+          "sourceType": "microsoft.windowsDefenderATP.api.EntityType",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "enumRef": "EntityType",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "evidenceCreationTime",
+          "sourceName": "evidenceCreationTime",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "sha1",
+          "sourceName": "sha1",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "sha256",
+          "sourceName": "sha256",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "fileName",
+          "sourceName": "fileName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "filePath",
+          "sourceName": "filePath",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "processId",
+          "sourceName": "processId",
+          "sourceType": "Edm.Int64",
+          "logicalType": "integer",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "constraints": {
+            "bitWidth": 64,
+            "signed": true
+          },
+          "wireHints": {
+            "jsSafeInteger": false,
+            "recommendedApiRepresentation": "string"
+          }
+        },
+        {
+          "name": "processCommandLine",
+          "sourceName": "processCommandLine",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "processCreationTime",
+          "sourceName": "processCreationTime",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "parentProcessId",
+          "sourceName": "parentProcessId",
+          "sourceType": "Edm.Int64",
+          "logicalType": "integer",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "constraints": {
+            "bitWidth": 64,
+            "signed": true
+          },
+          "wireHints": {
+            "jsSafeInteger": false,
+            "recommendedApiRepresentation": "string"
+          }
+        },
+        {
+          "name": "parentProcessCreationTime",
+          "sourceName": "parentProcessCreationTime",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "parentProcessFileName",
+          "sourceName": "parentProcessFileName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "parentProcessFilePath",
+          "sourceName": "parentProcessFilePath",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "ipAddress",
+          "sourceName": "ipAddress",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "url",
+          "sourceName": "url",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "registryKey",
+          "sourceName": "registryKey",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "registryHive",
+          "sourceName": "registryHive",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "registryValueType",
+          "sourceName": "registryValueType",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "registryValue",
+          "sourceName": "registryValue",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "registryValueName",
+          "sourceName": "registryValueName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "accountName",
+          "sourceName": "accountName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "domainName",
+          "sourceName": "domainName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "userSid",
+          "sourceName": "userSid",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "aadUserId",
+          "sourceName": "aadUserId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "userPrincipalName",
+          "sourceName": "userPrincipalName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "detectionStatus",
+          "sourceName": "detectionStatus",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "Domain": {
+      "sourceType": "microsoft.windowsDefenderATP.api.Domain",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "host",
+          "sourceName": "host",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "incidentId",
+      "sourceName": "incidentId",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "investigationId",
+      "sourceName": "investigationId",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "assignedTo",
+      "sourceName": "assignedTo",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "severity",
+      "sourceName": "severity",
+      "sourceType": "microsoft.windowsDefenderATP.api.AlertSeverity",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "AlertSeverity",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "status",
+      "sourceName": "status",
+      "sourceType": "microsoft.windowsDefenderATP.api.AlertStatus",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "AlertStatus",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "classification",
+      "sourceName": "classification",
+      "sourceType": "microsoft.windowsDefenderATP.api.AlertClassification",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "AlertClassification",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "determination",
+      "sourceName": "determination",
+      "sourceType": "microsoft.windowsDefenderATP.api.AlertDetermination",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "AlertDetermination",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "investigationState",
+      "sourceName": "investigationState",
+      "sourceType": "microsoft.windowsDefenderATP.api.InvestigationState",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "InvestigationState",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "detectionSource",
+      "sourceName": "detectionSource",
+      "sourceType": "microsoft.windowsDefenderATP.api.DetectionSource",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "DetectionSource",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "detectorId",
+      "sourceName": "detectorId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "category",
+      "sourceName": "category",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "threatFamilyName",
+      "sourceName": "threatFamilyName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "title",
+      "sourceName": "title",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "description",
+      "sourceName": "description",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "alertCreationTime",
+      "sourceName": "alertCreationTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "firstEventTime",
+      "sourceName": "firstEventTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastEventTime",
+      "sourceName": "lastEventTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastUpdateTime",
+      "sourceName": "lastUpdateTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "resolvedTime",
+      "sourceName": "resolvedTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "machineId",
+      "sourceName": "machineId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "computerDnsName",
+      "sourceName": "computerDnsName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "rbacGroupName",
+      "sourceName": "rbacGroupName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "aadTenantId",
+      "sourceName": "aadTenantId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "relatedUser",
+      "sourceName": "relatedUser",
+      "sourceType": "microsoft.windowsDefenderATP.api.AlertRelatedUser",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "AlertRelatedUser"
+    },
+    {
+      "name": "threatName",
+      "sourceName": "threatName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "mitreTechniques",
+      "sourceName": "mitreTechniques",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "loggedOnUsers",
+      "sourceName": "loggedOnUsers",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.LoggedOnUser)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.LoggedOnUser",
+        "ref": "LoggedOnUser"
+      }
+    },
+    {
+      "name": "comments",
+      "sourceName": "comments",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.AlertComment)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.AlertComment",
+        "ref": "AlertComment"
+      }
+    },
+    {
+      "name": "evidence",
+      "sourceName": "evidence",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.AlertEvidence)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.AlertEvidence",
+        "ref": "AlertEvidence"
+      }
+    },
+    {
+      "name": "domains",
+      "sourceName": "domains",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.Domain)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.Domain",
+        "ref": "Domain"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:d49d341e2bff04ffab458feae330cc0d366d1ba34079babb26888529eed08690",
+    "arrow": "sha256:f350605ff4dc90681de76f01a95feeaea1a89998edba1515a1ea5e8b4dcfc4bb"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.068144Z",
+    "doNotEdit": true
+  }
+}

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mde-contract-gen"
+version = "0.1.0"
+description = "Standalone canonical contract generator for Microsoft Defender for Endpoint metadata."
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "defusedxml>=0.7.1",
+    "jsonschema>=4.26.0",
+    "pyarrow>=24.0.0",
+    "pydantic>=2.13.4",
+    "ruff>=0.15.11",
+]
+
+[project.scripts]
+mde-contract-gen = "mde_contract_gen.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

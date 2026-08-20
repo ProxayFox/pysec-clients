@@ -1,0 +1,136 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.export-files-response.source",
+  "version": "1.0.0",
+  "title": "ExportFilesResponse",
+  "description": "Canonical MDE source contract for the ExportFilesResponse response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "ExportFilesResponse",
+    "boundFunction": "SoftwareVulnerabilitiesExport",
+    "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "SoftwareVulnerabilitiesExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "SecureConfigurationsAssessmentExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "SoftwareInventoryExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "SoftwareInventoryNonCpeExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "BrowserExtensionsInventoryExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "HardwareFirmwareInventoryExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "InfoGatheringExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "BaselineComplianceAssessmentExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "CertificateAssessmentExport",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.ExportFilesResponse",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "exportFiles",
+      "sourceName": "exportFiles",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "generatedTime",
+      "sourceName": "generatedTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:a390d796daa604b88cc4c54c1749fb3e15fa991583349ab448648a81d21bbc62",
+    "arrow": "sha256:d4252f92eb7e1e67e18aaee85f60bf165841d4782851db3b81ce6700785d8e5b"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.076829Z",
+    "doNotEdit": true
+  }
+}

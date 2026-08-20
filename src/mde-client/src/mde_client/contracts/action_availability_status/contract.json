@@ -1,0 +1,112 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.action-availability-status.source",
+  "version": "1.0.0",
+  "title": "ActionAvailabilityStatus",
+  "description": "Canonical MDE source contract for the ActionAvailabilityStatus response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "ActionAvailabilityStatus",
+    "boundFunction": "AvailableMachineActions",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.ActionAvailabilityStatus)",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "AvailableMachineActions",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.ActionAvailabilityStatus)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "FullActionType": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Unknown",
+        "FullIsolation",
+        "SelectiveIsolation",
+        "RunAntiVirusScan",
+        "CollectInvestigationPackage",
+        "StopAndQuarantineFile",
+        "RestrictCodeExecution",
+        "InitiateInvestigation",
+        "OffBoard",
+        "LiveResponse",
+        "Troubleshoot",
+        "LogsCollection",
+        "UnManagedDeviceIsolation",
+        "TokenRefresh",
+        "RegenerateId",
+        "EnableActiveDirectoryUser",
+        "DisableActiveDirectoryUser",
+        "ResetPasswordActiveDirectoryUser",
+        "ImmuneActiveDirectoryCustomPlaybook",
+        "Unisolation",
+        "UnrestrictCodeExecution",
+        "UnManagedDeviceUnisolation",
+        "LiveResponsePortal"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {},
+  "fields": [
+    {
+      "name": "action",
+      "sourceName": "action",
+      "sourceType": "microsoft.windowsDefenderATP.api.FullActionType",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "FullActionType",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "isAvailable",
+      "sourceName": "isAvailable",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "notSupportedReason",
+      "sourceName": "notSupportedReason",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:2a0238d9b3e44d3cf3e2de574e805363172ba3a572505a3bc66ca5ad7a61dc89",
+    "arrow": "sha256:f7489250c5748c27887e89712cae78f32545d2c9e20b894e194c7b98470c239b"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.067584Z",
+    "doNotEdit": true
+  }
+}

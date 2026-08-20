@@ -1,0 +1,361 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.recommendation.source",
+  "version": "1.0.0",
+  "title": "Recommendation",
+  "description": "Canonical MDE source contract for the Recommendation response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "Recommendation",
+    "entitySet": "Recommendations",
+    "boundFunction": "Recommendations",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.Recommendation)",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [
+      "software",
+      "vulnerabilities"
+    ],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Recommendations",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Recommendation)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Recommendations",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Recommendation)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "PublicRecommendationExceptionStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Active",
+        "Exception",
+        "PartialException"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "productName",
+      "sourceName": "productName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendationName",
+      "sourceName": "recommendationName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "weaknesses",
+      "sourceName": "weaknesses",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "vendor",
+      "sourceName": "vendor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendedVersion",
+      "sourceName": "recommendedVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendedVendor",
+      "sourceName": "recommendedVendor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendedProgram",
+      "sourceName": "recommendedProgram",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendationCategory",
+      "sourceName": "recommendationCategory",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "subCategory",
+      "sourceName": "subCategory",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "severityScore",
+      "sourceName": "severityScore",
+      "sourceType": "Edm.Double",
+      "logicalType": "number",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "precision": "double"
+      }
+    },
+    {
+      "name": "publicExploit",
+      "sourceName": "publicExploit",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "activeAlert",
+      "sourceName": "activeAlert",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "associatedThreats",
+      "sourceName": "associatedThreats",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "remediationType",
+      "sourceName": "remediationType",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "status",
+      "sourceName": "status",
+      "sourceType": "microsoft.windowsDefenderATP.api.PublicRecommendationExceptionStatus",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "PublicRecommendationExceptionStatus",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "configScoreImpact",
+      "sourceName": "configScoreImpact",
+      "sourceType": "Edm.Double",
+      "logicalType": "number",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "precision": "double"
+      }
+    },
+    {
+      "name": "exposureImpact",
+      "sourceName": "exposureImpact",
+      "sourceType": "Edm.Double",
+      "logicalType": "number",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "precision": "double"
+      }
+    },
+    {
+      "name": "totalMachineCount",
+      "sourceName": "totalMachineCount",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "exposedMachinesCount",
+      "sourceName": "exposedMachinesCount",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "nonProductivityImpactedAssets",
+      "sourceName": "nonProductivityImpactedAssets",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "relatedComponent",
+      "sourceName": "relatedComponent",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "hasUnpatchableCve",
+      "sourceName": "hasUnpatchableCve",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "tags",
+      "sourceName": "tags",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "exposedCriticalDevices",
+      "sourceName": "exposedCriticalDevices",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:e866439808d02f4ea2fa385fb8968132415e630e8d91d84618581cbc92521c6a",
+    "arrow": "sha256:23081090f961bd4c4fd2b792117541da5d8e68986c9c58380859ab9aa9f1e813"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.084461Z",
+    "doNotEdit": true
+  }
+}

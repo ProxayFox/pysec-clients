@@ -44,7 +44,7 @@ docs = [
 ]
 
 [tool.uv.workspace]
-members = ["src/*"]
+members = ["src/*", "tools/*"]
 
 [tool.uv.sources]
 mde-client = { workspace = true }
@@ -75,13 +75,13 @@ exclude_also = [
 
 [tool.ty.environment]
 python = "./.venv"
-root = ["./src/mde-client/src", "./tests", "./scripts"]
+root = ["./src/mde-client/src", "./tests", "./scripts", "./tools/mde-contract-gen/src"]
 
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
-include = ["src", "tests", "scripts"]
-extraPaths = ["src/mde-client/src", "scripts"]
+include = ["src", "tests", "scripts", "tools/mde-contract-gen/src"]
+extraPaths = ["src/mde-client/src", "scripts", "tools/mde-contract-gen/src"]
 
 [tool.ruff.lint.per-file-ignores]
 # These modules predate the lint rule and are part of the established package

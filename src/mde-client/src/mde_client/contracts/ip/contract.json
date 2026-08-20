@@ -1,0 +1,74 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.ip.source",
+  "version": "1.0.0",
+  "title": "Ip",
+  "description": "Canonical MDE source contract for the Ip response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "Ip",
+    "entitySet": "Ips",
+    "boundFunction": "IPs",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.Ip)",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [
+      "alerts",
+      "machines"
+    ],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Ips",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Ip)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "IPs",
+        "bindingType": "microsoft.windowsDefenderATP.api.Alert",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Ip)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:ce8a9ed5a184f7590723bf79fdb0cbf1c59d39b8d21c1b0636a31d81bf1976df",
+    "arrow": "sha256:65e85ceae334ac8c3d7d1fb40de21c31bb88a23fef461373a809dcd7a435d393"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.080657Z",
+    "doNotEdit": true
+  }
+}

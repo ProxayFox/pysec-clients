@@ -1,14 +1,9 @@
-name: Refresh MDE Schema Contracts
+name: Refresh MDE Canonical Contracts
 
 on:
   schedule:
     - cron: "0 3 * * 1"   # Every Monday at 03:00 UTC
   workflow_dispatch:        # Allow manual trigger from the Actions tab
-    inputs:
-      force_refresh:
-        description: "Force re-fetch of $metadata even if not stale"
-        type: boolean
-        default: true
 
 permissions:
   contents: write
@@ -20,8 +15,8 @@ env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
 
 jobs:
-  refresh-schemas:
-    name: Regenerate Arrow schemas from MDE $metadata
+  refresh-contracts:
+    name: Refresh metadata and canonical contract projections
     runs-on: ubuntu-latest
 
     steps:
@@ -44,14 +39,20 @@ jobs:
           tool: just
 
       - name: Install dependencies
-        run: uv sync --all-groups
+        run: uv sync --all-packages --all-groups --frozen
 
-      - name: Regenerate schemas
+      - name: Fetch upstream metadata snapshot
         env:
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-        run: uv run scripts/mde_contract.py --refresh-metadata
+        run: uv run scripts/fetch_mde_metadata.py
+
+      - name: Regenerate canonical contracts
+        run: just contracts-generate
+
+      - name: Validate generated projections
+        run: just quality-contracts
 
       - name: Check for changes
         id: diff
@@ -62,18 +63,22 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: chore/mde-schema-refresh
+          branch: chore/mde-contract-refresh
           delete-branch: true
-          commit-message: "chore(schemas): refresh MDE Arrow schema contracts"
-          title: "chore(schemas): refresh MDE Arrow schema contracts"
+          commit-message: "chore(contracts): refresh MDE source contracts"
+          title: "chore(contracts): refresh MDE source contracts"
           body: |
-            Automated weekly refresh of the Arrow schema contracts generated from the MDE API `$metadata` endpoint.
+            Automated weekly refresh of the canonical MDE source contracts and
+            their PyArrow and JSON Schema projections.
 
             **Triggered by:** ${{ github.event_name == 'schedule' && 'weekly schedule' || 'manual dispatch' }}
             **Workflow run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
             ---
-            Review the diff to confirm the changes reflect expected upstream API updates before merging.
+            Review the upstream metadata and override diffs, confirm the
+            recommended semantic-version bumps in
+            `tools/mde-contract-gen/versions.json`, and verify Arrow parity
+            before merging.
           labels: |
             automated
-            schemas
+            contracts

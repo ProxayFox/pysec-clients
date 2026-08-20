@@ -9,6 +9,7 @@ Reference pages describe the package surface as it exists today.
 - [Results wrappers](results.md)
 - [Query models](queries.md)
 - [ViaFiles](via-files.md)
+- [Canonical contracts](contracts.md)
 
 ## Endpoint reference
 

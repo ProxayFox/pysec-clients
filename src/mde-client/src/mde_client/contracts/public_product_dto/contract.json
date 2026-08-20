@@ -1,0 +1,202 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.public-product-dto.source",
+  "version": "1.0.0",
+  "title": "PublicProductDto",
+  "description": "Canonical MDE source contract for the PublicProductDto response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "PublicProductDto",
+    "entitySet": "PublicProductDto",
+    "boundFunction": "Software",
+    "returnType": "microsoft.windowsDefenderATP.api.PublicProductDto",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "PublicProductDto",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.PublicProductDto)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Software",
+        "bindingType": "microsoft.windowsDefenderATP.api.Recommendation",
+        "returnType": "microsoft.windowsDefenderATP.api.PublicProductDto",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "name",
+      "sourceName": "name",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "vendor",
+      "sourceName": "vendor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "weaknesses",
+      "sourceName": "weaknesses",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "publicExploit",
+      "sourceName": "publicExploit",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "activeAlert",
+      "sourceName": "activeAlert",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "exposedMachines",
+      "sourceName": "exposedMachines",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "installedMachines",
+      "sourceName": "installedMachines",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "impactScore",
+      "sourceName": "impactScore",
+      "sourceType": "Edm.Single",
+      "logicalType": "number",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "precision": "single"
+      }
+    },
+    {
+      "name": "isNormalized",
+      "sourceName": "isNormalized",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "category",
+      "sourceName": "category",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "tags",
+      "sourceName": "tags",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:8c85a61a8d62c431d005ef9cd5553987e04883c304e9fb108b904cbd6e7374f9",
+    "arrow": "sha256:cc7d7e73e6031c32cb2c4d894f4664ab834013b2449d6e9b44dadcbcd460f2fb"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.083488Z",
+    "doNotEdit": true
+  }
+}

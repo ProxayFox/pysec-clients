@@ -1,0 +1,177 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.investigation.source",
+  "version": "1.0.0",
+  "title": "Investigation",
+  "description": "Canonical MDE source contract for the Investigation response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "Investigation",
+    "entitySet": "Investigations",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Investigations",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Investigation)",
+        "collection": true
+      },
+      {
+        "kind": "Action",
+        "name": "StartInvestigation",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.Investigation",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "InvestigationState": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Unknown",
+        "Terminated",
+        "SuccessfullyRemediated",
+        "Benign",
+        "Failed",
+        "PartiallyRemediated",
+        "Running",
+        "PendingApproval",
+        "PendingResource",
+        "Disabled",
+        "Queued",
+        "InnerFailure",
+        "PreexistingAlert",
+        "UnsupportedOs",
+        "UnsupportedAlertType",
+        "SuppressedAlert",
+        "PartiallyInvestigated",
+        "TerminatedByUser",
+        "TerminatedBySystem"
+      ],
+      "isFlags": true
+    }
+  },
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "startTime",
+      "sourceName": "startTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "endTime",
+      "sourceName": "endTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "state",
+      "sourceName": "state",
+      "sourceType": "microsoft.windowsDefenderATP.api.InvestigationState",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "InvestigationState",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "cancelledBy",
+      "sourceName": "cancelledBy",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "statusDetails",
+      "sourceName": "statusDetails",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "machineId",
+      "sourceName": "machineId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "computerDnsName",
+      "sourceName": "computerDnsName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "triggeringAlertId",
+      "sourceName": "triggeringAlertId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:08e26c6e46b3e14fd86994c500843be2912dc85c0405243e7aa19e774a20d989",
+    "arrow": "sha256:70cbc9ecd3d69880ea15b804edc7b123ee9028f599925ed3462177a27f47afea"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.080427Z",
+    "doNotEdit": true
+  }
+}

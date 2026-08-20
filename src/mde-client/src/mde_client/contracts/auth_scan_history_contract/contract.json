@@ -1,0 +1,230 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.auth-scan-history-contract.source",
+  "version": "1.0.0",
+  "title": "AuthScanHistoryContract",
+  "description": "Canonical MDE source contract for the AuthScanHistoryContract response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "AuthScanHistoryContract",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Override",
+        "name": "GetScanHistoryBySessionId",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.DeviceAuthenticatedScanDefinition)",
+        "returnType": "microsoft.windowsDefenderATP.api.AuthScanHistoryContract",
+        "collection": false
+      },
+      {
+        "kind": "Override",
+        "name": "GetScanHistoryByScanDefinitionId",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.DeviceAuthenticatedScanDefinition)",
+        "returnType": "microsoft.windowsDefenderATP.api.AuthScanHistoryContract",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "AuthenticatedScanStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Failure",
+        "Success",
+        "PartialSuccess"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {
+    "ScannedTargetResultContract": {
+      "sourceType": "microsoft.windowsDefenderATP.api.ScannedTargetResultContract",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "scanDuration",
+          "sourceName": "scanDuration",
+          "sourceType": "Edm.TimeOfDay",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "semantic": "time"
+          }
+        },
+        {
+          "name": "ip",
+          "sourceName": "ip",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "hostname",
+          "sourceName": "hostname",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "scannedDeviceDescription",
+          "sourceName": "scannedDeviceDescription",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "errorMessage",
+          "sourceName": "errorMessage",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "scanStatus",
+          "sourceName": "scanStatus",
+          "sourceType": "microsoft.windowsDefenderATP.api.AuthenticatedScanStatus",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "enumRef": "AuthenticatedScanStatus",
+          "enumRepresentation": "name"
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "orgId",
+      "sourceName": "orgId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "scanDefinitionId",
+      "sourceName": "scanDefinitionId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "sessionId",
+      "sourceName": "sessionId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "scannerId",
+      "sourceName": "scannerId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "numberOfSuccessfullyScannedTargets",
+      "sourceName": "numberOfSuccessfullyScannedTargets",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "numberOfTargets",
+      "sourceName": "numberOfTargets",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "scanStatus",
+      "sourceName": "scanStatus",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "generalErrorMessage",
+      "sourceName": "generalErrorMessage",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "scannedTargets",
+      "sourceName": "scannedTargets",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.ScannedTargetResultContract)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.ScannedTargetResultContract",
+        "ref": "ScannedTargetResultContract"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:b19856e58d44ba43e9331f848055baa7d8fe6c2596999e64490da2a0da67e8d0",
+    "arrow": "sha256:67671c46a8e1d18e4aec04ea588d5b4daa7193dccfaeacb2f198ef467f82ddfd"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.071468Z",
+    "doNotEdit": true
+  }
+}

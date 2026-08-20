@@ -21,8 +21,8 @@ Running
 -------
     pytest tests/mde_client/test_schema_validator.py -v
 
-The XML-based tests require the committed fixture:
-    tests/mde_client/fixtures/mde_metadata.xml
+The XML-based tests use the generator's committed metadata snapshot:
+    tools/mde-contract-gen/metadata/mde_metadata.xml
 
 If it is missing, run ``just schema-refresh`` first.
 """
@@ -37,21 +37,36 @@ from typing import Any
 import mde_client.schemas as schemas_pkg
 import pyarrow as pa
 import pytest
-from mde_contract import EDM_PA_TYPES, RUNTIME_NULLABLE_FIELD_OVERRIDES, to_const
+from mde_contract_gen.builder import to_const
+from mde_contract_gen.cli import DEFAULT_METADATA
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
-
-FIXTURE_XML = Path("tests/mde_client/fixtures/mde_metadata.xml")
+FIXTURE_XML = DEFAULT_METADATA
 
 # ── OData constants ───────────────────────────────────────────────────────────
 
 _MDE_NS = "http://docs.oasis-open.org/odata/ns/edm"
 _MDE_API_PREFIX = "microsoft.windowsDefenderATP.api."
 
-# Unpack just the pa.DataType half of each tuple — the str half is only needed
-# by the code generator, not by tests that compare actual Arrow types.
 _EDM_TO_PA: dict[str, pa.DataType] = {
-    edm: pa_type for edm, (pa_type, _) in EDM_PA_TYPES.items()
+    "Edm.String": pa.string(),
+    "Edm.Int16": pa.int16(),
+    "Edm.Int32": pa.int32(),
+    "Edm.Int64": pa.int64(),
+    "Edm.Boolean": pa.bool_(),
+    "Edm.Double": pa.float64(),
+    "Edm.Single": pa.float32(),
+    "Edm.Byte": pa.uint8(),
+    "Edm.SByte": pa.int8(),
+    "Edm.Guid": pa.string(),
+    "Edm.DateTimeOffset": pa.timestamp("us", tz="UTC"),
+    "Edm.Duration": pa.duration("us"),
+    "Edm.TimeOfDay": pa.time64("us"),
+    "Edm.Binary": pa.large_binary(),
+}
+
+RUNTIME_NULLABLE_FIELD_OVERRIDES = {
+    "AssetVulnerability": {"cvssScore"},
+    "DeltaAssetVulnerability": {"cvssScore"},
 }
 
 # ── Name derivation helpers ───────────────────────────────────────────────────

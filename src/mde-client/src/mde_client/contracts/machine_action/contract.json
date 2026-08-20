@@ -1,0 +1,699 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.machine-action.source",
+  "version": "1.0.0",
+  "title": "MachineAction",
+  "description": "Canonical MDE source contract for the MachineAction response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "MachineAction",
+    "entitySet": "MachineActions",
+    "boundFunction": "MachineActions",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.MachineAction)",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "MachineActions",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.MachineAction)",
+        "collection": true
+      },
+      {
+        "kind": "EntitySet",
+        "name": "MachineAction",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.MachineAction)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "MachineActions",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.MachineAction)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "LatestMachineActions",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.MachineAction)",
+        "collection": true
+      },
+      {
+        "kind": "Action",
+        "name": "Cancel",
+        "bindingType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "Isolate",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "RunAntiVirusScan",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "StopAndQuarantineFile",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "RunLiveResponse",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "RunCustomPlaybook",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "Unisolate",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "OffBoard",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "CollectInvestigationPackage",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "LogsCollection",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "RestrictCodeExecution",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "UnrestrictCodeExecution",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.MachineAction",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "CustomPlaybookActionTypes": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "PutFile",
+        "GetFile",
+        "RunPowerShell",
+        "RunScript"
+      ],
+      "isFlags": false
+    },
+    "CustomPlaybookCommandStatus": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Executing",
+        "Completed",
+        "Failed",
+        "PendingResource",
+        "Submitted",
+        "Created"
+      ],
+      "isFlags": false
+    },
+    "CustomPlaybookParams": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "FileName",
+        "Args",
+        "Path",
+        "ScriptName",
+        "IsExternalSource",
+        "FileUri",
+        "ScriptHash",
+        "ScriptSource"
+      ],
+      "isFlags": false
+    },
+    "KnownRequestSource": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Unspecified",
+        "PublicApi",
+        "Portal",
+        "MCAS",
+        "TVM",
+        "CustomDetection",
+        "BulkAction",
+        "ISG",
+        "NDR",
+        "EndpointConfigManagement",
+        "IncidentTasks",
+        "MDI",
+        "ActiveScan"
+      ],
+      "isFlags": false
+    },
+    "actionStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Pending",
+        "Cancelled",
+        "TimeOut",
+        "Failed",
+        "InProgress",
+        "Succeeded"
+      ],
+      "isFlags": false
+    },
+    "actionType": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Unknown",
+        "RequestSample",
+        "Block",
+        "RunAntiVirusScan",
+        "Offboard",
+        "RegenerateId",
+        "CollectInvestigationPackage",
+        "Isolate",
+        "Unisolate",
+        "StopAndQuarantineFile",
+        "RestrictCodeExecution",
+        "UnrestrictCodeExecution",
+        "LiveResponse",
+        "Troubleshoot",
+        "LogsCollection",
+        "TokenRefresh",
+        "EndpointConfigManagementCheckin",
+        "EnableActiveDirectoryUser",
+        "DisableActiveDirectoryUser",
+        "ResetPasswordActiveDirectoryUser",
+        "ImmuneActiveDirectoryCustomPlaybook"
+      ],
+      "isFlags": false
+    },
+    "fileIdentifierType": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Sha1",
+        "Sha256",
+        "Md5"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {
+    "RelatedFileInfo": {
+      "sourceType": "microsoft.windowsDefenderATP.api.RelatedFileInfo",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "fileIdentifier",
+          "sourceName": "fileIdentifier",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "fileIdentifierType",
+          "sourceName": "fileIdentifierType",
+          "sourceType": "microsoft.windowsDefenderATP.api.fileIdentifierType",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "enumRef": "fileIdentifierType",
+          "enumRepresentation": "name"
+        }
+      ]
+    },
+    "CustomPlaybookParameter": {
+      "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookParameter",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "key",
+          "sourceName": "key",
+          "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookParams",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "enumRef": "CustomPlaybookParams",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "value",
+          "sourceName": "value",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "CustomPlaybookCommand": {
+      "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookCommand",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "type",
+          "sourceName": "type",
+          "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookActionTypes",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "enumRef": "CustomPlaybookActionTypes",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "params",
+          "sourceName": "params",
+          "sourceType": "Collection(microsoft.windowsDefenderATP.api.CustomPlaybookParameter)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "object",
+            "nullable": true,
+            "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookParameter",
+            "ref": "CustomPlaybookParameter"
+          }
+        }
+      ]
+    },
+    "CustomPlaybookCommandResult": {
+      "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookCommandResult",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "index",
+          "sourceName": "index",
+          "sourceType": "Edm.Int32",
+          "logicalType": "integer",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "bitWidth": 32,
+            "signed": true
+          }
+        },
+        {
+          "name": "command",
+          "sourceName": "command",
+          "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookCommand",
+          "logicalType": "object",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "ref": "CustomPlaybookCommand"
+        },
+        {
+          "name": "startTime",
+          "sourceName": "startTime",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "endTime",
+          "sourceName": "endTime",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "commandStatus",
+          "sourceName": "commandStatus",
+          "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookCommandStatus",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "enumRef": "CustomPlaybookCommandStatus",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "errors",
+          "sourceName": "errors",
+          "sourceType": "Collection(Edm.String)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "string",
+            "nullable": true,
+            "sourceType": "Edm.String"
+          }
+        }
+      ]
+    },
+    "TroubleshootInfo": {
+      "sourceType": "microsoft.windowsDefenderATP.api.TroubleshootInfo",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "expirationUtc",
+          "sourceName": "expirationUtc",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "startTsModeUtc",
+          "sourceName": "startTsModeUtc",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "paramsJsonFormatVersion",
+          "sourceName": "paramsJsonFormatVersion",
+          "sourceType": "Edm.Int32",
+          "logicalType": "integer",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "bitWidth": 32,
+            "signed": true
+          }
+        },
+        {
+          "name": "state",
+          "sourceName": "state",
+          "sourceType": "Edm.Int32",
+          "logicalType": "integer",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "bitWidth": 32,
+            "signed": true
+          }
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.Guid",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true,
+      "format": {
+        "semantic": "uuid"
+      }
+    },
+    {
+      "name": "type",
+      "sourceName": "type",
+      "sourceType": "microsoft.windowsDefenderATP.api.actionType",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "actionType",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "title",
+      "sourceName": "title",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "requestor",
+      "sourceName": "requestor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "requestorComment",
+      "sourceName": "requestorComment",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "status",
+      "sourceName": "status",
+      "sourceType": "microsoft.windowsDefenderATP.api.actionStatus",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "actionStatus",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "machineId",
+      "sourceName": "machineId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "computerDnsName",
+      "sourceName": "computerDnsName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "relatedFileInfo",
+      "sourceName": "relatedFileInfo",
+      "sourceType": "microsoft.windowsDefenderATP.api.RelatedFileInfo",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "RelatedFileInfo"
+    },
+    {
+      "name": "creationDateTimeUtc",
+      "sourceName": "creationDateTimeUtc",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastUpdateDateTimeUtc",
+      "sourceName": "lastUpdateDateTimeUtc",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "cancellationRequestor",
+      "sourceName": "cancellationRequestor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "cancellationComment",
+      "sourceName": "cancellationComment",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "cancellationDateTimeUtc",
+      "sourceName": "cancellationDateTimeUtc",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "errorHResult",
+      "sourceName": "errorHResult",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "scope",
+      "sourceName": "scope",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "commands",
+      "sourceName": "commands",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.CustomPlaybookCommandResult)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.CustomPlaybookCommandResult",
+        "ref": "CustomPlaybookCommandResult"
+      }
+    },
+    {
+      "name": "troubleshootInfo",
+      "sourceName": "troubleshootInfo",
+      "sourceType": "microsoft.windowsDefenderATP.api.TroubleshootInfo",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "TroubleshootInfo"
+    },
+    {
+      "name": "externalId",
+      "sourceName": "externalId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "requestSource",
+      "sourceName": "requestSource",
+      "sourceType": "microsoft.windowsDefenderATP.api.KnownRequestSource",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "KnownRequestSource",
+      "enumRepresentation": "name"
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:1197d8b293bc7ab2b190a6654d3c91f9764552b38229c26007b3cd137da81359",
+    "arrow": "sha256:211fbafa9664463e9d9375e392872058106e43bafc8d380b557c2f2b2b187af0"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.082248Z",
+    "doNotEdit": true
+  }
+}

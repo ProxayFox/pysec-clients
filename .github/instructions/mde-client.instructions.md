@@ -14,7 +14,7 @@ Follow the patterns established in the existing code. Reference files:
 - [endpoints/machines.py](../../src/mde-client/src/mde_client/endpoints/machines.py) — endpoint class, query models, result wrappers, pagination, and OData filters.
 - [viaFiles.py](../../src/mde-client/src/mde_client/viaFiles.py) — async export download, decompression, NDJSON parsing, and batching.
 - [README.md](../../src/mde-client/README.md) — current public package behavior and supported endpoint surface.
-- [mde_contract.py](../../scripts/mde_contract.py) — schema generation workflow and `quality-schema` handoff.
+- [mde-contract-gen](../../tools/mde-contract-gen/) — standalone canonical contract generation workflow.
 
 ## Adding or changing an endpoint
 
@@ -44,5 +44,8 @@ Follow the patterns established in the existing code. Reference files:
 - Preserve Defender API field names in query models when the endpoint intentionally mirrors upstream filters, for example `healthStatus`.
 - File-export endpoints should reuse `ViaFiles`; do not reimplement async download, decompression, or NDJSON parsing inside endpoint modules.
 - Use a module-level logger when needed: `log = logging.getLogger(__name__)`.
-- If schema or generated model surfaces need regeneration, prefer `just schema-build`, `just schema-build-dry`, `just schema-refresh`, or `just schema-refresh-dry` over manual bulk edits.
+- If contract, schema, or generated model surfaces need regeneration, use
+  `just contracts-generate`, `just contracts-check`,
+  `just contracts-doctor`, and `just quality-contracts` instead of manual
+  bulk edits.
 - Keep `__init__.py` exports minimal and maintain `__all__`.

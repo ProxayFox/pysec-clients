@@ -1,0 +1,21 @@
+{
+  "selection": {
+    "rootType": "AuthScanHistoryContract",
+    "operations": [
+      {
+        "kind": "Override",
+        "name": "GetScanHistoryBySessionId",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.DeviceAuthenticatedScanDefinition)",
+        "returnType": "microsoft.windowsDefenderATP.api.AuthScanHistoryContract",
+        "collection": false
+      },
+      {
+        "kind": "Override",
+        "name": "GetScanHistoryByScanDefinitionId",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.DeviceAuthenticatedScanDefinition)",
+        "returnType": "microsoft.windowsDefenderATP.api.AuthScanHistoryContract",
+        "collection": false
+      }
+    ]
+  }
+}

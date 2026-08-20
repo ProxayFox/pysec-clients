@@ -12,7 +12,7 @@ import httpx
 import yaml
 
 ROOT = Path("/workspaces/pysec-clients")
-XML_PATH = ROOT / "build" / "mde_metadata.xml"
+XML_PATH = ROOT / "tools" / "mde-contract-gen" / "metadata" / "mde_metadata.xml"
 ENDPOINTS_DIR = ROOT / "src" / "mde-client" / "src" / "mde_client" / "endpoints"
 TODO_IGNORE_PATH = ROOT / "scripts" / "mde_todo_ignore.yaml"
 NS = {"edm": "http://docs.oasis-open.org/odata/ns/edm"}
@@ -677,7 +677,7 @@ def main() -> None:
     lines.append("# MDE Client — Endpoint Coverage TODO")
     lines.append("")
     lines.append(
-        "> Auto-generated gap analysis comparing `build/mde_metadata.xml` against `src/mde-client/src/mde_client/endpoints/`"
+        "> Auto-generated gap analysis comparing `tools/mde-contract-gen/metadata/mde_metadata.xml` against `src/mde-client/src/mde_client/endpoints/`"
     )
     lines.append(f"> Generated: {TODAY}")
     lines.append("")
@@ -796,7 +796,9 @@ def main() -> None:
         for singleton in meta["singletons"]:
             lines.append(f"- {singleton.attrib.get('Name', '')}")
     else:
-        lines.append("- None present in `build/mde_metadata.xml`.")
+        lines.append(
+            "- None present in `tools/mde-contract-gen/metadata/mde_metadata.xml`."
+        )
     lines.append("")
 
     output: str = "\n".join(lines)

@@ -19,6 +19,9 @@ def fake_app(monkeypatch: pytest.MonkeyPatch) -> MagicMock:
 
 
 class TestTokenAcquisition:
+    def test_scopes_follow_msal_list_contract(self) -> None:
+        assert isinstance(MSALAuth._SCOPES, list)
+
     def test_returns_access_token(self, fake_app: MagicMock) -> None:
         fake_app.acquire_token_for_client.return_value = {"access_token": "tok-123"}
         auth = MSALAuth("tenant", "cid", "sec")

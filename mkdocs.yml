@@ -86,6 +86,7 @@ nav:
           - Results wrappers: mde_client/reference/results.md
           - Query models: mde_client/reference/queries.md
           - ViaFiles: mde_client/reference/via-files.md
+          - Canonical contracts: mde_client/reference/contracts.md
           - Endpoints:
               - Index: mde_client/reference/endpoints/index.md
               - advanced_queries: mde_client/reference/endpoints/advanced-queries.md
@@ -121,3 +122,4 @@ nav:
           - How export-backed endpoints work: mde_client/explanation/export-backed-endpoints.md
           - Why the client supports dependency injection: mde_client/explanation/dependency-injection.md
           - Result materialization model: mde_client/explanation/result-materialization.md
+          - Canonical MDE source contracts: mde_client/explanation/canonical-contracts.md
