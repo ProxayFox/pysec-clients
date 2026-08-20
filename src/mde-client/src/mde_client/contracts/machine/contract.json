@@ -1,0 +1,678 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.machine.source",
+  "version": "1.0.0",
+  "title": "Machine",
+  "description": "Canonical MDE source contract for the Machine response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "Machine",
+    "entitySet": "Machines",
+    "boundFunction": "UnTaggedMachines",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [
+      "logOnUsers",
+      "alerts",
+      "machineActions",
+      "vulnerabilities",
+      "recommendations",
+      "software"
+    ],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Machines",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "UnTaggedMachines",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "BigPageSize",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "FindByTag",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "FindByIp",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Machine",
+        "bindingType": "microsoft.windowsDefenderATP.api.Alert",
+        "returnType": "microsoft.windowsDefenderATP.api.Machine",
+        "collection": false
+      },
+      {
+        "kind": "Function",
+        "name": "Machines",
+        "bindingType": "microsoft.windowsDefenderATP.api.File",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Machines",
+        "bindingType": "microsoft.windowsDefenderATP.api.Domain",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Machines",
+        "bindingType": "microsoft.windowsDefenderATP.api.User",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Action",
+        "name": "Tags",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.Machine",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "AddOrRemoveTagForMultipleMachines",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "collection": true
+      },
+      {
+        "kind": "Action",
+        "name": "SetDeviceValue",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.Machine",
+        "collection": false
+      },
+      {
+        "kind": "Action",
+        "name": "SetExclusion",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "microsoft.windowsDefenderATP.api.Machine",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "DeviceManagedBy": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Unknown",
+        "Intune",
+        "SystemCenterConfigurationManager",
+        "MicrosoftDefenderForEndpoint"
+      ],
+      "isFlags": false
+    },
+    "DeviceManagedByStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Unknown",
+        "Success",
+        "Error"
+      ],
+      "isFlags": false
+    },
+    "DeviceValue": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Normal",
+        "Low",
+        "High"
+      ],
+      "isFlags": false
+    },
+    "ExclusionReason": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "Other",
+        "InactiveDevice",
+        "DuplicateDevice",
+        "DeviceDoesNotExist",
+        "DeviceOutOfScope"
+      ],
+      "isFlags": false
+    },
+    "ExposureLevel": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "None",
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "isFlags": false
+    },
+    "InterfaceType": {
+      "underlyingType": "Edm.Int64",
+      "members": [
+        "Unknown",
+        "Other",
+        "Ethernet",
+        "TokenRing",
+        "PPP",
+        "SoftwareLoopback",
+        "ATM",
+        "IEEE80211",
+        "Tunnel",
+        "IEEE1394"
+      ],
+      "isFlags": false
+    },
+    "IpInterfaceOperationalStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Up",
+        "Down",
+        "Testing",
+        "Unknown",
+        "Dormant",
+        "Present",
+        "LowerLayerDown"
+      ],
+      "isFlags": false
+    },
+    "MachineHealthStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Active",
+        "Inactive",
+        "ImpairedCommunication",
+        "NoSensorData",
+        "NoSensorDataImpairedCommunication",
+        "Unknown"
+      ],
+      "isFlags": false
+    },
+    "OnboardingStatus": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "InsufficientInfo",
+        "Onboarded",
+        "CanBeOnboarded",
+        "Unsupported"
+      ],
+      "isFlags": false
+    },
+    "RiskScore": {
+      "underlyingType": "Edm.Byte",
+      "members": [
+        "None",
+        "Informational",
+        "Low",
+        "Medium",
+        "High"
+      ],
+      "isFlags": false
+    },
+    "vmCloudProvider": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Unknown",
+        "Azure"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {
+    "MachineIpAddress": {
+      "sourceType": "microsoft.windowsDefenderATP.api.MachineIpAddress",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "ipAddress",
+          "sourceName": "ipAddress",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "macAddress",
+          "sourceName": "macAddress",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "type",
+          "sourceName": "type",
+          "sourceType": "microsoft.windowsDefenderATP.api.InterfaceType",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "enumRef": "InterfaceType",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "operationalStatus",
+          "sourceName": "operationalStatus",
+          "sourceType": "microsoft.windowsDefenderATP.api.IpInterfaceOperationalStatus",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "enumRef": "IpInterfaceOperationalStatus",
+          "enumRepresentation": "name"
+        }
+      ]
+    },
+    "VmMetadata": {
+      "sourceType": "microsoft.windowsDefenderATP.api.VmMetadata",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "vmId",
+          "sourceName": "vmId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "cloudProvider",
+          "sourceName": "cloudProvider",
+          "sourceType": "microsoft.windowsDefenderATP.api.vmCloudProvider",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "enumRef": "vmCloudProvider",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "resourceId",
+          "sourceName": "resourceId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "subscriptionId",
+          "sourceName": "subscriptionId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "mergedIntoMachineId",
+      "sourceName": "mergedIntoMachineId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "isPotentialDuplication",
+      "sourceName": "isPotentialDuplication",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "isExcluded",
+      "sourceName": "isExcluded",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "exclusionReason",
+      "sourceName": "exclusionReason",
+      "sourceType": "microsoft.windowsDefenderATP.api.ExclusionReason",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "ExclusionReason",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "computerDnsName",
+      "sourceName": "computerDnsName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "firstSeen",
+      "sourceName": "firstSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastSeen",
+      "sourceName": "lastSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "osPlatform",
+      "sourceName": "osPlatform",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "osProcessor",
+      "sourceName": "osProcessor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "version",
+      "sourceName": "version",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "lastIpAddress",
+      "sourceName": "lastIpAddress",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "lastExternalIpAddress",
+      "sourceName": "lastExternalIpAddress",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "agentVersion",
+      "sourceName": "agentVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "osBuild",
+      "sourceName": "osBuild",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "healthStatus",
+      "sourceName": "healthStatus",
+      "sourceType": "microsoft.windowsDefenderATP.api.MachineHealthStatus",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "MachineHealthStatus",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "deviceValue",
+      "sourceName": "deviceValue",
+      "sourceType": "microsoft.windowsDefenderATP.api.DeviceValue",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "DeviceValue",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "rbacGroupId",
+      "sourceName": "rbacGroupId",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "rbacGroupName",
+      "sourceName": "rbacGroupName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "ipAddresses",
+      "sourceName": "ipAddresses",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.MachineIpAddress)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.MachineIpAddress",
+        "ref": "MachineIpAddress"
+      }
+    },
+    {
+      "name": "riskScore",
+      "sourceName": "riskScore",
+      "sourceType": "microsoft.windowsDefenderATP.api.RiskScore",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "RiskScore",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "exposureLevel",
+      "sourceName": "exposureLevel",
+      "sourceType": "microsoft.windowsDefenderATP.api.ExposureLevel",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "ExposureLevel",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "isAadJoined",
+      "sourceName": "isAadJoined",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "aadDeviceId",
+      "sourceName": "aadDeviceId",
+      "sourceType": "Edm.Guid",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "semantic": "uuid"
+      }
+    },
+    {
+      "name": "machineTags",
+      "sourceName": "machineTags",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "vmMetadata",
+      "sourceName": "vmMetadata",
+      "sourceType": "microsoft.windowsDefenderATP.api.VmMetadata",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "VmMetadata"
+    },
+    {
+      "name": "onboardingStatus",
+      "sourceName": "onboardingStatus",
+      "sourceType": "microsoft.windowsDefenderATP.api.OnboardingStatus",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "OnboardingStatus",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "osArchitecture",
+      "sourceName": "osArchitecture",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "managedBy",
+      "sourceName": "managedBy",
+      "sourceType": "microsoft.windowsDefenderATP.api.DeviceManagedBy",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "DeviceManagedBy",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "managedByStatus",
+      "sourceName": "managedByStatus",
+      "sourceType": "microsoft.windowsDefenderATP.api.DeviceManagedByStatus",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "DeviceManagedByStatus",
+      "enumRepresentation": "name"
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:bc90e3557016157b3c0ee2611820daa704af2acd6cd753fc3c77574811d2699f",
+    "arrow": "sha256:973c6b2c8d95a82f43db263762065c9448c84532d002655a146536e70cf6c509"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.081531Z",
+    "doNotEdit": true
+  }
+}

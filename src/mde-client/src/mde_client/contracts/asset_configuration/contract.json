@@ -1,0 +1,208 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.asset-configuration.source",
+  "version": "1.0.0",
+  "title": "AssetConfiguration",
+  "description": "Canonical MDE source contract for the AssetConfiguration response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "AssetConfiguration",
+    "boundFunction": "SecureConfigurationsAssessmentByMachine",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.AssetConfiguration)",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "SecureConfigurationsAssessmentByMachine",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.AssetConfiguration)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "deviceId",
+      "sourceName": "deviceId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "rbacGroupId",
+      "sourceName": "rbacGroupId",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "rbacGroupName",
+      "sourceName": "rbacGroupName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "deviceName",
+      "sourceName": "deviceName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "osPlatform",
+      "sourceName": "osPlatform",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "osVersion",
+      "sourceName": "osVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "timestamp",
+      "sourceName": "timestamp",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "configurationId",
+      "sourceName": "configurationId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "configurationCategory",
+      "sourceName": "configurationCategory",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "configurationSubcategory",
+      "sourceName": "configurationSubcategory",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "configurationImpact",
+      "sourceName": "configurationImpact",
+      "sourceType": "Edm.Double",
+      "logicalType": "number",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "precision": "double"
+      }
+    },
+    {
+      "name": "isCompliant",
+      "sourceName": "isCompliant",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "isApplicable",
+      "sourceName": "isApplicable",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "isExpectedUserImpact",
+      "sourceName": "isExpectedUserImpact",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "configurationName",
+      "sourceName": "configurationName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendationReference",
+      "sourceName": "recommendationReference",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:de7f2550d2dc6380b2a74094f46acf2da077b45c09f37e5f4f73aade81b706b7",
+    "arrow": "sha256:28454df552a0b5dd8c3b7c3e67cd6f5f818f8f7f67ad0b9d4fd9f7dad7fe44aa"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.069920Z",
+    "doNotEdit": true
+  }
+}

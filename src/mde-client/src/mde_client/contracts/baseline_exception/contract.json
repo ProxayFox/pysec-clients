@@ -1,0 +1,348 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.baseline-exception.source",
+  "version": "1.0.0",
+  "title": "BaselineException",
+  "description": "Canonical MDE source contract for the BaselineException response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "BaselineException",
+    "entitySet": "BaselineExceptions",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "BaselineExceptions",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.BaselineException)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {
+    "BaselineConfigurationDto": {
+      "sourceType": "microsoft.windowsDefenderATP.api.BaselineConfigurationDto",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "id",
+          "sourceName": "id",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "constraints": {
+            "maxLength": 50
+          }
+        },
+        {
+          "name": "title",
+          "sourceName": "title",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "constraints": {
+            "maxLength": 300
+          }
+        }
+      ]
+    },
+    "BaselineExceptionDeviceDto": {
+      "sourceType": "microsoft.windowsDefenderATP.api.BaselineExceptionDeviceDto",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "id",
+          "sourceName": "id",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "constraints": {
+            "maxLength": 50
+          }
+        },
+        {
+          "name": "name",
+          "sourceName": "name",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "constraints": {
+            "maxLength": 200
+          }
+        },
+        {
+          "name": "rbacGroupId",
+          "sourceName": "rbacGroupId",
+          "sourceType": "Edm.Int32",
+          "logicalType": "integer",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "bitWidth": 32,
+            "signed": true
+          }
+        }
+      ]
+    },
+    "UserDto": {
+      "sourceType": "microsoft.windowsDefenderATP.api.UserDto",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "id",
+          "sourceName": "id",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "email",
+          "sourceName": "email",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "approvedBy",
+      "sourceName": "approvedBy",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "justification",
+      "sourceName": "justification",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "dueDate",
+      "sourceName": "dueDate",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "description",
+      "sourceName": "description",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "status",
+      "sourceName": "status",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "isActive",
+      "sourceName": "isActive",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "softwareName",
+      "sourceName": "softwareName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "softwareVersion",
+      "sourceName": "softwareVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "benchmarkName",
+      "sourceName": "benchmarkName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "benchmarkVersion",
+      "sourceName": "benchmarkVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "complianceLevel",
+      "sourceName": "complianceLevel",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "configurations",
+      "sourceName": "configurations",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.BaselineConfigurationDto)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.BaselineConfigurationDto",
+        "ref": "BaselineConfigurationDto"
+      }
+    },
+    {
+      "name": "devices",
+      "sourceName": "devices",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.BaselineExceptionDeviceDto)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.BaselineExceptionDeviceDto",
+        "ref": "BaselineExceptionDeviceDto"
+      }
+    },
+    {
+      "name": "lastModifiedOn",
+      "sourceName": "lastModifiedOn",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastModifiedBy",
+      "sourceName": "lastModifiedBy",
+      "sourceType": "microsoft.windowsDefenderATP.api.UserDto",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "UserDto"
+    },
+    {
+      "name": "title",
+      "sourceName": "title",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "createdOn",
+      "sourceName": "createdOn",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "requester",
+      "sourceName": "requester",
+      "sourceType": "microsoft.windowsDefenderATP.api.UserDto",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "UserDto"
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:e61673283b1a4ca163a27d5887d4b24f7df9b0740a8bf2a91495fc3c752c309e",
+    "arrow": "sha256:2e817c97017e4bfe6e76d934a4d6d3aa8412ae2e23f9d0a98a1345318cd2b756"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.072143Z",
+    "doNotEdit": true
+  }
+}

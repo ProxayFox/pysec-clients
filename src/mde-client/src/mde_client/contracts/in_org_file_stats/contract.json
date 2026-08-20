@@ -1,0 +1,172 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.in-org-file-stats.source",
+  "version": "1.0.0",
+  "title": "InOrgFileStats",
+  "description": "Canonical MDE source contract for the InOrgFileStats response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "InOrgFileStats",
+    "boundFunction": "Stats",
+    "returnType": "microsoft.windowsDefenderATP.api.InOrgFileStats",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "Stats",
+        "bindingType": "microsoft.windowsDefenderATP.api.File",
+        "returnType": "microsoft.windowsDefenderATP.api.InOrgFileStats",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "sha1",
+      "sourceName": "sha1",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "orgPrevalence",
+      "sourceName": "orgPrevalence",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "organizationPrevalence",
+      "sourceName": "organizationPrevalence",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "orgFirstSeen",
+      "sourceName": "orgFirstSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "orgLastSeen",
+      "sourceName": "orgLastSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "globalPrevalence",
+      "sourceName": "globalPrevalence",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "globallyPrevalence",
+      "sourceName": "globallyPrevalence",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "globalFirstObserved",
+      "sourceName": "globalFirstObserved",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "globalLastObserved",
+      "sourceName": "globalLastObserved",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "topFileNames",
+      "sourceName": "topFileNames",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:3868db1898ea06036e9866ad4169aa0c8947edb045773de6f2ec7e0003da097a",
+    "arrow": "sha256:1d4427840d893f456128fad64aaa9bb04e4d21a30522b7d7224ded6a08f83998"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.077794Z",
+    "doNotEdit": true
+  }
+}

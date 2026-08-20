@@ -1,0 +1,150 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.public-asset-dto.source",
+  "version": "1.0.0",
+  "title": "PublicAssetDto",
+  "description": "Canonical MDE source contract for the PublicAssetDto response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "PublicAssetDto",
+    "boundFunction": "MachineReferences",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.PublicAssetDto)",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "MachineReferences",
+        "bindingType": "microsoft.windowsDefenderATP.api.Vulnerability",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.PublicAssetDto)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "MachineReferences",
+        "bindingType": "microsoft.windowsDefenderATP.api.Recommendation",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.PublicAssetDto)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "MachineReferences",
+        "bindingType": "microsoft.windowsDefenderATP.api.RemediationTask",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.PublicAssetDto)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "MachineReferences",
+        "bindingType": "microsoft.windowsDefenderATP.api.Software",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.PublicAssetDto)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "computerDnsName",
+      "sourceName": "computerDnsName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "osPlatform",
+      "sourceName": "osPlatform",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "assetCriticalityLevel",
+      "sourceName": "assetCriticalityLevel",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "tags",
+      "sourceName": "tags",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "rbacGroupName",
+      "sourceName": "rbacGroupName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "rbacGroupId",
+      "sourceName": "rbacGroupId",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:3e021fe548aa9d57ca0e63302e6b25883265513e89d45e7a00597161506465ac",
+    "arrow": "sha256:a9bcc6320d2f5f1c76ae07e7aa9242c118382c941109386dd2389832b216457b"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.082836Z",
+    "doNotEdit": true
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.in-org-ip-stats.source",
+  "version": "1.0.0",
+  "title": "InOrgIPStats",
+  "description": "Canonical MDE source contract for the InOrgIPStats response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "InOrgIPStats",
+    "boundFunction": "Stats",
+    "returnType": "microsoft.windowsDefenderATP.api.InOrgIPStats",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "Stats",
+        "bindingType": "microsoft.windowsDefenderATP.api.Ip",
+        "returnType": "microsoft.windowsDefenderATP.api.InOrgIPStats",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "ipAddress",
+      "sourceName": "ipAddress",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "orgPrevalence",
+      "sourceName": "orgPrevalence",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "organizationPrevalence",
+      "sourceName": "organizationPrevalence",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "orgFirstSeen",
+      "sourceName": "orgFirstSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "orgLastSeen",
+      "sourceName": "orgLastSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:82d8a377b39ebfcd4a157230d08ebe58282574804d61e593b8f18e08e216ed4b",
+    "arrow": "sha256:ee9ac56112746587d4555437b4c66be9487d7f0e5e48e9b17b35ee583b4463c8"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.078042Z",
+    "doNotEdit": true
+  }
+}

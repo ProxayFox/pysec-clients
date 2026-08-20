@@ -1,0 +1,263 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.baseline-profile.source",
+  "version": "1.0.0",
+  "title": "BaselineProfile",
+  "description": "Canonical MDE source contract for the BaselineProfile response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "BaselineProfile",
+    "entitySet": "BaselineProfiles",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "BaselineProfiles",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.BaselineProfile)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "name",
+      "sourceName": "name",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "description",
+      "sourceName": "description",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "benchmark",
+      "sourceName": "benchmark",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "version",
+      "sourceName": "version",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "operatingSystem",
+      "sourceName": "operatingSystem",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "operatingSystemVersion",
+      "sourceName": "operatingSystemVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "status",
+      "sourceName": "status",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "complianceLevel",
+      "sourceName": "complianceLevel",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "settingsNumber",
+      "sourceName": "settingsNumber",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "createdBy",
+      "sourceName": "createdBy",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "lastUpdatedBy",
+      "sourceName": "lastUpdatedBy",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "createdOnTimeOffset",
+      "sourceName": "createdOnTimeOffset",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastUpdateTimeOffset",
+      "sourceName": "lastUpdateTimeOffset",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "passedDevices",
+      "sourceName": "passedDevices",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "totalDevices",
+      "sourceName": "totalDevices",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "rbacGroupIdsProfileScope",
+      "sourceName": "rbacGroupIdsProfileScope",
+      "sourceType": "Collection(Edm.Int32)",
+      "logicalType": "array",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "items": {
+        "logicalType": "integer",
+        "nullable": true,
+        "sourceType": "Edm.Int32",
+        "constraints": {
+          "bitWidth": 32,
+          "signed": true
+        }
+      }
+    },
+    {
+      "name": "rbacGroupNamesProfileScope",
+      "sourceName": "rbacGroupNamesProfileScope",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "deviceTagsProfileScope",
+      "sourceName": "deviceTagsProfileScope",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:dde3580818ba22c976639187fc2d516534bdde4ef65e5d734e7a7be4743f425e",
+    "arrow": "sha256:8330f56b9cd42fa905c4d3148d6e4b81cd20eb0079423c022de873bc188a8fc4"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.072562Z",
+    "doNotEdit": true
+  }
+}

@@ -1,0 +1,148 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.dlp-machine.source",
+  "version": "1.0.0",
+  "title": "DlpMachine",
+  "description": "Canonical MDE source contract for the DlpMachine response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "DlpMachine",
+    "boundFunction": "Dlp",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.DlpMachine)",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "Dlp",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.DlpMachine)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "MachineConfigurationStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Valid",
+        "UnsupportedOs",
+        "InactiveAV",
+        "NotificationsDisabled",
+        "MissingUpdate"
+      ],
+      "isFlags": false
+    },
+    "MachineHealthStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Active",
+        "Inactive",
+        "ImpairedCommunication",
+        "NoSensorData",
+        "NoSensorDataImpairedCommunication",
+        "Unknown"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "computerDnsName",
+      "sourceName": "computerDnsName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "healthStatus",
+      "sourceName": "healthStatus",
+      "sourceType": "microsoft.windowsDefenderATP.api.MachineHealthStatus",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "MachineHealthStatus",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "configStatus",
+      "sourceName": "configStatus",
+      "sourceType": "microsoft.windowsDefenderATP.api.MachineConfigurationStatus",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "MachineConfigurationStatus",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "lastSeen",
+      "sourceName": "lastSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "osPlatform",
+      "sourceName": "osPlatform",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "version",
+      "sourceName": "version",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:27ff7f7cf848a101cbf58d38305bd3ffc8f2532b5ef96cbb5d64e8e9737360d4",
+    "arrow": "sha256:f2c61d39bfac11136862c421352ad0bed261424a983c52e6c709b4cb9ddb7718"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.076448Z",
+    "doNotEdit": true
+  }
+}

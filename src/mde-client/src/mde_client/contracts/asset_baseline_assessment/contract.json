@@ -1,0 +1,252 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.asset-baseline-assessment.source",
+  "version": "1.0.0",
+  "title": "AssetBaselineAssessment",
+  "description": "Canonical MDE source contract for the AssetBaselineAssessment response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "AssetBaselineAssessment",
+    "boundFunction": "BaselineComplianceAssessmentByMachine",
+    "returnType": "microsoft.windowsDefenderATP.api.AssetBaselineAssessment",
+    "keys": [],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "BaselineComplianceAssessmentByMachine",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "microsoft.windowsDefenderATP.api.AssetBaselineAssessment",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "configurationId",
+      "sourceName": "configurationId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "deviceId",
+      "sourceName": "deviceId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "deviceName",
+      "sourceName": "deviceName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "profileId",
+      "sourceName": "profileId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "osPlatform",
+      "sourceName": "osPlatform",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "osVersion",
+      "sourceName": "osVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "rbacGroupId",
+      "sourceName": "rbacGroupId",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "rbacGroupName",
+      "sourceName": "rbacGroupName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "isApplicable",
+      "sourceName": "isApplicable",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "isCompliant",
+      "sourceName": "isCompliant",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "dataCollectionTimeOffset",
+      "sourceName": "dataCollectionTimeOffset",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "complianceCalculationTimeOffset",
+      "sourceName": "complianceCalculationTimeOffset",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "recommendedValue",
+      "sourceName": "recommendedValue",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "currentValue",
+      "sourceName": "currentValue",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "rawValue",
+      "sourceName": "rawValue",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "source",
+      "sourceName": "source",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "isExempt",
+      "sourceName": "isExempt",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "complianceEvaluationDetails",
+      "sourceName": "complianceEvaluationDetails",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:126a791b7b35c5da6d9bec3120761f7961c8dbd92edf1df90123f7a39100c5c9",
+    "arrow": "sha256:2d7fdf98518234baedf442713c2ec22dcc1cdc995dcce7c13379e5695d41e6f2"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.068995Z",
+    "doNotEdit": true
+  }
+}

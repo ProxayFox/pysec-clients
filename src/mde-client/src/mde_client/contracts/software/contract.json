@@ -1,0 +1,267 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.software.source",
+  "version": "1.0.0",
+  "title": "Software",
+  "description": "Canonical MDE source contract for the Software response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "Software",
+    "entitySet": "Software",
+    "boundFunction": "Software",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.Software)",
+    "keys": [],
+    "excludedNavigationProperties": [
+      "vulnerabilities"
+    ],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Software",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Software)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Software",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Software)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {
+    "PublicDistributionDto": {
+      "sourceType": "microsoft.windowsDefenderATP.api.PublicDistributionDto",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "version",
+          "sourceName": "version",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "installations",
+          "sourceName": "installations",
+          "sourceType": "Edm.Int64",
+          "logicalType": "integer",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "bitWidth": 64,
+            "signed": true
+          },
+          "wireHints": {
+            "jsSafeInteger": false,
+            "recommendedApiRepresentation": "string"
+          }
+        },
+        {
+          "name": "vulnerabilities",
+          "sourceName": "vulnerabilities",
+          "sourceType": "Edm.Int64",
+          "logicalType": "integer",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "bitWidth": 64,
+            "signed": true
+          },
+          "wireHints": {
+            "jsSafeInteger": false,
+            "recommendedApiRepresentation": "string"
+          }
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "name",
+      "sourceName": "name",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "vendor",
+      "sourceName": "vendor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "weaknesses",
+      "sourceName": "weaknesses",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "publicExploit",
+      "sourceName": "publicExploit",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "activeAlert",
+      "sourceName": "activeAlert",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "exposedMachines",
+      "sourceName": "exposedMachines",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "installedMachines",
+      "sourceName": "installedMachines",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "impactScore",
+      "sourceName": "impactScore",
+      "sourceType": "Edm.Single",
+      "logicalType": "number",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "precision": "single"
+      }
+    },
+    {
+      "name": "isNormalized",
+      "sourceName": "isNormalized",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "category",
+      "sourceName": "category",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "tags",
+      "sourceName": "tags",
+      "sourceType": "Collection(Edm.String)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "string",
+        "nullable": true,
+        "sourceType": "Edm.String"
+      }
+    },
+    {
+      "name": "distributions",
+      "sourceName": "distributions",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.PublicDistributionDto)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.PublicDistributionDto",
+        "ref": "PublicDistributionDto"
+      }
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:88af8121b6ff69eb7a1b27ece81b8bffb8fc38909e6e1caf13c4551d96592d39",
+    "arrow": "sha256:4e3cb7ea3b60bb4c27ebd54b2cdecd4c43cdd149649dd8b854c5a6a6ea24c599"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.085353Z",
+    "doNotEdit": true
+  }
+}

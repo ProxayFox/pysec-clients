@@ -1,0 +1,133 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.library-files.source",
+  "version": "1.0.0",
+  "title": "LibraryFiles",
+  "description": "Canonical MDE source contract for the LibraryFiles response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "LibraryFiles",
+    "entitySet": "LibraryFiles",
+    "keys": [
+      "fileName"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "LibraryFiles",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.LibraryFiles)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "fileName",
+      "sourceName": "fileName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "sha256",
+      "sourceName": "sha256",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "description",
+      "sourceName": "description",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "creationTime",
+      "sourceName": "creationTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastUpdatedTime",
+      "sourceName": "lastUpdatedTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "createdBy",
+      "sourceName": "createdBy",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "hasParameters",
+      "sourceName": "hasParameters",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "parametersDescription",
+      "sourceName": "parametersDescription",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:1aab417ec95dd7d24fda4c7f505a4a2c77eac20330069a394ec333de09f61c32",
+    "arrow": "sha256:68e755093500d9fa6867e4e5567f8bfeed259bab029b725bec694cedd3c6eb30"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.080838Z",
+    "doNotEdit": true
+  }
+}

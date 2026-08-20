@@ -1,0 +1,339 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.device-group.source",
+  "version": "1.0.0",
+  "title": "DeviceGroup",
+  "description": "Canonical MDE source contract for the DeviceGroup response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "DeviceGroup",
+    "entitySet": "DeviceGroups",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "DeviceGroups",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.DeviceGroup)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "AutomationLevelEnum": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "NoAutomatedResponse",
+        "SemiRequireApprovalForAllFolders",
+        "SemiRequireApprovalForNonTempFolders",
+        "SemiRequireApprovalForCoreFolders",
+        "FullRemediateThreatsAutomatically"
+      ],
+      "isFlags": false
+    },
+    "OperatorType": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "StartsWith",
+        "EndsWith",
+        "Equals",
+        "Contains",
+        "In"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {
+    "AadUsersGroup": {
+      "sourceType": "microsoft.windowsDefenderATP.api.AadUsersGroup",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "displayName",
+          "sourceName": "displayName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "id",
+          "sourceName": "id",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "DeviceGroupPropertyCondition": {
+      "sourceType": "microsoft.windowsDefenderATP.api.DeviceGroupPropertyCondition",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "condition",
+          "sourceName": "condition",
+          "sourceType": "microsoft.windowsDefenderATP.api.OperatorType",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "enumRef": "OperatorType",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "value",
+          "sourceName": "value",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "DeviceGroupListPropertyCondition": {
+      "sourceType": "microsoft.windowsDefenderATP.api.DeviceGroupListPropertyCondition",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "condition",
+          "sourceName": "condition",
+          "sourceType": "microsoft.windowsDefenderATP.api.OperatorType",
+          "logicalType": "string",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "enumRef": "OperatorType",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "valuesList",
+          "sourceName": "valuesList",
+          "sourceType": "Collection(Edm.String)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "string",
+            "nullable": true,
+            "sourceType": "Edm.String"
+          }
+        }
+      ]
+    },
+    "DeviceGroupRules": {
+      "sourceType": "microsoft.windowsDefenderATP.api.DeviceGroupRules",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "devicesNamesConditions",
+          "sourceName": "devicesNamesConditions",
+          "sourceType": "Collection(microsoft.windowsDefenderATP.api.DeviceGroupPropertyCondition)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "object",
+            "nullable": true,
+            "sourceType": "microsoft.windowsDefenderATP.api.DeviceGroupPropertyCondition",
+            "ref": "DeviceGroupPropertyCondition"
+          }
+        },
+        {
+          "name": "devicesDomainsConditions",
+          "sourceName": "devicesDomainsConditions",
+          "sourceType": "Collection(microsoft.windowsDefenderATP.api.DeviceGroupPropertyCondition)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "object",
+            "nullable": true,
+            "sourceType": "microsoft.windowsDefenderATP.api.DeviceGroupPropertyCondition",
+            "ref": "DeviceGroupPropertyCondition"
+          }
+        },
+        {
+          "name": "devicesTagsConditions",
+          "sourceName": "devicesTagsConditions",
+          "sourceType": "Collection(microsoft.windowsDefenderATP.api.DeviceGroupPropertyCondition)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "object",
+            "nullable": true,
+            "sourceType": "microsoft.windowsDefenderATP.api.DeviceGroupPropertyCondition",
+            "ref": "DeviceGroupPropertyCondition"
+          }
+        },
+        {
+          "name": "devicesOsConditions",
+          "sourceName": "devicesOsConditions",
+          "sourceType": "Collection(microsoft.windowsDefenderATP.api.DeviceGroupListPropertyCondition)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "object",
+            "nullable": true,
+            "sourceType": "microsoft.windowsDefenderATP.api.DeviceGroupListPropertyCondition",
+            "ref": "DeviceGroupListPropertyCondition"
+          }
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": true,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "priority",
+      "sourceName": "priority",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "deviceGroupName",
+      "sourceName": "deviceGroupName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "isUnassignedDeviceGroup",
+      "sourceName": "isUnassignedDeviceGroup",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "automationLevel",
+      "sourceName": "automationLevel",
+      "sourceType": "microsoft.windowsDefenderATP.api.AutomationLevelEnum",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "AutomationLevelEnum",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "description",
+      "sourceName": "description",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "deviceCount",
+      "sourceName": "deviceCount",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "lastUpdateTime",
+      "sourceName": "lastUpdateTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "aadUsersGroups",
+      "sourceName": "aadUsersGroups",
+      "sourceType": "Collection(microsoft.windowsDefenderATP.api.AadUsersGroup)",
+      "logicalType": "array",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "items": {
+        "logicalType": "object",
+        "nullable": true,
+        "sourceType": "microsoft.windowsDefenderATP.api.AadUsersGroup",
+        "ref": "AadUsersGroup"
+      }
+    },
+    {
+      "name": "deviceGroupRules",
+      "sourceName": "deviceGroupRules",
+      "sourceType": "microsoft.windowsDefenderATP.api.DeviceGroupRules",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "DeviceGroupRules"
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:95132fd6a9a940e85722f10845a9280680ce3bdbcaeec5c1f8c29f1a9bed53fd",
+    "arrow": "sha256:7b225fb603b4ef897c275fb9d716b7a33004b685b72bd40cb36d29445e5f1cc7"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.076048Z",
+    "doNotEdit": true
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.firmware.source",
+  "version": "1.0.0",
+  "title": "Firmware",
+  "description": "Canonical MDE source contract for the Firmware response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "Firmware",
+    "entitySet": "Firmware",
+    "boundFunction": "Firmware",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.Firmware)",
+    "keys": [
+      "name"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Firmware",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Firmware)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "Firmware",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.Firmware)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "name",
+      "sourceName": "name",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "type",
+      "sourceName": "type",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "vendor",
+      "sourceName": "vendor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "family",
+      "sourceName": "family",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "version",
+      "sourceName": "version",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "additionalFields",
+      "sourceName": "additionalFields",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:702e816d397a0027311d246cf8d3f8c337c07c2532762647a86098f74fc1753f",
+    "arrow": "sha256:28cec125cd77568e292845a26fbdb17c8bc2db8ca9c25a2d19532b3e3636992b"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.077382Z",
+    "doNotEdit": true
+  }
+}

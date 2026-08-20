@@ -1,0 +1,175 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.asset-browser-extension.source",
+  "version": "1.0.0",
+  "title": "AssetBrowserExtension",
+  "description": "Canonical MDE source contract for the AssetBrowserExtension response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "ComplexType",
+    "entityType": "AssetBrowserExtension",
+    "boundFunction": "BrowserExtensionsInventoryByMachine",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.AssetBrowserExtension)",
+    "keys": [],
+    "excludedNavigationProperties": [
+      "permissions"
+    ],
+    "operations": [
+      {
+        "kind": "Function",
+        "name": "BrowserExtensionsInventoryByMachine",
+        "bindingType": "Collection(microsoft.windowsDefenderATP.api.Machine)",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.AssetBrowserExtension)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "deviceId",
+      "sourceName": "deviceId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "rbacGroupId",
+      "sourceName": "rbacGroupId",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "rbacGroupName",
+      "sourceName": "rbacGroupName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "installationTime",
+      "sourceName": "installationTime",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "browserName",
+      "sourceName": "browserName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "extensionId",
+      "sourceName": "extensionId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "extensionName",
+      "sourceName": "extensionName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "extensionDescription",
+      "sourceName": "extensionDescription",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "extensionVersion",
+      "sourceName": "extensionVersion",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "extensionRisk",
+      "sourceName": "extensionRisk",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "extensionVendor",
+      "sourceName": "extensionVendor",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "isActivated",
+      "sourceName": "isActivated",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:7dced568df0c4f255a2e0322b34b58127dacec2e221d5997b29007f4a306aecb",
+    "arrow": "sha256:2cf5350c4256aa2836482e94aecfc3118c1386001c1bcc1091701691c2cefe59"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.069340Z",
+    "doNotEdit": true
+  }
+}

@@ -1,0 +1,680 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.device-authenticated-scan-definition.source",
+  "version": "1.0.0",
+  "title": "DeviceAuthenticatedScanDefinition",
+  "description": "Canonical MDE source contract for the DeviceAuthenticatedScanDefinition response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "DeviceAuthenticatedScanDefinition",
+    "entitySet": "DeviceAuthenticatedScanDefinitions",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "DeviceAuthenticatedScanDefinitions",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.DeviceAuthenticatedScanDefinition)",
+        "collection": true
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {
+    "AuthScanType": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Network",
+        "Windows",
+        "Linux",
+        "AdvancedActive"
+      ],
+      "isFlags": false
+    },
+    "ScanStatus": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Success",
+        "Fail"
+      ],
+      "isFlags": false
+    },
+    "TargetType": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "Ip",
+        "Hostname",
+        "Combined"
+      ],
+      "isFlags": false
+    },
+    "WindowsAuthType": {
+      "underlyingType": "Edm.Int32",
+      "members": [
+        "None",
+        "Ntlm",
+        "Kerberos",
+        "Negotiate"
+      ],
+      "isFlags": false
+    }
+  },
+  "definitions": {
+    "AuthParamsBase": {
+      "sourceType": "microsoft.windowsDefenderATP.api.AuthParamsBase",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "keyVaultUri",
+          "sourceName": "keyVaultUri",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "keyVaultSecretName",
+          "sourceName": "keyVaultSecretName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "type",
+          "sourceName": "type",
+          "sourceType": "microsoft.windowsDefenderATP.api.WindowsAuthType",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants.",
+          "enumRef": "WindowsAuthType",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "username",
+          "sourceName": "username",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "password",
+          "sourceName": "password",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "domain",
+          "sourceName": "domain",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "isgmsaUser",
+          "sourceName": "isgmsaUser",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "packetPrivacy",
+          "sourceName": "packetPrivacy",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "packetIntegrity",
+          "sourceName": "packetIntegrity",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "privateKey",
+          "sourceName": "privateKey",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "communityString",
+          "sourceName": "communityString",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "authProtocol",
+          "sourceName": "authProtocol",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "authPassword",
+          "sourceName": "authPassword",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "privProtocol",
+          "sourceName": "privProtocol",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        },
+        {
+          "name": "privPassword",
+          "sourceName": "privPassword",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "notes": "Nullable union projection of an abstract EDMX complex type and its concrete descendants."
+        }
+      ]
+    },
+    "AgentContract": {
+      "sourceType": "microsoft.windowsDefenderATP.api.AgentContract",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "id",
+          "sourceName": "id",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "machineId",
+          "sourceName": "machineId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "machineName",
+          "sourceName": "machineName",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "lastSeen",
+          "sourceName": "lastSeen",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "assignedApplicationId",
+          "sourceName": "assignedApplicationId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "scannerSoftwareVersion",
+          "sourceName": "scannerSoftwareVersion",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "lastCommandExecutionTimestamp",
+          "sourceName": "lastCommandExecutionTimestamp",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        },
+        {
+          "name": "mdeClientVersion",
+          "sourceName": "mdeClientVersion",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        }
+      ]
+    },
+    "ScanState": {
+      "sourceType": "microsoft.windowsDefenderATP.api.ScanState",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "status",
+          "sourceName": "status",
+          "sourceType": "microsoft.windowsDefenderATP.api.ScanStatus",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "enumRef": "ScanStatus",
+          "enumRepresentation": "name"
+        },
+        {
+          "name": "failureReason",
+          "sourceName": "failureReason",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "executionDateTime",
+          "sourceName": "executionDateTime",
+          "sourceType": "Edm.DateTimeOffset",
+          "logicalType": "datetime",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "format": {
+            "unit": "microsecond",
+            "timezone": "UTC"
+          }
+        }
+      ]
+    },
+    "AdvancedActiveConfiguration": {
+      "sourceType": "microsoft.windowsDefenderATP.api.AdvancedActiveConfiguration",
+      "logicalType": "object",
+      "fields": [
+        {
+          "name": "addresses",
+          "sourceName": "addresses",
+          "sourceType": "Collection(Edm.String)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "string",
+            "nullable": true,
+            "sourceType": "Edm.String"
+          }
+        },
+        {
+          "name": "siteId",
+          "sourceName": "siteId",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "scanIdentifier",
+          "sourceName": "scanIdentifier",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "maxConcurrentScans",
+          "sourceName": "maxConcurrentScans",
+          "sourceType": "Edm.Int32",
+          "logicalType": "integer",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "bitWidth": 32,
+            "signed": true
+          }
+        },
+        {
+          "name": "portCheckTimeout",
+          "sourceName": "portCheckTimeout",
+          "sourceType": "Edm.Single",
+          "logicalType": "number",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "precision": "single"
+          }
+        },
+        {
+          "name": "singleScanTimeout",
+          "sourceName": "singleScanTimeout",
+          "sourceType": "Edm.Int32",
+          "logicalType": "integer",
+          "required": true,
+          "nullable": false,
+          "key": false,
+          "constraints": {
+            "bitWidth": 32,
+            "signed": true
+          }
+        },
+        {
+          "name": "disabledScanners",
+          "sourceName": "disabledScanners",
+          "sourceType": "Collection(Edm.String)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "string",
+            "nullable": true,
+            "sourceType": "Edm.String"
+          }
+        },
+        {
+          "name": "enabledEndpoints",
+          "sourceName": "enabledEndpoints",
+          "sourceType": "Collection(Edm.String)",
+          "logicalType": "array",
+          "required": false,
+          "nullable": true,
+          "key": false,
+          "items": {
+            "logicalType": "string",
+            "nullable": true,
+            "sourceType": "Edm.String"
+          }
+        },
+        {
+          "name": "exportHMI",
+          "sourceName": "exportHMI",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": true,
+          "nullable": false,
+          "key": false
+        },
+        {
+          "name": "externalAddress",
+          "sourceName": "externalAddress",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": true,
+          "nullable": false,
+          "key": false
+        },
+        {
+          "name": "enableTCPPortScan",
+          "sourceName": "enableTCPPortScan",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": true,
+          "nullable": false,
+          "key": false
+        },
+        {
+          "name": "exportSuccessfullOnlyAddresses",
+          "sourceName": "exportSuccessfullOnlyAddresses",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": true,
+          "nullable": false,
+          "key": false
+        },
+        {
+          "name": "zone",
+          "sourceName": "zone",
+          "sourceType": "Edm.String",
+          "logicalType": "string",
+          "required": false,
+          "nullable": true,
+          "key": false
+        },
+        {
+          "name": "force",
+          "sourceName": "force",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": true,
+          "nullable": false,
+          "key": false
+        },
+        {
+          "name": "safe",
+          "sourceName": "safe",
+          "sourceType": "Edm.Boolean",
+          "logicalType": "boolean",
+          "required": true,
+          "nullable": false,
+          "key": false
+        }
+      ]
+    }
+  },
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "scanType",
+      "sourceName": "scanType",
+      "sourceType": "microsoft.windowsDefenderATP.api.AuthScanType",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": false,
+      "enumRef": "AuthScanType",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "scanName",
+      "sourceName": "scanName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "isActive",
+      "sourceName": "isActive",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "scanAuthenticationParams",
+      "sourceName": "scanAuthenticationParams",
+      "sourceType": "microsoft.windowsDefenderATP.api.AuthParamsBase",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "AuthParamsBase"
+    },
+    {
+      "name": "target",
+      "sourceName": "target",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "scannerAgent",
+      "sourceName": "scannerAgent",
+      "sourceType": "microsoft.windowsDefenderATP.api.AgentContract",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "AgentContract"
+    },
+    {
+      "name": "orgId",
+      "sourceName": "orgId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "latestScan",
+      "sourceName": "latestScan",
+      "sourceType": "microsoft.windowsDefenderATP.api.ScanState",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "ScanState"
+    },
+    {
+      "name": "intervalInHours",
+      "sourceName": "intervalInHours",
+      "sourceType": "Edm.Int32",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 32,
+        "signed": true
+      }
+    },
+    {
+      "name": "createdBy",
+      "sourceName": "createdBy",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "targetType",
+      "sourceName": "targetType",
+      "sourceType": "microsoft.windowsDefenderATP.api.TargetType",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "enumRef": "TargetType",
+      "enumRepresentation": "name"
+    },
+    {
+      "name": "isTroubleshootMode",
+      "sourceName": "isTroubleshootMode",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": true,
+      "nullable": false,
+      "key": false
+    },
+    {
+      "name": "advancedActiveConfiguration",
+      "sourceName": "advancedActiveConfiguration",
+      "sourceType": "microsoft.windowsDefenderATP.api.AdvancedActiveConfiguration",
+      "logicalType": "object",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "ref": "AdvancedActiveConfiguration"
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:5720b9a6c477f161fced9cb8359bc832502cf4d99e4b58475694122cd71965a1",
+    "arrow": "sha256:dbea70797463c22cc02e44692864ba4661b2c3b8531cb2088d362f41294acda1"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.074923Z",
+    "doNotEdit": true
+  }
+}

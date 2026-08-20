@@ -1,0 +1,198 @@
+{
+  "contractFormatVersion": "1.0.0",
+  "name": "mde.user.source",
+  "version": "1.0.0",
+  "title": "User",
+  "description": "Canonical MDE source contract for the User response shape.",
+  "stage": "source",
+  "owner": "mde-client",
+  "source": {
+    "system": "microsoft-defender-for-endpoint",
+    "metadataFormat": "odata-edmx",
+    "metadataNamespace": "microsoft.windowsDefenderATP.api",
+    "structuralType": "EntityType",
+    "entityType": "User",
+    "entitySet": "Users",
+    "boundFunction": "LogOnUsers",
+    "returnType": "Collection(microsoft.windowsDefenderATP.api.User)",
+    "keys": [
+      "id"
+    ],
+    "excludedNavigationProperties": [
+      "mostPrevalentMachine",
+      "leastPrevalentMachine",
+      "machines",
+      "alerts"
+    ],
+    "operations": [
+      {
+        "kind": "EntitySet",
+        "name": "Users",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.User)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "LogOnUsers",
+        "bindingType": "microsoft.windowsDefenderATP.api.Machine",
+        "returnType": "Collection(microsoft.windowsDefenderATP.api.User)",
+        "collection": true
+      },
+      {
+        "kind": "Function",
+        "name": "User",
+        "bindingType": "microsoft.windowsDefenderATP.api.Alert",
+        "returnType": "microsoft.windowsDefenderATP.api.User",
+        "collection": false
+      }
+    ]
+  },
+  "conventions": {
+    "requiredRule": "Nullable=\"false\" maps to required=true and nullable=false. An omitted Nullable attribute uses the OData default true and maps to required=false and nullable=true. Checked-in overrides may document verified runtime exceptions.",
+    "requiredDerivedFrom": "odata-nullable",
+    "enumRule": "Enums use logicalType=string for Arrow and API forward compatibility; enumRef preserves the current member catalogue and closed enums are opt-in.",
+    "guidRule": "Edm.Guid is represented as string with semantic uuid.",
+    "datetimeRule": "Edm.DateTimeOffset is represented as datetime with microsecond precision and UTC timezone.",
+    "unspecifiedNullableDefault": true,
+    "note": "Runtime corrections and polymorphic union behavior are declared in checked-in overrides."
+  },
+  "enums": {},
+  "definitions": {},
+  "fields": [
+    {
+      "name": "id",
+      "sourceName": "id",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": true,
+      "nullable": false,
+      "key": true
+    },
+    {
+      "name": "accountName",
+      "sourceName": "accountName",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "accountDomain",
+      "sourceName": "accountDomain",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "accountSid",
+      "sourceName": "accountSid",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "firstSeen",
+      "sourceName": "firstSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "lastSeen",
+      "sourceName": "lastSeen",
+      "sourceType": "Edm.DateTimeOffset",
+      "logicalType": "datetime",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "format": {
+        "unit": "microsecond",
+        "timezone": "UTC"
+      }
+    },
+    {
+      "name": "mostPrevalentMachineId",
+      "sourceName": "mostPrevalentMachineId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "leastPrevalentMachineId",
+      "sourceName": "leastPrevalentMachineId",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "logonTypes",
+      "sourceName": "logonTypes",
+      "sourceType": "Edm.String",
+      "logicalType": "string",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "logOnMachinesCount",
+      "sourceName": "logOnMachinesCount",
+      "sourceType": "Edm.Int64",
+      "logicalType": "integer",
+      "required": false,
+      "nullable": true,
+      "key": false,
+      "constraints": {
+        "bitWidth": 64,
+        "signed": true
+      },
+      "wireHints": {
+        "jsSafeInteger": false,
+        "recommendedApiRepresentation": "string"
+      }
+    },
+    {
+      "name": "isDomainAdmin",
+      "sourceName": "isDomainAdmin",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": false,
+      "nullable": true,
+      "key": false
+    },
+    {
+      "name": "isOnlyNetworkUser",
+      "sourceName": "isOnlyNetworkUser",
+      "sourceType": "Edm.Boolean",
+      "logicalType": "boolean",
+      "required": false,
+      "nullable": true,
+      "key": false
+    }
+  ],
+  "hashes": {
+    "definition": "sha256:2936422ef4bb377c58c7c53e8848cf7141705051c11b48e0291470929e23e77b",
+    "arrow": "sha256:193ac766c39fd3993e942f0f5cc2e41d6406cfbf96e23f2fc7dfa7e491780e15"
+  },
+  "generation": {
+    "generated": true,
+    "generator": "mde-contract-gen",
+    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "generatedAt": "2026-08-20T02:01:23.085691Z",
+    "doNotEdit": true
+  }
+}
