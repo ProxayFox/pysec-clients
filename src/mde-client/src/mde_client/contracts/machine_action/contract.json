@@ -148,7 +148,9 @@
         "PutFile",
         "GetFile",
         "RunPowerShell",
-        "RunScript"
+        "RunScript",
+        "Processes",
+        "ProcessDump"
       ],
       "isFlags": false
     },
@@ -174,7 +176,9 @@
         "IsExternalSource",
         "FileUri",
         "ScriptHash",
-        "ScriptSource"
+        "ScriptSource",
+        "Pid",
+        "Type"
       ],
       "isFlags": false
     },
@@ -193,7 +197,10 @@
         "EndpointConfigManagement",
         "IncidentTasks",
         "MDI",
-        "ActiveScan"
+        "ActiveScan",
+        "Disruption",
+        "DFS",
+        "M365DReportingServices"
       ],
       "isFlags": false
     },
@@ -686,13 +693,13 @@
     }
   ],
   "hashes": {
-    "definition": "sha256:1197d8b293bc7ab2b190a6654d3c91f9764552b38229c26007b3cd137da81359",
+    "definition": "sha256:1f362a67fd4b7e4dcf7bdd7530b1194e78e4eca62d11d42f533279d3509de2c0",
     "arrow": "sha256:211fbafa9664463e9d9375e392872058106e43bafc8d380b557c2f2b2b187af0"
   },
   "generation": {
     "generated": true,
     "generator": "mde-contract-gen",
-    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "sourceMetadataHash": "sha256:41d1e2c159eb2363642f43bdeb17ba216e397148aa9fd4f77783be1f467ad70c",
     "generatedAt": "2026-08-20T02:01:23.082248Z",
     "doNotEdit": true
   }

@@ -144,7 +144,8 @@
         "MicrosoftInsiderRiskManagement",
         "Nsn",
         "DefenderForAIServices",
-        "SecurityCopilot"
+        "SecurityCopilot",
+        "SecurityForAI"
       ],
       "isFlags": true
     },
@@ -278,7 +279,9 @@
         "UnknownFutureValue",
         "MicrosoftDefenderForCloud",
         "MicrosoftSentinel",
-        "MicrosoftInsiderRiskManagement"
+        "MicrosoftInsiderRiskManagement",
+        "MicrosoftThreatIntelligence",
+        "MicrosoftSecurityForAI"
       ],
       "isFlags": true
     },
@@ -1519,13 +1522,13 @@
     }
   ],
   "hashes": {
-    "definition": "sha256:f8c361e156124fdd45c2e6948d22c9b9c7138d3200868a4dfd8f795376623015",
+    "definition": "sha256:a0a15adab96fdbbf669b96568ec0c2ed4621c3eb9aef68d45de8cc5153eb54c9",
     "arrow": "sha256:3c21139bba1a38d245fec3b2c027ee54bf2758c604eb4d44c3035464a7755fab"
   },
   "generation": {
     "generated": true,
     "generator": "mde-contract-gen",
-    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "sourceMetadataHash": "sha256:41d1e2c159eb2363642f43bdeb17ba216e397148aa9fd4f77783be1f467ad70c",
     "generatedAt": "2026-08-20T02:01:23.078636Z",
     "doNotEdit": true
   }

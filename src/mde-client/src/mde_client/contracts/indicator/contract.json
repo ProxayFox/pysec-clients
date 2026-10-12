@@ -51,7 +51,10 @@
         "EndpointConfigManagement",
         "IncidentTasks",
         "MDI",
-        "ActiveScan"
+        "ActiveScan",
+        "Disruption",
+        "DFS",
+        "M365DReportingServices"
       ],
       "isFlags": false
     },
@@ -476,13 +479,13 @@
     }
   ],
   "hashes": {
-    "definition": "sha256:e399be38d8c825869ea88e375edf2f47941b15e16434c6fcd7f7131e977876d2",
+    "definition": "sha256:7c8c8f304f2147127ef7f6172b31d0da46e847ed4d1457e791042726cbad973d",
     "arrow": "sha256:fac1bbf6920ebd4e8516a0812e9897a2a9597da67efbf5d82fe5af3a85603bf4"
   },
   "generation": {
     "generated": true,
     "generator": "mde-contract-gen",
-    "sourceMetadataHash": "sha256:667f1f2c9938e2eb07b9f281d9c7826d1adb6a56e4cdb940647faaad64779de7",
+    "sourceMetadataHash": "sha256:41d1e2c159eb2363642f43bdeb17ba216e397148aa9fd4f77783be1f467ad70c",
     "generatedAt": "2026-08-20T02:01:23.079945Z",
     "doNotEdit": true
   }
