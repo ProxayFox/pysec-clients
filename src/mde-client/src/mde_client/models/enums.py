@@ -40,7 +40,7 @@ AUTOMATION_LEVEL_ENUM = Literal[
     "FullRemediateThreatsAutomatically",
 ]
 CUSTOM_PLAYBOOK_ACTION_TYPES = Literal[
-    "PutFile", "GetFile", "RunPowerShell", "RunScript"
+    "PutFile", "GetFile", "RunPowerShell", "RunScript", "Processes", "ProcessDump"
 ]
 CUSTOM_PLAYBOOK_COMMAND_STATUS = Literal[
     "Executing", "Completed", "Failed", "PendingResource", "Submitted", "Created"
@@ -54,12 +54,19 @@ CUSTOM_PLAYBOOK_PARAMS = Literal[
     "FileUri",
     "ScriptHash",
     "ScriptSource",
+    "Pid",
+    "Type",
 ]
 DATA_ORIGIN_PRODUCT = Literal[
     "Unspecified", "Mdatp", "Itp", "Oatp", "Aad", "Mapg", "Dlp", "Mdi", "All"
 ]
 DEFENDER_RUNNING_MODE = Literal[
-    "Normal", "Passive", "SideBySidePassive", "NotRunning", "FailedGettingStatus"
+    "Normal",
+    "Passive",
+    "SideBySidePassive",
+    "NotRunning",
+    "Audit",
+    "FailedGettingStatus",
 ]
 DETECTION_SOURCE = Literal[
     "Unknown",
@@ -114,6 +121,7 @@ DETECTION_SOURCE = Literal[
     "Nsn",
     "DefenderForAIServices",
     "SecurityCopilot",
+    "SecurityForAI",
 ]
 DETERMINATION_TYPE = Literal["Unknown", "Malware", "Unwanted", "Clean", "Pua"]
 DEVICE_MANAGED_BY = Literal[
@@ -287,6 +295,9 @@ KNOWN_REQUEST_SOURCE = Literal[
     "IncidentTasks",
     "MDI",
     "ActiveScan",
+    "Disruption",
+    "DFS",
+    "M365DReportingServices",
 ]
 LINUX_AUTH_TYPE = Literal["Password", "PrivateKey"]
 MACHINE_CONFIGURATION_STATUS = Literal[
@@ -327,6 +338,8 @@ SERVICE_SOURCE = Literal[
     "MicrosoftDefenderForCloud",
     "MicrosoftSentinel",
     "MicrosoftInsiderRiskManagement",
+    "MicrosoftThreatIntelligence",
+    "MicrosoftSecurityForAI",
 ]
 SNMP_AUTH_TYPE = Literal["CommunityString", "NoAuthNoPriv", "AuthNoPriv", "AuthPriv"]
 TAG_ACTION = Literal["Add", "Remove"]
